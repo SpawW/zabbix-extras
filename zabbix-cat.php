@@ -24,9 +24,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ** 
 **/
-	function quotestr($p_texto) { // Função para colocar aspas com mais segurança
-		return "'".mysql_real_escape_string($p_texto)."'";
-	}
 ?>
 <?php
 	require_once('include/config.inc.php');
@@ -34,7 +31,7 @@
 	require_once('include/forms.inc.php');
 	require_once('zabbix-translate.php');
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$titulo 			= _ze('Zabbix-CAT-Title');;//'Zabbix-CAT - Capacidade e Tendência';
+	$titulo 		= _ze('Zabbix-CAT-Title');;//'Zabbix-CAT - Capacidade e Tendência';
 	$page['title'] 		= $titulo;
 	$page['file'] 		= 'zabbix-cat.php';
 	$page['hist_arg'] 	= array('hostid','groupid','graphid');
@@ -43,7 +40,7 @@
 	include_once('include/page_header.php');
 ?>
 <?php
-	function newComboFilter ($query, $value, $name) {
+/*	function newComboFilter ($query, $value, $name) {
 		$cmbRange 		= new CComboBox($name, $value, 'javascript: submit();');
 		$result			= DBselect($query);
 		$cmbRange->additem("0", "");
@@ -52,31 +49,16 @@
 		}
 		return $cmbRange;
 	}
-	function descritivo($texto){
+*/	function descritivo($texto){
 		$texto = str_replace("\n",";\n",$texto);
 		$arrayDesc = explode("\n",$texto);
 		return new CTag('div', 'yes', $arrayDesc, 'text');
 	}
-	function exibeConteudo ($condicao,$conteudo) {
+/*	function exibeConteudo ($condicao,$conteudo) {
 		if ($condicao) { return $conteudo;} 
 		else { return array (""); }
 	}
-	function preparaQuery ($p_query) {
-		$result	= DBselect($p_query);
-		if (!$result) { 
-			die("Invalid query."//.mysql_error()
-			); 
-			return 0;
-		} else { return $result; } 
-	}
-	function valorCampo ($p_query, $p_campo) {
-		$retorno = "";
-		$result = preparaQuery($p_query);
-		while($row = DBfetch($result)){
-			$retorno = $row[$p_campo];
-		}
-		return $retorno;
-	}
+*/
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -187,7 +169,250 @@
 	$completo = get_request('itemid',0) > 0;
 	$cmbAgregation	= new CComboBox('agregation', get_request('agregation',0), 'javascript: submit();');
 	if ($completo) {
+		$intervalDesc 		= array ('',_ze('Zabbix-CAT-Day'),_ze('Zabbix-CAT-Week'),_ze('Zabbix-CAT-Month'),_ze('Zabbix-CAT-Year'));
+		$intervalFactor 	= array (0,1,7,30,365);
+		$intervalFactor2 	= array (0,'+1 days','+1 week','+1 months','+1 years');
+		$sourceAgregator 	= array ('hu.value_max','hu.value_min','hu.value_avg');
+//		$sourceAgregator 	= array ('AVG(hu.value_max)','AVG(hu.value_min)','AVG(hu.value_avg)');
+		$intervalMask 		= array ('','%d/%m/%Y','%U','%m/%Y','%Y');
+		$intervalMask2 		= array ('','d/m/Y','W (d/m/Y)','m/Y','Y');
+		$intervalMaskSort 	= array ('','%Y%m%d','%Y%U','%Y%m','%Y');
+		for ($i = 0; $i < count($intervalDesc); $i++) {
+			$cmbTimeSource->additem($i, $intervalDesc[$i]);
+			$cmbTimeProjection->additem($i, $intervalDesc[$i]);	
+		}
+		$completo = $timeShiftSource > 0 && $timeShiftProjection > 0;
+		$cmbAgregation->additem(0, _ze('Zabbix-CAT-Max'));
+		$cmbAgregation->additem(1, _ze('Zabbix-CAT-Min'));
+		$cmbAgregation->additem(2, _ze('Zabbix-CAT-Avg'));
+	}
+
+/*----------- Filtro por período ---------------*/
+		$reporttimetab 	= new CTable(null,'calendar');
+		$clndr_icon 	= new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
+		$clndr_icon->addAction('onclick','javascript: var pos = getPosition(this); '.
+			'pos.top+=10; pos.left+=16; '.
+			"CLNDR['avail_report_since'].clndr.clndrshow(pos.top,pos.left);");
+		$reporttimetab->addRow(array(
+			_('From'),
+			array(new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
+			'/', new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
+			'/', new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
+			SPACE, new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
+			':', new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2)
+			), $clndr_icon
+		));
+		$clndr_icon->addAction('onclick','javascript: var pos = getPosition(this); '.
+			'pos.top+=10; pos.left+=16; '.
+			"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
+		$reporttimetab->addRow(array(
+			_('Till'), 
+			array(new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
+			'/', new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
+			'/', new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
+			SPACE, new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
+			':', new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2)),
+			$clndr_icon
+		));
+		zbx_add_post_js('create_calendar(null,'.
+			'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
+			'"avail_report_since",'.
+			'"report_timesince");');
+		zbx_add_post_js('create_calendar(null,'.
+			'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
+			'"avail_report_till",'.
+			'"report_timetill");'
+		);
+
+		$reporttimetab2 = new CTable(null,'calendar');
 		
+		$reporttimetab2->addRow(array(array(bold(_ze('Zabbix-CAT-Analysis')), ': '), array($cmbTimeSource,$cmbAgregation)));
+		$reporttimetab2->addRow(array(array(bold(_ze("Zabbix-CAT-Projection")), ': '), array($cmbTimeProjection,array(bold(_ze("Zabbix-CAT-Ammount")), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
+		$reporttimetab2->addRow(array(array(bold(_ze('Zabbix-CAT-Formatting')), ': '), array($cmbFormato)));
+/*----------- Implementa o Filtro por período ---------------*/
+		$filter_table->addRow(array(
+			array(bold(_('Group')), ': ', $cmbGroups),
+			array(bold(_('Host')), ': ', $cmbHosts),
+			exibeConteudo ($hostid > 0,array(bold(_('Application')), ': ', $cmbApplications)),
+			array()
+		));
+		$filter_table->addRow(array(
+			exibeConteudo ($applicationid > 0,array(bold(_('Item')), ': ', $cmbItems)),
+			exibeConteudo ($itemid > 0,$reporttimetab),
+			exibeConteudo ($itemid > 0,$reporttimetab2)			
+		));
+		
+		$filter_form = new CForm();
+		$filter_form->setMethod('get');
+		$filter_form->setAttribute('name','zbx_filter');
+		$filter_form->setAttribute('id','zbx_filter');
+
+		$reset = new CButton('reset',_('Reset'));
+		$reset->onClick("javascript: clearAllForm('zbx_filter');");
+		$grafico = new CButton('grafico',_ze('Zabbix-CAT-Chart'));
+		// Habilita o botão de geração de gráfico quando tem host e item selecionado =============================================
+		if (($hostid < 1) and ($itemid < 1)) {
+			$grafico->setAttribute('disabled', '');
+		}
+		$grafico->onClick("javascript: fnGrafico();");
+		$filter = new CButton('filter',_ze("Zabbix-CAT-UpdateFilter"));
+		$filter->onClick("javascript: submit();");
+
+		$footer_col = new CCol(array($filter, SPACE, $reset, SPACE, $grafico), 'center');
+		$footer_col->setColSpan(4);
+	
+		$filter_table->addRow($footer_col);
+
+		$filter_form->addItem($filter_table);
+		$filter_form->addVar('report_timesince', date('YmdHis', $report_timesince));
+		$filter_form->addVar('report_timetill', date('YmdHis', $report_timetill));
+		$hostprof_wdgt->addFlicker($filter_form, true);
+function campoPadrao ($p_campo,$p_mascara) {
+	
+}
+// FIM Formulario de Filtro =========================================================
+	if ($completo) {
+		$result			= DBselect("select value_type from items it where it.itemid = ".$_REQUEST['itemid']);
+		$cmbItems->additem("0", "");
+		while($row_extra = DBfetch($result)){ $tipo = $row_extra['value_type']; }
+		$tabela_log = ($tipo == 0 ? "trends" : "trends_uint");
+		$casasDecimais = ($tipo == 0 ? 4 : 0);
+// =================== Query Base (MySQL e não o lixo do postgres =====================================
+$query = "
+select ".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? " DISTINCT ON(momento) ": "" )."it.units, it.description, ano, mes, dia, momento, AVG(valor) as valor
+  from items it 
+ inner join 
+(select 
+hu.itemid,
+DATE_FORMAT(FROM_UNIXTIME(hu.clock), '%Y') as ano, DATE_FORMAT(FROM_UNIXTIME(hu.clock), '%m') as mes, DATE_FORMAT(FROM_UNIXTIME(hu.clock), '%d') as dia, 
+DATE_FORMAT(FROM_UNIXTIME(hu.clock), '".$intervalMask[$timeShiftSource]."') as momento, "
+. $sourceAgregator[get_request('agregation',0)]." as valor
+from ".$tabela_log." hu 
+where hu.clock between ".$report_timesince." and  ".$report_timetill."
+) a 
+on a.itemid = it.itemid 
+where it.itemid = ".$itemid."
+group by ".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? "units, ano, mes, dia, description, ": "" )." momento
+order by momento
+";
+	if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+		$query = str_replace('DATE_FORMAT','to_char',$query);
+		$query = str_replace('FROM_UNIXTIME','to_timestamp',$query);
+		$query = str_replace('%Y%m%d','YYYYMMDD',$query);
+		$query = str_replace('%m','MM',$query);
+		$query = str_replace('%d','DD',$query);
+		$query = str_replace('%Y','YYYY',$query);
+		$query = str_replace('%U','WW',$query);
+//		$query = str_replace('group by','group by it.units, it.description, hu.clock, ',$query);
+	}
+		$result			= DBselect($query);
+		$report			= Array();
+		$cont 			= 0;
+function week2date($year, $week, $weekday=7) {
+	global $timeShiftSource;
+	if ($timeShiftSource == 2) {
+$time = mktime(0, 0, 0, 1, (4 + ($week-1)*7), $year);
+$this_weekday = intval(date('N', $time));
+$tmp = $weekday - $this_weekday;
+return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $year));
+	} else {
+		return "";
+	}
+}
+		while($row = DBfetch($result)){
+			if ($cont == 0) {
+				$maximo = $primeiro = $ultimo = $minimo = floatval($row['valor']);
+				$unidade = $row['units'];
+			}
+			$report[$cont]['momento'] = $row['momento'] . week2date($row['ano'],$row['momento']);
+			$report[$cont]['valor'] = round(floatval($row['valor']),$casasDecimais);
+			$report[$cont]['tipo'] = _ze('Zabbix-CAT-HistoryData');
+			$dia = $row['dia'];
+			$mes = $row['mes'];
+			$ano = $row['ano'];
+			$minimo = floatval(($minimo >= $report[$cont]['valor'] ? $report[$cont]['valor'] : $minimo ));
+			$maximo = floatval(($maximo <= $report[$cont]['valor'] ? $report[$cont]['valor'] : $maximo ));
+			$cont++;
+		}
+		if ($cont > 0 ) { 
+			$ultimo = $report[($cont-1)]['valor'];
+			$tendencia = (($maximo - $minimo)/round($cont*1))*($primeiro < $ultimo ? 1 : -1) / ($intervalFactor[$timeShiftSource]);
+	
+			$dataAtual = mktime(0,0,0,$mes,$dia,$ano);
+			if ($timeShiftProjection > $timeShiftSource) {
+				$dataAtual = strtotime($intervalFactor2[$timeShiftSource], $dataAtual);
+			}
+			if ($timeShiftProjection >= $timeShiftSource || $timeShiftSource == 2 ) {
+				$dataAtual = strtotime($intervalFactor2[$timeShiftProjection], $dataAtual);
+			}
+			// Aplicando o fator de tendência tendência --------------------------
+			for ($i = 0; $i < intval(get_request('num_projection',0)); $i++) {		
+				$format = "d/m/Y";
+				$proximoDia   = date($intervalMask2[$timeShiftProjection], $dataAtual);
+				$dataAtual = strtotime($intervalFactor2[$timeShiftProjection], $dataAtual);
+				$report[$cont]['momento'] = $proximoDia;
+				$report[$cont]['valor'] = round(floatval($ultimo)+$tendencia*($intervalFactor[$timeShiftProjection]),$casasDecimais);
+				
+				$ultimo = $report[$cont]['valor'];
+				$report[$cont]['tipo'] = _ze('Zabbix-CAT-Trend');
+				$cont++;
+			}
+		}
+		$table = new CTableInfo();
+		switch ($formato) {
+			case 'csv';
+				$table->setHeader(array(_ze("Zabbix-CAT-Data")));	
+				break;
+			case 'html';
+				$table->setHeader(array(_ze('Zabbix-CAT-Instant'),_ze('Zabbix-CAT-Value'),_ze('Zabbix-CAT-Type')));	
+				break;			
+		}
+		$points = "";
+		$descUnidade="";
+		for ($i = 0; $i < $cont; $i++) {		
+			switch ($formato) {
+				case 'csv';
+					$table->addRow(array(quotestr($report[$i]['momento']).";".quotestr($report[$i]['valor']).";".quotestr($report[$i]['tipo']).";"));
+					break;
+				case 'html';
+					$momento = new CCol($report[$i]['momento'],1);
+					$valor = convert_units($report[$i]['valor'],$unidade);
+					$valor = new CCol($valor,1);
+					$tipo = new CCol($report[$i]['tipo'],1);
+					$table->addRow(array($momento,$valor,$tipo));
+					break;			
+			}
+			// Tratando o valor para o gráfico caso seja formatação de Byte
+			if ($unidade == 'B') {
+				$maximo = $maximo-1;
+				if ($maximo < 1024) {
+					$fator = 1;
+					$descUnidade = 'B';
+				} else if ($maximo < 1048576) {
+					$fator = 1024;
+					$descUnidade = 'KB';
+				} else if ($maximo < 1073741824) {
+					$fator = 1048576;
+					$descUnidade = 'MB';
+				} else if ($maximo < 1099511627776) {
+					$fator = 1073741824;
+					$descUnidade = 'GB';
+				} else {
+					$fator = 1099511627776;
+					$descUnidade = 'TB';
+				}
+				$descUnidade = " em " . $descUnidade;
+			} else { $fator = 1; $descUnidade = ""; }
+			$valor = round($report[$i]['valor'] / $fator,2);
+			$points .= "'".$report[$i]['momento']."',".$valor."[;]";
+		}
+		$tituloGrafico .= $descUnidade;
+		$script = "function fnGrafico () { ".
+		"window.open(\"zabbix-cat-chart-builder.php?p_title=".
+		$tituloGrafico."&p_points=".$points."'\",\"graficoZabbixCat\",\"width=720,height=350,top=130,left=150,scrollbars=yes,resizable=no\");"
+		.'};';
+		insert_js ($script);
+//		var_dump($urlGrafico);
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 		$hostprof_wdgt->addHeader($numrows);
