@@ -62,9 +62,9 @@ else {
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-	if (PAGE_TYPE_HTML == $page['type']) {
-		define('ZBX_PAGE_DO_REFRESH', ( $mode == "report" ? 0 : 1 ));
-	}
+/*	if (PAGE_TYPE_HTML == $page['type']) {
+		define('ZBX_PAGE_DO_REFRESH', 0);
+	}*/
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
