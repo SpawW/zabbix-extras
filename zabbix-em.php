@@ -623,6 +623,9 @@ if ($mode == "report") { // Custom event report for show only events related
     $count=1;
     $tmp = $options;
     $tmp['triggerids'] = $reference;
+    $tmp['time_till'] = $stime + ($range);;
+    $tmp['sortfield'] = 'eventid';
+    $tmp['sortorder'] = "DESC";
     $events = API::Event()->get($tmp);
     $listaTriggers = " ";
     $possui = false;
@@ -640,8 +643,8 @@ if ($mode == "report") { // Custom event report for show only events related
         $tmp2 = $options;
         $from = $event['clock'] - ($range);
         $till = $event['clock'] + ($range);
-        $options['time_from'] = $from;
-        $options['time_till'] = $till;
+        $tmp2['time_from'] = $from;
+        $tmp2['time_till'] = $till;
         $events2 = API::Event()->get($tmp2);
         $eventTitles[$count] = zbx_date2str(_('d M H:i'), $event['clock']);
         foreach ($events2 as $enum => $event2) { // Varrer outros eventos relacionados dentro do range
@@ -695,6 +698,14 @@ if ($mode == "report") { // Custom event report for show only events related
         // Somar quantas vezes o evento correlato ocorreu
         $count++;
     }
+    // Verificação de segurança pois podem existir menos de 10 eventos para a trigger de origem.
+    $tmp = count($eventTitles);
+    if ($tmp < 10) {
+        for ($i = $tmp; $i < 10; $i++) {
+           $eventTitles[$i+1] = _('Not Found');
+            //echo "$i<br>";
+        }
+    }
     function imagem ($tipo, $hint, $qtd) {
         if ($qtd > 0) {
             if ($tipo === "down") {
@@ -738,7 +749,7 @@ if ($mode == "report") { // Custom event report for show only events related
     // Atribuir ao table o report ----------------------------------------------
     if ($possui === false) { // Avisa que não foram encontrados eventos no período
         $tmp = new CCol(array(_ze2("Sem eventos para correlacionar com os parâmetros informados")), 'center');
-        $tmp->setColSpan(12);
+        $tmp->setColSpan(13);
         $table->addRow($tmp);
     } else {
         // Ordenando o array

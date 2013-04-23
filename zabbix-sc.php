@@ -22,9 +22,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ** 
 **/
-	function quotestr($p_texto) { // Função para colocar aspas com mais segurança
-		return "'".mysql_real_escape_string($p_texto)."'";
-	}
 ?>
 <?php
 	require_once('include/config.inc.php');
@@ -40,7 +37,7 @@
 	include_once('include/page_header.php');
 ?>
 <?php
-	function newComboFilter ($query, $value, $name) {
+/*	function newComboFilter ($query, $value, $name) {
 		$cmbRange 		= new CComboBox($name, $value, 'javascript: submit();');
 		$result			= DBselect($query);
 		$cmbRange->additem("0", "");
@@ -48,13 +45,13 @@
 			$cmbRange->additem($row_extra['id'], $row_extra['description']);
 		}
 		return $cmbRange;
-	}
+	}*/
 	function descritivo($texto){
 		$texto = str_replace("\n",";\n",$texto);
 		$arrayDesc = explode("\n",$texto);
 		return new CTag('div', 'yes', $arrayDesc, 'text');
 	}
-	function exibeConteudo ($condicao,$conteudo) {
+/*	function exibeConteudo ($condicao,$conteudo) {
 		if ($condicao) { return $conteudo;} 
 		else { return array (""); }
 	}
@@ -73,7 +70,7 @@
 			$retorno = $row[$p_campo];
 		}
 		return $retorno;
-	}
+	} */
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -155,7 +152,7 @@
 
 	$reset = new CButton('reset',_('Reset'));
 	$reset->onClick("javascript: clearAllForm('zbx_filter');");
-	$filter = new CButton('filter','Zabbix-Extras-AtualizarFiltro');
+	$filter = new CButton('filter',_ze2('Update Filter'));
 	$filter->onClick("javascript: submit();");
 
 	$footer_col = new CCol(array($filter, SPACE, $reset), 'center');
@@ -210,8 +207,11 @@ INNER JOIN hosts_groups hgr
 				$table->setHeader(array("Dados"));	
 				break;
 			case 'html';
-				$table->setHeader(array("Host","Item","Key",_("Delay"),"History","Trends","Status","History Costs"
-				,"Trends Costs","Storage Costs"));	
+				$table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
+                                    ,_("History"),_("Trends"),_("Status")
+                                    ,_ze2("History Costs"),_ze2("Trends Costs")
+                                    ,_ze2("Storage Costs")
+                                ));	
 				break;			
 		}
 		$linha = array();
@@ -247,7 +247,7 @@ INNER JOIN hosts_groups hgr
 	
 		$hostprof_wdgt->addItem($table);
 	} else {
-		$hostprof_wdgt->addItem(_('Zabbix-SC-WelcomeMessage'));
+		$hostprof_wdgt->addItem(_ze2('Enter the parameters for research!'));
 	}
 	$hostprof_wdgt->show();
 ?>

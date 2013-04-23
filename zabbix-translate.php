@@ -1,11 +1,11 @@
 ﻿<?php
+  global $VG_DEBUG;
+  $VG_DEBUG = (isset($_REQUEST['p_debug']) && $_REQUEST['p_debug'] == 'S' ? TRUE : FALSE );
   global $zeMessages, $zeLocale, $baseName;
   $zeMessages = Array (
 	"en_GB" => Array (
-//Zabbix-Extras
-     "Zabbix-Extras-AtualizarFiltro" => "Update Filter"		
 //Zabbix-CAT	
-	,"Zabbix-CAT-Title" => "Zabbix-CAT - Capacity and Trend"
+	"Zabbix-CAT-Title" => "Zabbix-CAT - Capacity and Trend"
 	,"Zabbix-CAT-UpdateFilter" => 'Update filter'
 	,"Zabbix-CAT-Analysis"=>"Analysis"
 	,"Zabbix-CAT-Projection"=>'Projection'
@@ -35,8 +35,22 @@
 	, "Zabbix-ALE-Extended" => " extended"
 	)
 	, "pt_BR" => Array (
+// Novo formato - Texto direto
+     "Update Filter" => "Atualizar filtro",
+     "Event Management" => "Correlacionamento de eventos",
+     "Correlate" => "Correlacionar",
+     "Amount" => "Ocorrências",
+     "Enter the parameters for research!" => "Informe os parâmetros para a pesquisa!",
+     "History Costs" => "Custo - Histórico",
+     "Trends Costs" => "Custo - Estatísticas",
+     "Storage Costs" => "Custo - Armazenamento",
+     "Related incidents" => "Incidentes relacionados",
+     "Possible cause." => "Possível causa.",
+     "Possible consequence." => "Possível consequência.",
+     "Number of Incidents" => "Quantidade de incidentes",
+     "Report generated on" => "Relatório gerado em",
 //Zabbix-Extras
-     "Zabbix-Extras-AtualizarFiltro" => "Atualizar filtro"		
+     "Update Filter" => "Atualizar filtro"		
 //Zabbix-CAT	
 	,"Zabbix-CAT-Title" => "Zabbix-CAT - Capacidade e Tendência"
 	,"Zabbix-CAT-UpdateFilter" => 'Atualizar Filtro'
@@ -63,7 +77,6 @@
 	, "Zabbix-NS-TitleBig" =>"Relatório de itens não suportados"
 //Zabbix-SC
 	, "Zabbix-SC-Title" => "Zabbix-SC - Custos de Armazenamento"
-	, "Zabbix-SC-WelcomeMessage" => "Informe os parâmetros para a pesquisa!"
 //Zabbix-ALE
 	, "Zabbix-ALE-Extended" => " extendido"
 //Zabbix-IS 
@@ -102,5 +115,72 @@
                     $cmbRange->additem($row_extra['id'], $row_extra['description']);
             }
             return $cmbRange;
+    }
+    function valorCampo ($p_query, $p_campo) {
+        $retorno = "";
+        $result = preparaQuery($p_query);
+        while($row = DBfetch($result)){
+            $retorno = $row[$p_campo];
+        }
+        return $retorno;
+    }
+    function preparaQuery ($p_query) {
+        $result	= DBselect($p_query);
+        if (!$result) { 
+            die("Invalid query."//.mysql_error()
+            ); 
+            return 0;
+        } else { return $result; } 
+    }
+    function getBetweenStrings($start, $end, $str){
+        $matches = array();
+        $regex = "/$start([a-zA-Z0-9_]*)$end/";
+        preg_match_all($regex, $str, $matches);
+        return $matches[1];
+    }
+    function debugInfo ($p_mensagem, $p_debug = false, $p_cor = "gray") {
+        global $VG_DEBUG;
+        if ($p_debug == true || $VG_DEBUG == true) {
+                echo '<div style="background-color:'.$p_cor.';">'.$p_mensagem."</div>";
+        }
+    }
+    function array_sort($array, $on, $order=SORT_ASC) {
+        $new_array = array();
+        $sortable_array = array();
+
+        if (count($array) > 0) {
+            foreach ($array as $k => $v) {
+                if (is_array($v)) {
+                    foreach ($v as $k2 => $v2) {
+                        if ($k2 == $on) {
+                            $sortable_array[$k] = $v2;
+                        }
+                    }
+                } else {
+                    $sortable_array[$k] = $v;
+                }
+            }
+
+            switch ($order) {
+                case SORT_ASC:
+                    asort($sortable_array);
+                break;
+                case SORT_DESC:
+                    arsort($sortable_array);
+                break;
+            }
+
+            foreach ($sortable_array as $k => $v) {
+                $new_array[$k] = $array[$k];
+            }
+        }
+
+        return $new_array;
+    }
+    function quotestr($p_texto) { // Função para colocar aspas com mais segurança
+            return "'".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? 
+              pg_escape_string($p_texto) :
+              mysql_real_escape_string($p_texto))."'";
+            //pg_escape_string
     }
 ?>

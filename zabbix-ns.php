@@ -56,36 +56,9 @@ include_once 'include/page_header.php';
 
 		'report_timesince'=>	array(T_ZBX_STR, O_OPT,  null,	null,		'isset({filter})'),
 		'report_timetill'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({filter})')
-/* actions */
-		,'filter'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
-/*		'groupid'		=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
-		'hostid'		=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
-		'filter_groupid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
-		'filter_hostid'	=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
-		'tpl_triggerid'	=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
-		'triggerid'		=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,		NULL),
-// filter
-        'select'		=>  array(T_ZBX_STR, O_OPT, NULL,   NULL,           NULL),
-        'filter_rst'	=>  array(T_ZBX_INT, O_OPT, P_SYS,  IN(array(0,1)), NULL),
-        'filter_set'	=> 	array(T_ZBX_STR, O_OPT, P_SYS,  null,   NULL),
-
-// filter
-		'filter_rst'	=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-		'filter_set'	=>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
-		'filter_timesince'=>array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-		'filter_timetill'=>	array(T_ZBX_INT, O_OPT,	P_UNSET_EMPTY,	null,	NULL),
-
-//ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favid'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
-*/	);
+	);
 
 	check_fields($fields);
-
-/* AJAX */
-//--------
-/* FILTER */
 
 // --------------------------- Filtro ---------------------------------------------------------------------
 	$options = array(
