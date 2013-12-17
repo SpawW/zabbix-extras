@@ -33,7 +33,7 @@
 	require_once('zabbix-translate.php');
 	$baseName = 'Zabbix-IS-';
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$titulo 			= _ze2('Zabbix-IS - Ranking of Items');;//'Zabbix-IS - Capacidade e Tendência';
+	$titulo 			= _zeT('Ranking of Items');;//'Zabbix-IS - Capacidade e Tendência';
 	$page['title'] 		= $titulo;
 	$page['file'] 		= 'zabbix-is.php';
 	$page['hist_arg'] 	= array('hostid','groupid','graphid');
@@ -251,13 +251,13 @@
 
 		$reset = new CButton('reset',_('Reset'));
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
-		$grafico = new CButton('grafico',_ze2('Zabbix-IS-Chart'));
+		$grafico = new CButton('grafico',_zeT('Chart'));
 		// Habilita o botão de geração de gráfico quando tem host e item selecionado =============================================
 		if (($hostid < 1) and ($itemid < 1)) {
 			$grafico->setAttribute('disabled', '');
 		}
 		$grafico->onClick("javascript: fnGrafico();");
-		$filter = new CButton('filter',_ze2("Zabbix-IS-UpdateFilter"));
+		$filter = new CButton('filter',_zeT("Update Filter"));
 		$filter->onClick("javascript: submit();");
 
 		$footer_col = new CCol(array($filter, SPACE, $reset, SPACE, $grafico), 'center');
@@ -323,7 +323,7 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 			}
 			$report[$cont]['momento'] = $row['momento'] . week2date($row['ano'],$row['momento']);
 			$report[$cont]['valor'] = round(floatval($row['valor']),$casasDecimais);
-			$report[$cont]['tipo'] = _ze2('Zabbix-IS-HistoryData');
+			$report[$cont]['tipo'] = _zeT('History Data');
 			$dia = $row['dia'];
 			$mes = $row['mes'];
 			$ano = $row['ano'];
@@ -351,17 +351,17 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 				$report[$cont]['valor'] = round(floatval($ultimo)+$tendencia*($intervalFactor[$timeShiftProjection]),$casasDecimais);
 				
 				$ultimo = $report[$cont]['valor'];
-				$report[$cont]['tipo'] = _ze2('Zabbix-IS-Trend');
+				$report[$cont]['tipo'] = _zeT('Trend');
 				$cont++;
 			}
 		}
 		$table = new CTableInfo();
 		switch ($reportType) {
 			case 'csv';
-				$table->setHeader(array(_ze2("Zabbix-IS-Data")));	
+				$table->setHeader(array(_zeT("Data")));	
 				break;
 			case 'html';
-				$table->setHeader(array(_ze2('Zabbix-IS-Instant'),_ze2('Zabbix-IS-Value'),_ze2('Zabbix-IS-Type')));	
+				$table->setHeader(array(_zeT('Instant'),_zeT('Value'),_zeT('Type')));	
 				break;			
 		}
 		$points = "";

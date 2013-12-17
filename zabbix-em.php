@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/include/actions.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
-require_once('zabbix-translate.php');
+require_once dirname(__FILE__).'/zabbix-translate.php';
 // ****************** Inicialização de variaveis *******************************
 
 $check_range = $_REQUEST['p_check_range']	= get_request('p_check_range', 30);
@@ -54,8 +54,8 @@ if (isset($_REQUEST['csv_export'])) {
 }
 else {
 	$CSV_EXPORT = false;
-
-	$page['title'] = _ze2('Event Management');
+        
+	$page['title'] = _zeT('Event Management');
 	$page['file'] = 'zabbix-em.php';
 	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.calendar.js', 'gtlc.js');
@@ -70,7 +70,7 @@ else {
 require_once dirname(__FILE__).'/include/page_header.php';
 
 
-$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
+$allow_discovery = check_right_on_discovery();
 
 $allowed_sources[] = EVENT_SOURCE_TRIGGERS;
 if ($allow_discovery) {
@@ -297,7 +297,7 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 
 if ($mode !== "report") {
     $events_wdgt->addPageHeader(
-            _ze2('Report generated on').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
+            _zeT('Report generated on').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
             array(
                     $frmForm,
                     SPACE,
@@ -318,12 +318,8 @@ if ($source == EVENT_SOURCE_TRIGGERS & $mode == "report") {
     $r_form->addVar('p_triggerid', $triggerid);
     $r_form->addVar('p_check_range', $check_range);
     $r_form->addVar('p_stime', $stime);
-/*    $r_form->addItem(array(
-            _('Group').SPACE,
-            $pageFilter->getGroupsCB(true)
-    ));  
-*/    $r_form->addItem(array(
-            SPACE._ze2('Number of Incidents')." >=".SPACE,
+    $r_form->addItem(array(
+            SPACE._zeT('Number of Incidents')." >=".SPACE,
             new CNumericBox('p_min_events',$min_events,6)
     ));
     $r_form->addItem(array(
@@ -344,18 +340,7 @@ if ($source == EVENT_SOURCE_TRIGGERS & $mode == "report") {
     ));
 }
 
-/*if ($allow_discovery) {
-	$cmbSource = new CComboBox('source', $source, 'submit()');
-	$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
-	$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-        if ( $mode != "report" ) {
-            $r_form->addItem(array(
-                    SPACE._('Source').SPACE,
-                    $cmbSource
-            ));
-        }
-}*/
-$tmp = _ze2('Event Management');
+$tmp = _zeT('Event Management');
 if ($reference > 0) {
     $triggerInfo = API::Trigger()->get(array(
         'output' => array( 'triggerid', 'description' ),
@@ -430,9 +415,11 @@ if ($mode !== "report") {
     $scroll_div->setAttribute('id', 'scrollbar_cntr');
     $events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state', 0));
     // }}} FILTER
+    $table = new CTableInfo(_('No events defined.'));
+} else {
+    $table = new CTableInfo(_zeT('No events related to the event source or without events compatible with the filter informed.'));
 }
 
-$table = new CTableInfo(_('No events defined.'));
 
 // CHECK IF EVENTS EXISTS {{{
 $options = array(
@@ -448,10 +435,11 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 }
 else {
 	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
-		$options['triggerids'] = $_REQUEST['triggerid'];
+//		$options['triggerids'] = $_REQUEST['triggerid'];
+		$options['objectids'] = $_REQUEST['triggerid'];
 	}
 	$options['object'] = EVENT_OBJECT_TRIGGER;
-	$options['filter'] = array('value_changed' => ($_REQUEST['showUnknown'] ? null : TRIGGER_VALUE_CHANGED_YES));
+//	$options['filter'] = array('value_changed' => ($_REQUEST['showUnknown'] ? null : TRIGGER_VALUE_CHANGED_YES));
 	$options['nodeids'] = get_current_nodeid();
 }
 
@@ -622,7 +610,8 @@ if ($mode == "report") { // Custom event report for show only events related
     $eventTitles = array();
     $count=1;
     $tmp = $options;
-    $tmp['triggerids'] = $reference;
+    $tmp['objectids'] = $reference;
+//    $tmp['triggerids'] = $reference;
     $tmp['time_till'] = $stime + ($range);;
     $tmp['sortfield'] = 'eventid';
     $tmp['sortorder'] = "DESC";
@@ -717,7 +706,7 @@ if ($mode == "report") { // Custom event report for show only events related
             }
             $img = new Cimg('images/general/arrow_'.$tipo.'2.png', $dep_type);
             $img->setAttribute('style', 'vertical-align: top; border: 0px;');
-            $img->setHint(_ze2($msg)."\n". _ze2('Related incidents') . ": " . $qtd . "\n". $hint);
+            $img->setHint(_zeT($msg)."\n". _zeT('Related incidents') . ": " . $qtd . "\n". $hint);
             return $img;
         } else { return ""; }
     }
@@ -731,7 +720,7 @@ if ($mode == "report") { // Custom event report for show only events related
         }
     }
     $table->setHeader(array(
-            _ze2('Amount'),
+            _zeT('Amount'),
             is_show_all_nodes() ? _('Node') : null,
             _('Host'),
             _('Trigger'),
@@ -748,7 +737,7 @@ if ($mode == "report") { // Custom event report for show only events related
     ));
     // Atribuir ao table o report ----------------------------------------------
     if ($possui === false) { // Avisa que não foram encontrados eventos no período
-        $tmp = new CCol(array(_ze2("Sem eventos para correlacionar com os parâmetros informados")), 'center');
+        $tmp = new CCol(array(_zeT("Sem eventos para correlacionar com os parâmetros informados")), 'center');
         $tmp->setColSpan(13);
         $table->addRow($tmp);
     } else {
@@ -824,12 +813,12 @@ if ($mode == "report") { // Custom event report for show only events related
 			$options = array(
 				'nodeids' => get_current_nodeid(),
 				'filter' => array(
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+//					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'object' => EVENT_OBJECT_TRIGGER,
 				),
 				'time_from' => $from,
 				'time_till' => $till,
-				'output' => API_OUTPUT_SHORTEN,
+//				'output' => API_OUTPUT_SHORTEN,
 				'sortfield' => 'eventid',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => ($config['search_limit'] + 1)
@@ -841,8 +830,8 @@ if ($mode == "report") { // Custom event report for show only events related
 
 			// trigger options
 			$trigOpt = array(
-				'nodeids' => get_current_nodeid(),
-				'output' => API_OUTPUT_SHORTEN
+				'nodeids' => get_current_nodeid()
+//				'output' => API_OUTPUT_SHORTEN
 			);
 
 			if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
@@ -858,7 +847,8 @@ if ($mode == "report") { // Custom event report for show only events related
 			$trigOpt['monitored'] = true;
 
 			$triggers = API::Trigger()->get($trigOpt);
-			$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
+			$options['objectids'] = zbx_objectValues($triggers, 'triggerid');
+//			$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
 
 			// query event with short data
 			$events = API::Event()->get($options);
@@ -932,7 +922,7 @@ if ($mode == "report") { // Custom event report for show only events related
 				// actions
                                 // Adail - Ajustar aqui para exibir o total de eventos no período ----
 				$actions = 
-                                new CButton("btnEM", _ze2('Correlate'), "return PopUp('zabbix-em.php?p_mode=report&"
+                                new CButton("btnEM", _zeT('Correlate'), "return PopUp('zabbix-em.php?p_mode=report&"
                                      ."p_triggerid=".$event['objectid']
                                         //."&p_check_range=".$check_range
                                      ."&fullscreen=1&form_refresh=0&p_stime=".$event['clock']
@@ -940,11 +930,17 @@ if ($mode == "report") { // Custom event report for show only events related
                                 //get_event_actions_status($event['eventid']);
 
 				$ack = getEventAckState($event, true);
-
-				$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array(
-					'clock' => $event['clock'],
-					'ns' => $event['ns']
-				)));
+                                if (versaoZabbix() == "2.2") {
+                                    $description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+                                            'clock' => $event['clock'],
+                                            'ns' => $event['ns']
+                                    )));                                
+                                } else {
+                                    $description = CEventHelper::expandDescription(zbx_array_merge($trigger, array(
+                                            'clock' => $event['clock'],
+                                            'ns' => $event['ns']
+                                    )));
+                                }
 
 				$tr_desc = new CSpan($description, 'pointer');
 				$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".
@@ -973,7 +969,8 @@ if ($mode == "report") { // Custom event report for show only events related
 				if ($_REQUEST['hostid'] == 0) {
 					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 					$scripts = $hostScripts[$host['hostid']];
-					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+                                        // aqui ... sumiu
+					//$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 				}
 
 				$table->addRow(array(
@@ -1054,7 +1051,8 @@ zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeli
 zbx_add_post_js('timeControl.processObjects();');
 
 // js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
+// aqui... sumiu
+//require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 $events_wdgt->show();
 if ($csv_disabled) {

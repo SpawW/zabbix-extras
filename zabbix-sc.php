@@ -30,47 +30,18 @@
 	require_once('zabbix-translate.php');
 	
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$page['title'] 		= _ze('Zabbix-SC-Title');
+	$page['title'] 		= _zeT('Storage Costs');
 	$page['file'] 		= 'zabbix-sc.php';
 	$page['hist_arg'] 	= array('hostid','groupid');
 
 	include_once('include/page_header.php');
 ?>
 <?php
-/*	function newComboFilter ($query, $value, $name) {
-		$cmbRange 		= new CComboBox($name, $value, 'javascript: submit();');
-		$result			= DBselect($query);
-		$cmbRange->additem("0", "");
-		while($row_extra = DBfetch($result)){
-			$cmbRange->additem($row_extra['id'], $row_extra['description']);
-		}
-		return $cmbRange;
-	}*/
 	function descritivo($texto){
 		$texto = str_replace("\n",";\n",$texto);
 		$arrayDesc = explode("\n",$texto);
 		return new CTag('div', 'yes', $arrayDesc, 'text');
 	}
-/*	function exibeConteudo ($condicao,$conteudo) {
-		if ($condicao) { return $conteudo;} 
-		else { return array (""); }
-	}
-	function preparaQuery ($p_query) {
-		$result	= DBselect($p_query);
-		if (!$result) { 
-			die("Invalid query."//.mysql_error()
-			); 
-			return 0;
-		} else { return $result; } 
-	}
-	function valorCampo ($p_query, $p_campo) {
-		$retorno = "";
-		$result = preparaQuery($p_query);
-		while($row = DBfetch($result)){
-			$retorno = $row[$p_campo];
-		}
-		return $retorno;
-	} */
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -78,10 +49,9 @@
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
 		'formato'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador do formato
-		'report_timesince'=>	array(T_ZBX_STR, O_OPT,  null,	null,		'isset({filter})'),
-		'report_timetill'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({filter})')
+		'view'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador da visão que se deseja
 /* actions */
-		,'filter'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+		'filter'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 
 	check_fields($fields);
@@ -100,23 +70,12 @@
 	$groupid = $_REQUEST['groupid'] = get_request('groupid', 0);
 	$hostid = $_REQUEST['hostid']	= get_request('hostid', 0);
 	$formato = $_REQUEST['formato']	= get_request('formato', 'html');
+	$view = $_REQUEST['view']	= get_request('view', 'H');
 	
 	// Verificação de segurança =========================================
 
-	if(get_request('groupid', 0) > 0){
-		$groupids = available_groups($_REQUEST['groupid'], 1);
-		$params = array(
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		if(empty($groupids)) access_deny();
-	}
-
-	if(get_request('hostid', 0) > 0){
-		$hostids = available_hosts($_REQUEST['hostid'], 1);
-		if(empty($hostids)) access_deny();
-	}
-
+        $groupids = checkAccessGroup ('groupid');
+        $hostids = checkAccessHost('hostid');
 	$hostprof_wdgt 		= new CWidget();
 // Formulario de Filtro =========================================================
 
@@ -124,10 +83,13 @@
 	$cmbGroups 		= $pageFilter->getGroupsCB(true);
 	$cmbHosts 		= $pageFilter->getHostsCB(true);
 	// Combo com os formatos de exibição
-	$cmbFormato		= new CComboBox('formato', $formato, 'javascript: submit();');
-	$cmbFormato->additem('', 'Selecione...');
-	$cmbFormato->additem('html', 'HTML');
-	$cmbFormato->additem('csv', 'CSV');
+	$cmbFormato = newComboFilterArray(array(
+            'html' => _('HTML'), 'csv' => _('CSV')
+        ),'formato',$formato);
+	// Combo com os formatos de exibição
+	$cmbView = newComboFilterArray(array(
+            'H' => _('Item'), 'G' => _('Host')
+        ),'view',$view);
 
 // FIM Combos de filtro =========================================================
 	$hostprof_wdgt->addHeader($page['title'], array());
@@ -141,7 +103,8 @@
 	$filter_table->addRow(array(
 		array(bold(_('Group')), ': ', $cmbGroups),
 		array(bold(_('Host')), ': ', $cmbHosts),
-		array(bold(_('Formato')), ': ', $cmbFormato),
+		array(bold(_zeT('Format')), ': ', $cmbFormato),
+		array(bold(_zeT('View')), ': ', $cmbView),
 		array()
 	));
 	
@@ -152,7 +115,7 @@
 
 	$reset = new CButton('reset',_('Reset'));
 	$reset->onClick("javascript: clearAllForm('zbx_filter');");
-	$filter = new CButton('filter',_ze2('Update Filter'));
+	$filter = new CButton('filter',_zeT('Update Filter'));
 	$filter->onClick("javascript: submit();");
 
 	$footer_col = new CCol(array($filter, SPACE, $reset), 'center');
@@ -167,8 +130,10 @@
 	$completo = (get_request('formato','') != '') && ($groupid > 1 || $hostid > 1);
 		
 	if ($completo) {
-		// Localizar todos os hosts que o usuário selecionou
-		$baseQuery = "SELECT hos.name as host_name, it.hostid, it.name as item_name, it.key_ as item_key, it.delay, it.history, it.trends, it.status , 86400 / it.delay * it.history AS history_costs, it.trends * 24 AS trends_costs
+
+// Localizar todos os hosts que o usuário selecionou -------------------------------------
+		$baseQuery = 
+"SELECT hos.name as host_name, it.hostid, it.name as item_name, it.key_ as item_key, it.delay, it.history, it.trends, it.status , 86400 / it.delay * it.history AS history_costs, it.trends * 24 AS trends_costs
 FROM items it
 INNER JOIN hosts hos
    ON hos.hostid = it.hostid
@@ -178,66 +143,94 @@ INNER JOIN hosts_groups hgr
 ." WHERE it.flags <> 2
 " . ($hostid > 0 ? " AND it.hostid = ".$hostid : "")
 . "\n order by host_name, item_key " ;
-	
-		// Construir resumo de historico armazenado por host
-		// Construir resumo de trends armazenado por host
-		$result			= DBselect($baseQuery);
-		$report			= Array();
-		$cont = $historyTotal = $trendTotal = $storageTotal	= 0;
-		while($row = DBfetch($result)){
-			$report[$cont][0] = $row['host_name'];
-			$report[$cont][1] = $row['item_name'];
-			$report[$cont][2] = $row['item_key'];
-			$report[$cont][3] = $row['delay'];
-			$report[$cont][4] = $row['history'];
-			$report[$cont][5] = $row['trends'];
-			$report[$cont][6] = $row['status'];
-			$report[$cont][7] = round(floatval($row['history_costs']),2);
-			$historyTotal += $report[$cont][7];
-			$report[$cont][8] = round(floatval($row['trends_costs']),2);
-			$trendTotal += $report[$cont][8];
-			$report[$cont][10] = ($report[$cont][7]*50)+($report[$cont][8]*128);
-			$storageTotal += $report[$cont][10];
-			$report[$cont][9] = convert_units($report[$cont][10],'B');
-			$cont++;
-		}
+                $report		= Array();
+                if ($view == "G") {
+                    $baseQuery = "SELECT host_name, hostid, SUM( history_costs ) AS history_costs, SUM( trends_costs ) AS trends_costs FROM ("
+                            . $baseQuery . ") hitem group by hostid order by host_name";
+                    $result = DBselect($baseQuery);
+                    $cont = $historyTotal = $trendTotal = $storageTotal	= 0;
+                    while($row = DBfetch($result)){
+                        $report[$cont][0] = $row['host_name'];
+                        $report[$cont][1] = round(floatval($row['history_costs']),2);
+                        $historyTotal += $report[$cont][1];
+                        $report[$cont][2] = round(floatval($row['trends_costs']),2);
+                        $trendTotal += $report[$cont][2];
+                        $report[$cont][4] = ($report[$cont][1]*50)+($report[$cont][2]*128);
+                        $storageTotal += $report[$cont][4];
+                        $report[$cont][3] = convert_units(array ('value' => $report[$cont][4], 'units' => 'B'));
+                        $cont++;
+                    }
+                } else {
+                    $result			= DBselect($baseQuery);
+                    $cont = $historyTotal = $trendTotal = $storageTotal	= 0;
+                    while($row = DBfetch($result)){
+                            $report[$cont][0] = $row['host_name'];
+                            $report[$cont][1] = $row['item_name'];
+                            $report[$cont][2] = $row['item_key'];
+                            $report[$cont][3] = $row['delay'];
+                            $report[$cont][4] = $row['history'];
+                            $report[$cont][5] = $row['trends'];
+                            $report[$cont][6] = $row['status'];
+                            $report[$cont][7] = round(floatval($row['history_costs']),2);
+                            $historyTotal += $report[$cont][7];
+                            $report[$cont][8] = round(floatval($row['trends_costs']),2);
+                            $trendTotal += $report[$cont][8];
+                            $report[$cont][10] = ($report[$cont][7]*50)+($report[$cont][8]*128);
+                            $storageTotal += $report[$cont][10];
+                            $report[$cont][9] = convert_units(array ('value' => $report[$cont][10], 'units' => 'B'));
+                            $cont++;
+                    }
+                }
+ // Monta o relatório ----------------------------------------------------------
 		$table = new CTableInfo();
 		switch ($formato) {
-			case 'csv';
-				$table->setHeader(array("Dados"));	
-				break;
-			case 'html';
-				$table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
-                                    ,_("History"),_("Trends"),_("Status")
-                                    ,_ze2("History Costs"),_ze2("Trends Costs")
-                                    ,_ze2("Storage Costs")
-                                ));	
-				break;			
+                    case 'csv';
+                        $table->setHeader(array("Dados"));	
+                        break;
+                    case 'html';
+                        if ($view == "G") {
+                            $table->setHeader(array(_("Host"),_zeT("History Costs"),_zeT("Trends Costs")
+                                ,_zeT("Storage Costs")
+                            ));	
+                        } else {
+                            $table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
+                                ,_("History"),_("Trends"),_("Status")
+                                ,_zeT("History Costs"),_zeT("Trends Costs")
+                                ,_zeT("Storage Costs")
+                            ));	
+                        }
+                        break;			
 		}
 		$linha = array();
 		$cont2 = count($report[0])-1;
 		for ($i = 0; $i < $cont; $i++) {		
-			switch ($formato) {
-				case 'csv';
-					$linhaCSV = "";
-					for ($x = 0; $x < $cont2; $x++) {
-						$linhaCSV .= quotestr($report[$i][$x].($x == 7 || $x == 8 ? " linhas" : " ")).";";
-					}
-					$table->addRow(array($linhaCSV));
-					break;
-				case 'html';
-					for ($x = 0; $x < $cont2; $x++) {
-						$linha[$x] = new CCol($report[$i][$x].($x == 7 || $x == 8 ? " linhas" : " "),1);
-					}
-					$table->addRow($linha);
-					break;			
-			}
+                    switch ($formato) {
+                        case 'csv';
+                            $linhaCSV = "";
+                            for ($x = 0; $x < $cont2; $x++) {
+                                $linhaCSV .= quotestr($report[$i][$x].($x == 7 || $x == 8 ? " linhas" : " ")).";";
+                            }
+                            $table->addRow(array($linhaCSV));
+                            break;
+                        case 'html';
+                            for ($x = 0; $x < $cont2; $x++) {
+                                $linha[$x] = new CCol($report[$i][$x].($x == 7 || $x == 8 ? " linhas" : " "),1);
+                            }
+                            $table->addRow($linha);
+                            break;			
+                    }
 		}
 		$descricao = new CCol ('');
 		$descricao->setAttribute('colspan','6');
 		$descricao->setAttribute('align','right');
 		if ($formato !== 'csv') {
-			$table->addRow(array($descricao,'Total',$historyTotal.' linhas',$trendTotal.' linhas',convert_units($storageTotal,'B')));
+                    if ($view == "G") {
+                        $table->addRow(array('Total',$historyTotal.' linhas',$trendTotal.' linhas'
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B'))));
+                    } else {
+                        $table->addRow(array($descricao,'Total',$historyTotal.' linhas',$trendTotal.' linhas'
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B'))));
+                    }
 		}
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
@@ -247,7 +240,7 @@ INNER JOIN hosts_groups hgr
 	
 		$hostprof_wdgt->addItem($table);
 	} else {
-		$hostprof_wdgt->addItem(_ze2('Enter the parameters for research!'));
+		$hostprof_wdgt->addItem(_zeT('Enter the parameters for research!'));
 	}
 	$hostprof_wdgt->show();
 ?>

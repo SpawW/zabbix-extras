@@ -31,7 +31,7 @@
 	require_once('include/forms.inc.php');
 	require_once('zabbix-translate.php');
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$titulo 		= _ze('Zabbix-CAT-Title');;//'Zabbix-CAT - Capacidade e Tendência';
+	$titulo 		= _zeT('Capacity and Trend');;//'Zabbix-CAT - Capacidade e Tendência';
 	$page['title'] 		= $titulo;
 	$page['file'] 		= 'zabbix-cat.php';
 	$page['hist_arg'] 	= array('hostid','groupid','graphid');
@@ -40,25 +40,11 @@
 	include_once('include/page_header.php');
 ?>
 <?php
-/*	function newComboFilter ($query, $value, $name) {
-		$cmbRange 		= new CComboBox($name, $value, 'javascript: submit();');
-		$result			= DBselect($query);
-		$cmbRange->additem("0", "");
-		while($row_extra = DBfetch($result)){
-			$cmbRange->additem($row_extra['id'], $row_extra['description']);
-		}
-		return $cmbRange;
-	}
-*/	function descritivo($texto){
+	function descritivo($texto){
 		$texto = str_replace("\n",";\n",$texto);
 		$arrayDesc = explode("\n",$texto);
 		return new CTag('div', 'yes', $arrayDesc, 'text');
 	}
-/*	function exibeConteudo ($condicao,$conteudo) {
-		if ($condicao) { return $conteudo;} 
-		else { return array (""); }
-	}
-*/
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -113,7 +99,9 @@
 	$timeShiftProjection	= get_request('timeshiftprojection',0);
 	// Verificação de segurança =========================================
 
-	if(get_request('groupid', 0) > 0){
+        $groupids = checkAccessGroup ('groupid');
+        $hostids = checkAccessHost('hostid');
+/*	if(get_request('groupid', 0) > 0){
 		$groupids = available_groups($_REQUEST['groupid'], 1);
 		$params = array(
 			'preservekeys' => 1,
@@ -126,7 +114,8 @@
 		$hostids = available_hosts($_REQUEST['hostid'], 1);
 		if(empty($hostids)) access_deny();
 	}
-	$hostprof_wdgt 		= new CWidget();
+*/
+        $hostprof_wdgt 		= new CWidget();
 // Formulario de Filtro =========================================================
 
 // Combos de filtro =========================================================
@@ -140,7 +129,9 @@
 	$cmbFormato->additem('csv', 'CSV');
 
 	$cmbItems 		= new CComboBox('itemid', $itemid, 'javascript: submit();');
-	$query 			=  "select it.itemid as id, it.name, it.key_ from items it inner join items_applications ia on ia.itemid = it.itemid and applicationid = ". $applicationid . " and it.status < 1 and it.flags <> 2 " . " order by 2 ";
+	$query 			=  "select it.itemid as id, it.name, it.key_ "
+        . " from items it inner join items_applications ia on ia.itemid = it.itemid and applicationid = "
+        . $applicationid . " and it.status < 1 and it.flags <> 2 " . " order by 2 ";
 	$result			= DBselect($query);
 	$cmbItems->additem("0", "");
 	$descItem = "";
@@ -169,7 +160,7 @@
 	$completo = get_request('itemid',0) > 0;
 	$cmbAgregation	= new CComboBox('agregation', get_request('agregation',0), 'javascript: submit();');
 	if ($completo) {
-		$intervalDesc 		= array ('',_ze('Zabbix-CAT-Day'),_ze('Zabbix-CAT-Week'),_ze('Zabbix-CAT-Month'),_ze('Zabbix-CAT-Year'));
+		$intervalDesc 		= array ('',_zeT('Day'),_zeT('Week'),_zeT('Month'),_zeT('Year'));
 		$intervalFactor 	= array (0,1,7,30,365);
 		$intervalFactor2 	= array (0,'+1 days','+1 week','+1 months','+1 years');
 		$sourceAgregator 	= array ('hu.value_max','hu.value_min','hu.value_avg');
@@ -182,9 +173,9 @@
 			$cmbTimeProjection->additem($i, $intervalDesc[$i]);	
 		}
 		$completo = $timeShiftSource > 0 && $timeShiftProjection > 0;
-		$cmbAgregation->additem(0, _ze('Zabbix-CAT-Max'));
-		$cmbAgregation->additem(1, _ze('Zabbix-CAT-Min'));
-		$cmbAgregation->additem(2, _ze('Zabbix-CAT-Avg'));
+		$cmbAgregation->additem(0, _zeT('Max'));
+		$cmbAgregation->additem(1, _zeT('Min'));
+		$cmbAgregation->additem(2, _zeT('Avg'));
 	}
 
 /*----------- Filtro por período ---------------*/
@@ -226,9 +217,9 @@
 
 		$reporttimetab2 = new CTable(null,'calendar');
 		
-		$reporttimetab2->addRow(array(array(bold(_ze('Zabbix-CAT-Analysis')), ': '), array($cmbTimeSource,$cmbAgregation)));
-		$reporttimetab2->addRow(array(array(bold(_ze("Zabbix-CAT-Projection")), ': '), array($cmbTimeProjection,array(bold(_ze("Zabbix-CAT-Ammount")), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
-		$reporttimetab2->addRow(array(array(bold(_ze('Zabbix-CAT-Formatting')), ': '), array($cmbFormato)));
+		$reporttimetab2->addRow(array(array(bold(_zeT('Analysis')), ': '), array($cmbTimeSource,$cmbAgregation)));
+		$reporttimetab2->addRow(array(array(bold(_zeT("Projection")), ': '), array($cmbTimeProjection,array(bold(_zeT("Ammount")), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
+		$reporttimetab2->addRow(array(array(bold(_zeT('Formatting')), ': '), array($cmbFormato)));
 /*----------- Implementa o Filtro por período ---------------*/
 		$filter_table->addRow(array(
 			array(bold(_('Group')), ': ', $cmbGroups),
@@ -249,13 +240,13 @@
 
 		$reset = new CButton('reset',_('Reset'));
 		$reset->onClick("javascript: clearAllForm('zbx_filter');");
-		$grafico = new CButton('grafico',_ze('Zabbix-CAT-Chart'));
+		$grafico = new CButton('grafico',_zeT('Chart'));
 		// Habilita o botão de geração de gráfico quando tem host e item selecionado =============================================
 		if (($hostid < 1) and ($itemid < 1)) {
 			$grafico->setAttribute('disabled', '');
 		}
 		$grafico->onClick("javascript: fnGrafico();");
-		$filter = new CButton('filter',_ze("Zabbix-CAT-UpdateFilter"));
+		$filter = new CButton('filter',_zeT("Update Filter"));
 		$filter->onClick("javascript: submit();");
 
 		$footer_col = new CCol(array($filter, SPACE, $reset, SPACE, $grafico), 'center');
@@ -288,7 +279,7 @@ DATE_FORMAT(FROM_UNIXTIME(hu.clock), '%Y') as ano, DATE_FORMAT(FROM_UNIXTIME(hu.
 DATE_FORMAT(FROM_UNIXTIME(hu.clock), '".$intervalMask[$timeShiftSource]."') as momento, "
 . $sourceAgregator[get_request('agregation',0)]." as valor
 from ".$tabela_log." hu 
-where hu.clock between ".$report_timesince." and  ".$report_timetill."
+where hu.clock between ".$report_timesince." and  ".$report_timetill." AND hu.itemid = " . $itemid . "
 ) a 
 on a.itemid = it.itemid 
 where it.itemid = ".$itemid."
@@ -326,7 +317,7 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 			}
 			$report[$cont]['momento'] = $row['momento'] . week2date($row['ano'],$row['momento']);
 			$report[$cont]['valor'] = round(floatval($row['valor']),$casasDecimais);
-			$report[$cont]['tipo'] = _ze('Zabbix-CAT-HistoryData');
+			$report[$cont]['tipo'] = _zeT('Data from history');
 			$dia = $row['dia'];
 			$mes = $row['mes'];
 			$ano = $row['ano'];
@@ -354,17 +345,17 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 				$report[$cont]['valor'] = round(floatval($ultimo)+$tendencia*($intervalFactor[$timeShiftProjection]),$casasDecimais);
 				
 				$ultimo = $report[$cont]['valor'];
-				$report[$cont]['tipo'] = _ze('Zabbix-CAT-Trend');
+				$report[$cont]['tipo'] = _zeT('Trend');
 				$cont++;
 			}
 		}
 		$table = new CTableInfo();
 		switch ($formato) {
 			case 'csv';
-				$table->setHeader(array(_ze("Zabbix-CAT-Data")));	
+				$table->setHeader(array(_zeT("Data")));	
 				break;
 			case 'html';
-				$table->setHeader(array(_ze('Zabbix-CAT-Instant'),_ze('Zabbix-CAT-Value'),_ze('Zabbix-CAT-Type')));	
+				$table->setHeader(array(_zeT('Instant'),_zeT('Value'),_zeT('Type')));	
 				break;			
 		}
 		$points = "";
@@ -376,8 +367,11 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 					break;
 				case 'html';
 					$momento = new CCol($report[$i]['momento'],1);
-					$valor = convert_units($report[$i]['valor'],$unidade);
+                                        $valor = convert_units(array(
+                                            'value' => $report[$i]['valor'],
+                                            'units' => $unidade));
 					$valor = new CCol($valor,1);
+                                        
 					$tipo = new CCol($report[$i]['tipo'],1);
 					$table->addRow(array($momento,$valor,$tipo));
 					break;			
