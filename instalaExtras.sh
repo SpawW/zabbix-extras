@@ -288,6 +288,7 @@ instalaMenusOLD() {
 
 instalaLiteral() {
     # Verificacao de instalacao previa do patch -- Menu.inc.php ------------
+    echo "Instalando patch de literais...";
     ARQUIVO="include/func.inc.php";
     TAG_INICIO='\#\#Zabbix\-Extras-Literal';
     TAG_FINAL="$TAG_INICIO-FIM";
@@ -590,8 +591,9 @@ instalaZE() {
     unzip $ARQ_TMP;
     cd $DIR_TMP
     cp -Rp * "$CAMINHO_FRONTEND";
-    # Alterar arquivos
     echo "Iniciando banco de dados...";
+    wget $URL_FRONTEND;
+    instalaLiteral;
 }
 
 identificaDistro;
