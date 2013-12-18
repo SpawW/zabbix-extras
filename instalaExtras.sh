@@ -44,6 +44,7 @@ idioma() {
 	"pt" )
       M_BASE="Este instalador ira adicionar um menu extra ao final da barra de menus do seu ambiente. Para a correta instalacao sao necessarios alguns parametros.";
       M_CAMINHO="Favor informar o caminho para o frontend do zabbix";
+      M_URL="Favor informar a URL do zabbix (usando localhost)";
       M_ERRO_CAMINHO="O caminho informado para o frontend do zabbix nao foi encontrado "
       M_ERRO_ABORT="Instalacao abortada!";
       M_PATCH="Efetuar download dos arquivos do patch (S)?";
@@ -61,6 +62,7 @@ idioma() {
 	*) 
       M_BASE="This installer will add an extra menu to the end of the menu bar of your environment. For installation are needed to inform some parameters.";
       M_CAMINHO="Please enter the path to the zabbix frontend ";
+      M_URL="Please enter the URL to the zabbix frontend (using localhost)";
       M_ERRO_CAMINHO="The informed path to zabbix frontend is not valid "
       M_ERRO_ABORT="Install aborted!";
       M_PATCH="Download the patch files (S) (S = Yes)?";
@@ -141,6 +143,8 @@ caminhoFrontend() {
         echo $M_ERRO_CAMINHO"($CAMINHO_FRONTEND). "$M_ERRO_ABORT;
         exit 0;
     fi
+    dialog --inputbox "$M_BASE\n$M_URL" 0 0 "http://localhost/zabbix" 2> $TMP_DIR/resposta_dialog.txt;
+    URL_FRONTEND=`cat $TMP_DIR/resposta_dialog.txt`;
 }
 downloadPacote() {
     dialog --yesno "$M_PATCH" 7 60;
@@ -429,12 +433,12 @@ instalaGeo() {
     unzip pluginGeo.zip
     cd /tmp/zabbix-geolocation-master/
     # Move para /
-    mv misc/geolocation.php $CAMINHO_FRONTEND/
+    #mv misc/geolocation.php $CAMINHO_FRONTEND/
     # Move para /extras    
     if [ ! -e "$CAMINHO_FRONTEND/extras/geo" ]; then
         mkdir -p "$CAMINHO_FRONTEND/extras/geo";
     fi
-    mv * "$CAMINHO_FRONTEND/extras/geo";
+    cp -Rp * "$CAMINHO_FRONTEND/extras/geo";
     # Alterar arquivos
 }
 
@@ -471,7 +475,6 @@ instalaMenus() {
         installMgs "U" "NS"; 
     else
         installMgs "N" "NS"; 
-set -x;
         TMP="\/\*\*";
         INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
         FIMINST=$INIINST;
@@ -490,8 +493,10 @@ set -x;
 }
 
 instalaArvore() {
+    instalaPacote "php5-curl";
     REPOS="https://github.com/SpawW/zabbix-service-tree/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvore.zip";
+    DIR_TMP="/tmp/zabbix-service-tree-master/";
     if [ -f $ARQ_TMP ]; then
         rm $ARQ_TMP;
     fi
@@ -499,37 +504,101 @@ instalaArvore() {
     wget $REPOS -O $ARQ_TMP;
     cd /tmp;
     # Descompacta em TMP
-    if [ -e /tmp/zabbix-service-tree/ ]; then
+    if [ -e $DIR_TMP ]; then
         unalias rm;
-        rm -rf /tmp/zabbix-service-tree/;
+        rm -rf $DIR_TMP;
     fi
-    unzip pluginArvore.zip
-    cd /tmp/zabbix-service-tree/
-    # Move para /
-    #mv misc/geolocation.php $CAMINHO_FRONTEND/
+    unzip $ARQ_TMP;
+    cd $DIR_TMP
     # Move para /extras    
     if [ ! -e "$CAMINHO_FRONTEND/extras/service-tree" ]; then
         mkdir -p "$CAMINHO_FRONTEND/extras/service-tree";
     fi
-    mv * "$CAMINHO_FRONTEND/extras/service-tree";
+    cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree";
+    # Alterar arquivos
+    #cat "$CAMINHO_FRONTEND/extras/service-tree/__conf.php" | grep -v "^\$ZABBIX" > "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
+    TMP="\$ZABBIX_CONF = '$CAMINHO_FRONTEND/conf/zabbix.conf.php'";
+    echo "\n$TMP;" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
+    TMP="$URL_FRONTEND";
+    echo "\$ZABBIX_API = '$TMP';" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
+    instalaArvoreDeamon;
+    instalaArvoreJS;
+}
+
+instalaArvoreDeamon() {
+    REPOS="https://github.com/SpawW/zabbix-service-tree-daemon/archive/master.zip";
+    ARQ_TMP="/tmp/pluginArvoreDaemon.zip";
+    DIR_TMP="/tmp/zabbix-service-tree-daemon-master/";
+    if [ -f $ARQ_TMP ]; then
+        rm $ARQ_TMP;
+    fi
+    # Baixa repositorio
+    wget $REPOS -O $ARQ_TMP;
+    cd /tmp;
+    # Descompacta em TMP
+    if [ -e $DIR_TMP ]; then
+        unalias rm;
+        rm -rf $DIR_TMP;
+    fi
+    unzip $ARQ_TMP;
+    cd $DIR_TMP
+    if [ ! -e "$CAMINHO_FRONTEND/extras/service-tree-daemon" ]; then
+        mkdir -p "$CAMINHO_FRONTEND/extras/service-tree-daemon";
+    fi
+    cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree-daemon";
     # Alterar arquivos
 }
 
-
-#instalaGeo;
-instalaArvore;
-#instalaExtras;
-exit;
+instalaArvoreJS() {
+    REPOS="https://github.com/SpawW/html5-tree-graph/archive/master.zip";
+    ARQ_TMP="/tmp/pluginArvoreJS.zip";
+    DIR_TMP="/tmp/html5-tree-graph-master/";
+    if [ -f $ARQ_TMP ]; then
+        rm $ARQ_TMP;
+    fi
+    # Baixa repositorio
+    wget $REPOS -O $ARQ_TMP;
+    cd /tmp;
+    # Descompacta em TMP
+    if [ -e $DIR_TMP ]; then
+        unalias rm;
+        rm -rf $DIR_TMP;
+    fi
+    unzip $ARQ_TMP;
+    cd $DIR_TMP
+    if [ ! -e "$CAMINHO_FRONTEND/extras/service-tree-daemon" ]; then
+        mkdir -p "$CAMINHO_FRONTEND/extras/service-tree-daemon";
+    fi
+    cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree-daemon";
+    # Alterar arquivos
+}
+instalaZE() {
+    REPOS="https://github.com/SpawW/zabbix-extras/archive/master.zip";
+    ARQ_TMP="/tmp/pluginExtras.zip";
+    DIR_TMP="/tmp/zabbix-extras-master/";
+    if [ -f $ARQ_TMP ]; then
+        rm $ARQ_TMP;
+    fi
+    # Baixa repositorio
+    wget $REPOS -O $ARQ_TMP;
+    cd /tmp;
+    # Descompacta em TMP
+    if [ -e $DIR_TMP ]; then
+        unalias rm;
+        rm -rf $DIR_TMP;
+    fi
+    unzip $ARQ_TMP;
+    cd $DIR_TMP
+    cp -Rp * "$CAMINHO_FRONTEND";
+    # Alterar arquivos
+    echo "Iniciando banco de dados...";
+}
 
 identificaDistro;
 preReq;
 idioma;
 caminhoFrontend;
-
-#downloadPacote;
-#selecionaModulos;
-confirmaInstalacao;
-#expandePatch;
+#confirmaInstalacao;
 
 suporteBDCustom;
 customMapas;
@@ -538,6 +607,7 @@ instalaPortletNS;
 instalaMenus;
 instalaGeo;
 instalaArvore;
-instalaExtras;
+instalaZE;
+
 exit;
 
