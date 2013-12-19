@@ -37,8 +37,7 @@
     function preparaQuery ($p_query) {
         $result	= DBselect($p_query);
         if (!$result) { 
-            die("Invalid query.".mysql_error()
-            ); 
+            die("Invalid query [$p_query].".mysql_error()); 
             return 0;
         } else { return $result; } 
     }

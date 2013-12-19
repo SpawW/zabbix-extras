@@ -219,71 +219,12 @@ expandePatch() {
        if [ -f "$CAMINHO_EXTRAS" ]; then
          rm -f "$CAMINHO_EXTRAS";
        fi
-       wget "http://spinola.net.br/zabbix-extras/lastVersion.tgz" -O $CAMINHO_EXTRAS;
+       wget "http://spinola.net.br/zabbix-extras/lastVersion.tgz" -o $CAMINHO_EXTRAS;
     fi
     # Instalando arquivos da customizacao -------------------------------------------------------
     clear;
     cd $CAMINHO_FRONTEND;
     tar -xzvf "$CAMINHO_EXTRAS";
-}
-
-instalaMenusOLD() {
-    # Instalando menu ---------------------------------------------------------------------------
-    if [ "$INSTALAR" = "S" ]; then 
-        # Verificação de instalação prévia do patch no javascript --------------
-        if [ "`cat js/main.js | grep spinola | wc -l`" -eq 0 ]; then
-            LINHA=`cat js/main.js | sed -ne "/{'empty'\:/{=;q;}"`;
-            echo "Instalando menu no javascript...";
-            sed -i "106s/'admin': 0/'admin': 0,'spinolaExtras':0/g" js/main.js 
-        fi
-        # Verificacao de instalacao previa do patch -- Menu.inc.php ------------
-        cp include/menu.inc.php include/menu.inc.php.original
-        #NUMLINHA=`cat include/menu.inc.php | sed -ne "/login'\ =>\ a/{=;q;}"`;
-        INIINST=`cat include/menu.inc.php | sed -ne "/\#\#Zabbix\-Extras/{=;q;}"`;
-        FIMINST=`cat include/menu.inc.php | sed -ne "/\#\#Zabbix\-Extras\-FIM/{=;q;}"`;
-        if [ ! -z $INIINST ]; then
-          echo "Existe instalacao previa no arquivo... removendo customizacao!";
-          sed -i "$INIINST,$FIMINST d" include/menu.inc.php
-        fi
-        echo "Instalando tags identificadoras do menu...";
-        NUMLINHA=`cat include/menu.inc.php | sed -ne "/login'\ =>\ a/{=;q;}"`;
-        sed -i "$NUMLINHA i##Zabbix-Extras\n##Zabbix-Extras-FIM" include/menu.inc.php
-        INIINST=`cat include/menu.inc.php | sed -ne "/\#\#Zabbix\-Extras/{=;q;}"`;
-        FIMINST=`cat include/menu.inc.php | sed -ne "/\#\#Zabbix\-Extras\-FIM/{=;q;}"`;
-
-        # Instalando menu Extras
-# Para o 2.0 é PERM_READ_LIST
-# Para o 2.2 é PERM_READ
-        sed -i "$FIMINST i'spinolaExtras' => array('label'=> 'Extras', 'user_type' => USER_TYPE_ZABBIX_USER, 'node_perm' => PERM_READ,	'default_page_id' => 0," include/menu.inc.php
-        FIMINST=$(($FIMINST+1));
-        sed -i "$FIMINST i'pages' => array(" include/menu.inc.php
-        FIMINST=$(($FIMINST+1));
-        # Instalacao do Zabbix-CAT - Modulo de gestao de capacidade
-        if [ "$ZABBIX_CAT" = "S" ]; then
-          sed -i "$FIMINST iarray('url' => 'zabbix-cat.php', 'label' => _('Zabbix-CAT'))" include/menu.inc.php
-          FIMINST=$(($FIMINST+1));
-        fi
-        # Instalacao do Zabbix-SC - Modulo de gestao de armazenamento
-        if [ "$ZABBIX_CAT" = "S" ]; then
-          sed -i "$FIMINST i,array('url' => 'zabbix-sc.php', 'label' => _('Zabbix-SC'))" include/menu.inc.php
-          FIMINST=$(($FIMINST+1));
-        fi
-        if [ "$ZABBIX_NS" = "S" ]; then
-          sed -i "$FIMINST i,array('url' => 'zabbix-ns.php', 'label' => _('Zabbix-NS'))" include/menu.inc.php
-          FIMINST=$(($FIMINST+1));
-        fi
-        if [ "$ZABBIX_EM" = "S" ]; then
-          sed -i "$FIMINST i,array('url' => 'zabbix-em.php', 'label' => _('Zabbix-EM'))" include/menu.inc.php
-          FIMINST=$(($FIMINST+1));
-        fi
-        sed -i "$FIMINST i)" include/menu.inc.php
-        FIMINST=$(($FIMINST+1));
-
-        # Fim da instalacao dos menus
-        sed -i "$FIMINST i)," include/menu.inc.php
-        FIMINST=$(($FIMINST+1));
-        echo "Patch e menus instalados entre as linhas $INIINST e $FIMINST do include/menu.inc.php";
-    fi # Fim instalacao menus
 }
 
 instalaLiteral() {
@@ -292,6 +233,7 @@ instalaLiteral() {
     ARQUIVO="include/func.inc.php";
     TAG_INICIO='\#\#Zabbix\-Extras-Literal';
     TAG_FINAL="$TAG_INICIO-FIM";
+    cd $CAMINHO_FRONTEND;
     cp $ARQUIVO include/func.inc.php.original
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
     FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
@@ -411,7 +353,7 @@ customLogo() {
         FIMINST=$INIINST;
     fi
     sed -i "$INIINST,$FIMINST d" $ARQUIVO;
-    TXT_CUSTOM="\$newCDiv = new CDiv(SPACE, '');\n\$newCDiv->setAttribute('style', \"background: url('zbxe-logo.php') no-repeat; height: 31px; width: 205px; cursor: pointer;\");";
+    TXT_CUSTOM="\$newCDiv = new CDiv(SPACE, '');\n\$newCDiv->setAttribute('style', \"background: url('zbxe-logo.php') no-repeat; height: 31px; width: 250px; cursor: pointer;\");";
     TXT_CUSTOM="$TXT_CUSTOM\n\$logo = new CLink(\$newCDiv, 'http://www.zabbix.com/', 'image', null, 'nosid');\n";
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
 }
@@ -576,9 +518,13 @@ instalaArvoreJS() {
 instalaZE() {
     REPOS="https://github.com/SpawW/zabbix-extras/archive/master.zip";
     ARQ_TMP="/tmp/pluginExtras.zip";
+    ARQ_TMP="/tmp/pluginExtrasBD.htm";
     DIR_TMP="/tmp/zabbix-extras-master/";
     if [ -f $ARQ_TMP ]; then
         rm $ARQ_TMP;
+    fi
+    if [ -f $ARQ_TMP2 ]; then
+        rm $ARQ_TMP2;
     fi
     # Baixa repositorio
     wget $REPOS -O $ARQ_TMP;
@@ -592,7 +538,10 @@ instalaZE() {
     cd $DIR_TMP
     cp -Rp * "$CAMINHO_FRONTEND";
     echo "Iniciando banco de dados...";
-    wget $URL_FRONTEND;
+#set -x;
+    wget "$URL_FRONTEND/zbxe-inicia-bd.php" ;
+    rm "./zbxe-inicia-bd.php";
+#set +x;
     instalaLiteral;
 }
 
