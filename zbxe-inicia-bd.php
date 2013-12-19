@@ -113,7 +113,7 @@ if ($total == 0) {
     (0, 'menu_01_cat', 'zabbix-cat|Capacity and Trends', 1),
     (0, 'menu_02_em', 'zabbix-em|Event Management', 1),
     (0, 'menu_03_ns', 'zabbix-ns|Not Supported Items', 1),
-    (0, 'menu_04_sc', 'zabbix-sc|Storage Custs', 1);";
+    (0, 'menu_04_sc', 'zabbix-sc|Storage Costs', 1);";
 
     echo "Populando dados padrões em zbxe_preferences...<br>";
     preparaQuery($query);
