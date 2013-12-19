@@ -555,10 +555,10 @@ suporteBDCustom;
 customMapas;
 customLogo;
 instalaPortletNS;
-instalaMenus;
 instalaGeo;
 instalaArvore;
 instalaZE;
+instalaMenus;
 
 exit;
 
