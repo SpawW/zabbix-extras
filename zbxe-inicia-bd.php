@@ -77,7 +77,21 @@ if ($total == 0) {
 ('pt_BR', 'History Costs', 'Custo - Histórico'),
 ('pt_BR', 'Trends Costs', 'Custo - Médias'),
 ('pt_BR', 'Format', 'Formato'),
-('pt_BR', 'View', 'Visão');";
+('pt_BR', 'View', 'Visão'),
+('pt_BR', 'Capacity and Trends', 'Capacity and Trends'),
+('pt_BR', 'Storage Custs', 'Storage Custs'),
+('pt_BR', 'Day', 'Dia'),
+('pt_BR', 'Week', 'Semana'),
+('pt_BR', 'Month', 'Mês'),
+('pt_BR', 'Year', 'Ano'),
+('pt_BR', 'Max', 'Max'),
+('pt_BR', 'Min', 'Min'),
+('pt_BR', 'Avg', 'Med'),
+('pt_BR', 'Data from history', 'Dados do histórico'),
+('pt_BR', 'Trend', 'Tendência'),
+('pt_BR', 'Instant', 'Momento'),
+('pt_BR', 'Value', 'Valor'),
+('pt_BR', 'Type', 'Tipo');";
     echo "Populando dados padrões em zbxe_translation...<br>";
     preparaQuery($query);
 
