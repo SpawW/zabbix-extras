@@ -8,8 +8,12 @@
 
 require_once('include/config.inc.php');
 require_once('include/zbxe_visual_imp.php');
-preparaQuery('drop table zbxe_translation');
-preparaQuery('drop table zbxe_preferences');
+try {	
+    $result     = DBselect('drop table zbxe_translation');
+    $result     = DBselect('drop table zbxe_preferences');
+} catch(Exception $erro) {
+    echo "Instalação limpa." . $erro->getMessage();
+}
 
 
 try {	
