@@ -555,10 +555,13 @@ suporteBDCustom;
 customMapas;
 customLogo;
 instalaPortletNS;
-instalaMenus;
 instalaGeo;
 instalaArvore;
 instalaZE;
+instalaMenus;
 
+echo "Parametros usados para instalacao:";
+echo "URL do Zabbix: [$URL_FRONTEND]";
+echo "Path do frontend Zabbix: [$CAMINHO_FRONTEND]";
 exit;
 
