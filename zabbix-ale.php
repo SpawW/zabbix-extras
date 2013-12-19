@@ -27,9 +27,9 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/audit.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
-require_once('zabbix-translate.php');
+require_once('include/zbxe_visual_imp.php');
 
-$page['title'] = _('Audit logs')._ze('Zabbix-ALE-Extended');
+$page['title'] = _('Audit logs')._zeP(' Extended');
 $page['file'] = 'zabbix-ale.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');

@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/include/actions.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
-require_once dirname(__FILE__).'/zabbix-translate.php';
+require_once dirname(__FILE__).'/include/zbxe_visual_imp.php';
 // ****************** Inicialização de variaveis *******************************
 
 $check_range = $_REQUEST['p_check_range']	= get_request('p_check_range', 30);

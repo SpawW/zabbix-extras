@@ -29,7 +29,7 @@
 	require_once('include/config.inc.php');
 	require_once('include/hosts.inc.php');
 	require_once('include/forms.inc.php');
-	require_once('zabbix-translate.php');
+	require_once('include/zbxe_visual_imp.php');
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
 	$titulo 		= _zeT('Capacity and Trend');;//'Zabbix-CAT - Capacidade e Tendência';
 	$page['title'] 		= $titulo;

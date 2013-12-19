@@ -31,7 +31,7 @@
 	require_once 'include/config.inc.php';
 	require_once 'include/hosts.inc.php';
 	require_once 'include/reports.inc.php';
-	require_once('zabbix-translate.php');
+	require_once('include/zbxe_visual_imp.php');
 	$page['title']	= _zeT('Not Supported Items');
 	$page['file']	= 'zabbix-ns.php';
 	$page['hist_arg'] = array('groupid', 'hostid','graphid');
