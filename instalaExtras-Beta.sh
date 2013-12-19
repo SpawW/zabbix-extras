@@ -119,7 +119,7 @@ identificaDistro() {
         fi
     fi
     case $LINUX_DISTRO in
-	"ubuntu" | "debian" | "red hat" | "centos" | "opensuse")
+	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse")
             CAMINHO_RCLOCAL="/etc/rc.local";
             echo "-- Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
             ;;
