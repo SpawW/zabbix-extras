@@ -119,7 +119,7 @@ identificaDistro() {
         fi
     fi
     case $LINUX_DISTRO in
-	"ubuntu" | "debian" | "red hat" | "centos" | "opensuse")
+	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse")
             CAMINHO_RCLOCAL="/etc/rc.local";
             echo "-- Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
             ;;
@@ -143,6 +143,7 @@ caminhoFrontend() {
         echo $M_ERRO_CAMINHO"($CAMINHO_FRONTEND). "$M_ERRO_ABORT;
         exit 0;
     fi
+    cd $CAMINHO_FRONTEND;
     dialog --inputbox "$M_BASE\n$M_URL" 0 0 "http://localhost/zabbix" 2> $TMP_DIR/resposta_dialog.txt;
     URL_FRONTEND=`cat $TMP_DIR/resposta_dialog.txt`;
 }
@@ -436,7 +437,7 @@ instalaMenus() {
 }
 
 instalaArvore() {
-    instalaPacote "php5-curl";
+    instalaPacote "php5-curl php-curl";
     REPOS="https://github.com/SpawW/zabbix-service-tree/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvore.zip";
     DIR_TMP="/tmp/zabbix-service-tree-master/";

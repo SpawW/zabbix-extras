@@ -118,7 +118,9 @@ function _zeT ($p_msg) {
         global $DB;
             return "'".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? 
               pg_escape_string($p_texto) :
-              mysql_real_escape_string($p_texto))."'";
+                addslashes($p_texto)
+              //mysql_real_escape_string($p_texto)
+                )."'";
             //pg_escape_string
     }
     function versaoZabbix () {
