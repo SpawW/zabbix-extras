@@ -44,8 +44,8 @@ if ($total == 0) {
     echo "Criando zbxe_preferences...<br>";
     preparaQuery($query);
 
-    $query = "INSERT INTO `zbxe_translation` (`lang`, `tx_original`, `tx_new`) VALUES
-('en_GB', 'Capacity and Trend', 'Capacity and Trend'),
+    $query = "
+INSERT INTO `zbxe_translation` (`lang`, `tx_original`, `tx_new`) VALUES
 ('en_GB', 'Day', 'Day'),
 ('en_GB', 'Week', 'Week'),
 ('en_GB', 'Month', 'Month'),
@@ -55,7 +55,6 @@ if ($total == 0) {
 ('en_GB', 'Avg', 'Avg'),
 ('en_GB', 'Analysis', 'Analysis'),
 ('en_GB', 'Projection', 'Projection'),
-('en_GB', 'Ammount', 'Ammount'),
 ('en_GB', 'Formatting', 'Formatting'),
 ('en_GB', 'Chart', 'Chart'),
 ('en_GB', 'Update Filter', 'Update Filter'),
@@ -64,10 +63,8 @@ if ($total == 0) {
 ('en_GB', 'Instant', 'Instant'),
 ('en_GB', 'Value', 'Value'),
 ('en_GB', 'Type', 'Type'),
-('pt_BR', 'Capacity and Trend', 'Capacidade e Tendencia'),
 ('pt_BR', 'Analysis', 'Análise'),
 ('pt_BR', 'Projection', 'Projeção'),
-('pt_BR', 'Ammount', 'Qtd'),
 ('pt_BR', 'Formatting', 'Formatação'),
 ('pt_BR', 'Chart', 'Gráfico'),
 ('pt_BR', 'Update Filter', 'Atualizar Filtro'),
@@ -76,7 +73,6 @@ if ($total == 0) {
 ('pt_BR', 'Correlate', 'Correlacionar'),
 ('pt_BR', 'Not Supported Items', 'Itens não suportados'),
 ('pt_BR', 'Not Supported Items Report', 'Relatório de itens não suportados'),
-('pt_BR', 'Storage Costs', 'Custos de armazenamento'),
 ('pt_BR', 'Enter the parameters for research!', 'Informe parâmetros para a pesquisa!'),
 ('pt_BR', 'History Costs', 'Custo - Histórico'),
 ('pt_BR', 'Trends Costs', 'Custo - Médias'),
@@ -95,38 +91,68 @@ if ($total == 0) {
 ('pt_BR', 'Trend', 'Tendência'),
 ('pt_BR', 'Instant', 'Momento'),
 ('pt_BR', 'Value', 'Valor'),
-('pt_BR', 'Type', 'Tipo');";
+('pt_BR', 'Type', 'Tipo'),
+('en_GB', 'Capacity and Trends', 'Capacity and Trends'),
+('en_GB', 'Event Management', 'Event Management'),
+('en_GB', 'Not Supported Items', 'Not Supported Items'),
+('en_GB', 'Storage Costs', 'Storage Costs'),
+('en_GB', 'Amount', 'Amount'),
+('en_GB', 'Report generated on', 'Report generated on'),
+('en_GB', 'Correlate', 'Correlate'),
+('en_GB', 'Number of Incidents', 'Number of Incidents'),
+('en_GB', 'No events related to the event source or without events compatible with the filter informed.', 'No events related to the event source or without events compatible with the filter informed.'),
+('en_GB', 'Not Supported Items Report', 'Not Supported Items Report'),
+('en_GB', 'Format', 'Format'),
+('en_GB', 'View', 'View'),
+('en_GB', 'Enter the parameters for research!', 'Enter the parameters for research!'),
+('en_GB', 'History Costs', 'History Costs'),
+('en_GB', 'Trends Costs', 'Trends Costs'),
+('en_GB', 'Color', 'Color'),
+('en_GB', 'Company', 'Company'),
+('en_GB', 'Border', 'Border'),
+('en_GB', 'Maps', 'Maps'),
+('en_GB', 'Delete User Personalization', 'Delete User Personalization'),
+('en_GB', 'Extras', 'Extras'),
+('en_GB', 'Extras - Default', 'Extras - Default'),
+('en_GB', 'Translate', 'Translate'),
+('en_GB', 'English String', 'English String'),
+('en_GB', 'Translation for', 'Translation for'),
+('pt_BR', 'Amount', 'Amount'),
+('pt_BR', 'Color', 'Cor'),
+('pt_BR', 'Company', 'Empresa'),
+('pt_BR', 'Border', 'Borda'),
+('pt_BR', 'Maps', 'Mapas'),
+('pt_BR', 'Delete User Personalization', 'Remover personalização do usuário'),
+('pt_BR', 'Extras', 'Extras'),
+('pt_BR', 'Extras - Default', 'Extras - Default'),
+('pt_BR', 'Translate', 'Tradução'),
+('pt_BR', 'English String', 'Texto Original'),
+('pt_BR', 'Translation for', 'Tradução para');
+
+";
     echo "Populando dados padrões em zbxe_translation...<br>";
     preparaQuery($query);
 
     // Preferences -----------------------------------------------------------------
     $query = "INSERT INTO `zbxe_preferences` (`userid`, `tx_option`, `tx_value`, `st_ativo`) VALUES
-    (0, 'map_title_show', '1', 1),
-    (0, 'map_title_color', 'red', 1),
-    (0, 'map_border_show', '0', 1),
-    (0, 'map_background_color', 'green', 1),
-    (0, 'map_border_color', 'red', 1),
-    (0, 'map_date_color', 'black', 1),
-    (0, 'map_company', 'SERPRO', 1),
-    (0, 'logo_company', 'zbxe_logo', 1),
-    (3, 'logo_company', 'zbxe_company_2', 1),
-    (0, 'menu_01_cat', 'zabbix-cat|Capacity and Trends', 1),
-    (0, 'menu_02_em', 'zabbix-em|Event Management', 1),
-    (0, 'menu_03_ns', 'zabbix-ns|Not Supported Items', 1),
-    (0, 'menu_04_sc', 'zabbix-sc|Storage Costs', 1);";
+(0, 'map_title_show', '1', 1),
+(0, 'map_title_color', '555555', 1),
+(0, 'map_border_show', '1', 1),
+(0, 'map_background_color', 'FFFF99', 1),
+(0, 'map_border_color', '000044', 1),
+(0, 'map_date_color', 'FF3333', 1),
+(0, 'map_company', 'Zabbix-Extras 2', 1),
+(0, 'logo_company', 'zbxe_logo', 1),
+(3, 'logo_company', 'zbxe_company_2', 1),
+(0, 'menu_01_cat', 'zbxe-cat|Capacity and Trends', 1),
+(0, 'menu_02_em', 'zbxe-em|Event Management', 1),
+(0, 'menu_03_ns', 'zbxe-ns|Not Supported Items', 1),
+(0, 'menu_04_sc', 'zbxe-sc|Storage Costs', 1);
+";
 
     echo "Populando dados padrões em zbxe_preferences...<br>";
     preparaQuery($query);
 
-    /*
-    $query = "INSERT INTO `zbxe_preferences` (`userid`, `tx_option`, `tx_value`, `st_ativo`) VALUES 
-    (0, 'menu_10_geo', 'zbxe-geolocation|Geolocation', 1),
-    (0, 'menu_10_arvore', 'zbxe-arvore|Arvore', 1)";
-    echo "Inserindo menus para Arvore e Geolocalizacao...<br>";
-    preparaQuery($query);
-
-    */
-    
 } else {
     echo "Banco já inicializado!<br>";
 }

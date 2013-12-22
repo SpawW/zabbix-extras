@@ -31,7 +31,7 @@
 	require_once('include/forms.inc.php');
 	require_once('include/zbxe_visual_imp.php');
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$titulo 		= _zeT('Capacity and Trend');;//'Zabbix-CAT - Capacidade e Tendência';
+	$titulo 		= _zeT('Capacity and Trends');;//'Zabbix-CAT - Capacidade e Tendência';
 	$page['title'] 		= $titulo;
 	$page['file'] 		= 'zbxe-cat.php';
 	$page['hist_arg'] 	= array('hostid','groupid','graphid');
