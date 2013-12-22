@@ -22,35 +22,20 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ** 
 **/
-	function quotestr($p_texto) { // Função para colocar aspas com mais segurança
-		return "'".mysql_real_escape_string($p_texto)."'";
-	}
 ?>
 <?php
 	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
 	require_once('include/forms.inc.php');
 	require_once('include/zbxe_visual_imp.php');
-	$baseName = 'Zabbix-IS-';
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$titulo 			= _zeT('Ranking of Items');;//'Zabbix-IS - Capacidade e Tendência';
+	$titulo 		= _zeT('Ranking of Items');//'Zabbix-IS - Capacidade e Tendência';
 	$page['title'] 		= $titulo;
-	$page['file'] 		= 'zabbix-is.php';
+	$page['file'] 		= 'zbxe-ir.php';
 	$page['hist_arg'] 	= array('hostid','groupid','graphid');
-//	$page['scripts'] 	= array('class.calendar.js', 'gtlc.js');
 
 	include_once('include/page_header.php');
 ?>
 <?php
-	function newComboFilter ($query, $value, $name) {
-		$cmbRange 		= new CComboBox($name, $value, 'javascript: submit();');
-		$result			= DBselect($query);
-		$cmbRange->additem("0", "");
-		while($row_extra = DBfetch($result)){
-			$cmbRange->additem($row_extra['id'], $row_extra['description']);
-		}
-		return $cmbRange;
-	}
 	function newComboAPI ($Data, $keyField, $showField, $selected_value, $name, $reloadScript = 'javascript: submit();', $fristBlank = true) {
 		$cmbRange 		= new CComboBox($name, $selected_value, $reloadScript);
 		if ($fristBlank == true) {
@@ -58,35 +43,9 @@
 		}
 
 		for ($i = 0; $i < count($Data); $i++) {
-//		while($row_extra = DBfetch($result)){
 			$cmbRange->additem($Data[$i][$keyField], $Data[$i][$showField]);
 		}
 		return $cmbRange;
-	}
-	function descritivo($texto){
-		$texto = str_replace("\n",";\n",$texto);
-		$arrayDesc = explode("\n",$texto);
-		return new CTag('div', 'yes', $arrayDesc, 'text');
-	}
-	function exibeConteudo ($condicao,$conteudo) {
-		if ($condicao) { return $conteudo;} 
-		else { return array (""); }
-	}
-	function preparaQuery ($p_query) {
-		$result	= DBselect($p_query);
-		if (!$result) { 
-			die("Invalid query."//.mysql_error()
-			); 
-			return 0;
-		} else { return $result; } 
-	}
-	function valorCampo ($p_query, $p_campo) {
-		$retorno = "";
-		$result = preparaQuery($p_query);
-		while($row = DBfetch($result)){
-			$retorno = $row[$p_campo];
-		}
-		return $retorno;
 	}
 ?>
 <?php
@@ -100,7 +59,8 @@
 		'agregation'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
 		'keyStandard'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null),
 		'reportType'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador do formato
-		'searchgroupid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
+		'searchgroupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
+		'ordem'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	DB_ID,	null), // Ordenacao do relatorio
 
 /* actions */
 		'filter'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
@@ -117,15 +77,16 @@
 
 		'groupid' => get_request('groupid', null),
 		'searchgroupid' => get_request('searchgroupid', null),
+		'ordem' => get_request('ordem', null),
 		'hostid' => get_request('hostid', null),
 		'itemid' => get_request('itemid', null)
 	);
-	var_dump (get_request('keyStandard', ''));
-	
+
 	$pageFilter = new CPageFilter($options);
 	
 	$groupid = $_REQUEST['groupid'] 			= get_request('groupid', 0);
 	$searchgroupid = $_REQUEST['searchgroupid']	= get_request('searchgroupid', 0);
+	$ordem = $_REQUEST['ordem']	= get_request('ordem', 'max');
 	$hostid = $_REQUEST['hostid']	= get_request('hostid', 0);
 	$applicationid = $_REQUEST['applicationid']	= get_request('applicationid', 0);
 	$itemid = $_REQUEST['itemid']	= get_request('itemid', 0);
@@ -133,21 +94,9 @@
 	$reportType = $_REQUEST['reportType']	= get_request('reportType', 'html');
 	
 	// Verificação de segurança =========================================
+        $groupids = checkAccessGroup ('groupid');
+        $hostids = checkAccessHost('hostid');
 
-	if(get_request('groupid', 0) > 0){
-		$groupids = available_groups($_REQUEST['groupid'], 1);
-		$params = array(
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		if(empty($groupids)) access_deny();
-	}
-
-	if(get_request('hostid', 0) > 0){
-		$hostids = available_hosts($_REQUEST['hostid'], 1);
-		var_dump ($hostids);
-		if(empty($hostids)) access_deny();
-	}
 	$hostprof_wdgt 		= new CWidget();
 // Formulario de Filtro =========================================================
 
@@ -160,11 +109,13 @@
 	order_result($groupsArray['groups'], 'name');
 
 	$cmbGroupSearch = newComboAPI ($groupsArray['groups'], 'groupid', 'name', $searchgroupid, 'searchgroupid',true,'');
+        $cmbOrdem = newComboFilterArray(array(
+            'max' => _zeT('Max'), 'min' => _zeT('Min'), 'avg' => _zeT('Avg')
+        ),'ordem',$ordem);
 	$cmbGroups = newComboAPI ($groupsArray['groups'], 'groupid', 'name', $groupid, 'groupid');
 
 	$hostsArray = API::Host()->get(array(
 		'groupids' => $groupid,
-//		'editable' => 1,
 		'output' => API_OUTPUT_EXTEND
 	));
 	order_result($hostsArray,'host');
@@ -177,15 +128,6 @@
 		'output' => API_OUTPUT_EXTEND
 	));
 	$cmbApplications = newComboAPI($appArray,'applicationid','name',$applicationid,'applicationid');
-/*
-	$itemArray = API::Item()->get(array(
-		'hostids' => $hostid,
-		'sortfield' => '',
-		'output' => API_OUTPUT_EXTEND
-	));
-	var_dump($itemArray);
-	$cmbItems = newComboAPI($itemArray,'itemid','name',$itemid,'itemid');
-*/
 	$cmbItems 		= new CComboBox('itemid', $itemid, 'javascript: submit();');
 	$query 			=  "select it.itemid as id, it.name, it.key_ from items it inner join items_applications ia on ia.itemid = it.itemid and applicationid = ". $applicationid . " and it.status < 1 and it.flags <> 2 " . " order by 2 ";
 	$result			= DBselect($query);
@@ -221,56 +163,63 @@
 	$completo = $keyStandard !== '';
 
 /*----------- Implementa o Filtro ---------------*/
- 		$filter_table->addItem(new CDiv(_('Wizard'), 'thin_header')); // Search standard
- 		$filter_table->addRow(array(
-			array(bold(_('Group')), ': ', $cmbGroups),
-			array(bold(_('Host')), ': ', $cmbHosts),
-			exibeConteudo ($hostid > 0,array(bold(_('Application')), ': ', $cmbApplications)),
-			exibeConteudo ($applicationid > 0,array(bold(_('Item')), ': ', $cmbItems)),
-			array()
-		));
-		$filter_table2 = new CTable('', 'filter_config'); // Place to run the search	 
-		$filter_table2->setAttribute('border',0);
-		$filter_table2->setAttribute('width','100%');
- 		$filter_table2->addItem(new CDiv(_('Search definition'), 'thin_header'));
-	
-		if (($itemid > 0) and ($keyStandard == "")) {
-			$keyStandard = valorCampo ('select key_ as id from items where itemid = '.$itemid,'id');
-		}
-	
-		$filter_table2->addRow(array(
-			array(bold(_('Search group')), ': ', $cmbGroupSearch),
-			array(bold(_('Item key')),' ('._('like').'): ',new CTextBox('keyStandard', $keyStandard, 60)),
-			array()
-		));
-		
-		$filter_form = new CForm();
-		$filter_form->setMethod('get');
-		$filter_form->setAttribute('name','zbx_filter');
-		$filter_form->setAttribute('id','zbx_filter');
+        $filter_table->addItem(new CDiv(_('Wizard'), 'thin_header')); // Search standard
+        $filter_table->addRow(array(
+                array(bold(_('Group')), ': ', $cmbGroups),
+                array(bold(_('Host')), ': ', $cmbHosts),
+                exibeConteudo ($hostid > 0,array(bold(_('Application')), ': ', $cmbApplications)),
+                exibeConteudo ($applicationid > 0,array(bold(_('Item')), ': ', $cmbItems)),
+                array()
+        ));
+        $filter_table2 = new CTable('', 'filter_config'); // Place to run the search	 
+        $filter_table2->setAttribute('border',0);
+        $filter_table2->setAttribute('width','100%');
+        $filter_table2->addItem(new CDiv(_('Search definition'), 'thin_header'));
 
-		$reset = new CButton('reset',_('Reset'));
-		$reset->onClick("javascript: clearAllForm('zbx_filter');");
-		$grafico = new CButton('grafico',_zeT('Chart'));
-		// Habilita o botão de geração de gráfico quando tem host e item selecionado =============================================
-		if (($hostid < 1) and ($itemid < 1)) {
-			$grafico->setAttribute('disabled', '');
-		}
-		$grafico->onClick("javascript: fnGrafico();");
-		$filter = new CButton('filter',_zeT("Update Filter"));
-		$filter->onClick("javascript: submit();");
+        if (($itemid > 0) and ($keyStandard == "")) {
+                $keyStandard = valorCampo ('select key_ as id from items where itemid = '.$itemid,'id');
+        }
 
-		$footer_col = new CCol(array($filter, SPACE, $reset, SPACE, $grafico), 'center');
-		$footer_col->setColSpan(4);
-	
-		$filter_table2->addRow($footer_col);
+        $filter_table2->addRow(array(
+                array(bold(_zeT('Search group')), ': ', $cmbGroupSearch),
+                array(bold(_zeT('Item key')),' ('._('like').'): ',new CTextBox('keyStandard', $keyStandard, 60)),
+                array(bold(_zeT('Sort Order')), ': ', $cmbOrdem),
+                array()
+        ));
 
-		$filter_form->addItem($filter_table);
-		$filter_form->addItem($filter_table2);
-		$hostprof_wdgt->addFlicker($filter_form, true);
+        $filter_form = new CForm();
+        $filter_form->setMethod('get');
+        $filter_form->setAttribute('name','zbx_filter');
+        $filter_form->setAttribute('id','zbx_filter');
+
+        $reset = new CButton('reset',_('Reset'));
+        $reset->onClick("javascript: clearAllForm('zbx_filter');");
+        $grafico = new CButton('grafico',_zeT('Chart'));
+        // Habilita o botão de geração de gráfico quando tem host e item selecionado =============================================
+        if (($hostid < 1) and ($itemid < 1)) {
+                $grafico->setAttribute('disabled', '');
+        }
+        $grafico->onClick("javascript: fnGrafico();");
+        $filter = new CButton('filter',_zeT("Update Filter"));
+        $filter->onClick("javascript: submit();");
+
+        $footer_col = new CCol(array($filter, SPACE, $reset, SPACE, $grafico), 'center');
+        $footer_col->setColSpan(4);
+
+        $filter_table2->addRow($footer_col);
+
+        $filter_form->addItem($filter_table);
+        $filter_form->addItem($filter_table2);
+        $hostprof_wdgt->addFlicker($filter_form, true);
 // FIM Formulario de Filtro =========================================================
 	if ($completo) {
-		$result			= DBselect("select value_type from items it where it.itemid = ".$_REQUEST['itemid']);
+            echo "oi";
+            // Localiza todos os itens similares.
+            // 
+            // Recupera os últimos valores coletados
+            // Monta o relatório
+            exit;
+		$result	= DBselect("select value_type from items it where it.itemid = ".$_REQUEST['itemid']);
 		$cmbItems->additem("0", "");
 		while($row_extra = DBfetch($result)){ $tipo = $row_extra['value_type']; }
 		$tabela_log = ($tipo == 0 ? "trends" : "trends_uint");

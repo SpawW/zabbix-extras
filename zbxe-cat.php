@@ -33,7 +33,7 @@
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
 	$titulo 		= _zeT('Capacity and Trend');;//'Zabbix-CAT - Capacidade e Tendência';
 	$page['title'] 		= $titulo;
-	$page['file'] 		= 'zabbix-cat.php';
+	$page['file'] 		= 'zbxe-cat.php';
 	$page['hist_arg'] 	= array('hostid','groupid','graphid');
 	$page['scripts'] 	= array('class.calendar.js', 'gtlc.js');
 
@@ -101,20 +101,6 @@
 
         $groupids = checkAccessGroup ('groupid');
         $hostids = checkAccessHost('hostid');
-/*	if(get_request('groupid', 0) > 0){
-		$groupids = available_groups($_REQUEST['groupid'], 1);
-		$params = array(
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		if(empty($groupids)) access_deny();
-	}
-
-	if(get_request('hostid', 0) > 0){
-		$hostids = available_hosts($_REQUEST['hostid'], 1);
-		if(empty($hostids)) access_deny();
-	}
-*/
         $hostprof_wdgt 		= new CWidget();
 // Formulario de Filtro =========================================================
 
@@ -218,7 +204,7 @@
 		$reporttimetab2 = new CTable(null,'calendar');
 		
 		$reporttimetab2->addRow(array(array(bold(_zeT('Analysis')), ': '), array($cmbTimeSource,$cmbAgregation)));
-		$reporttimetab2->addRow(array(array(bold(_zeT("Projection")), ': '), array($cmbTimeProjection,array(bold(_zeT("Ammount")), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
+		$reporttimetab2->addRow(array(array(bold(_zeT("Projection")), ': '), array($cmbTimeProjection,array(bold(_zeT("Amount")), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
 		$reporttimetab2->addRow(array(array(bold(_zeT('Formatting')), ': '), array($cmbFormato)));
 /*----------- Implementa o Filtro por período ---------------*/
 		$filter_table->addRow(array(

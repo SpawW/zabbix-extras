@@ -56,7 +56,7 @@ else {
 	$CSV_EXPORT = false;
         
 	$page['title'] = _zeT('Event Management');
-	$page['file'] = 'zabbix-em.php';
+	$page['file'] = 'zbxe-em.php';
 	$page['hist_arg'] = array('groupid', 'hostid');
 	$page['scripts'] = array('class.calendar.js', 'gtlc.js');
 
@@ -922,7 +922,7 @@ if ($mode == "report") { // Custom event report for show only events related
 				// actions
                                 // Adail - Ajustar aqui para exibir o total de eventos no período ----
 				$actions = 
-                                new CButton("btnEM", _zeT('Correlate'), "return PopUp('zabbix-em.php?p_mode=report&"
+                                new CButton("btnEM", _zeT('Correlate'), "return PopUp('zbxe-em.php?p_mode=report&"
                                      ."p_triggerid=".$event['objectid']
                                         //."&p_check_range=".$check_range
                                      ."&fullscreen=1&form_refresh=0&p_stime=".$event['clock']

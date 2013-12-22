@@ -116,12 +116,10 @@ function _zeT ($p_msg) {
     }
     function quotestr($p_texto) { // Função para colocar aspas com mais segurança
         global $DB;
-            return "'".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? 
-              pg_escape_string($p_texto) :
-                addslashes($p_texto)
-              //mysql_real_escape_string($p_texto)
-                )."'";
-            //pg_escape_string
+        return "'".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? 
+          pg_escape_string($p_texto) :
+            addslashes($p_texto)
+        )."'";
     }
     function versaoZabbix () {
         return substr(ZABBIX_VERSION,0,3);
@@ -146,7 +144,13 @@ function _zeT ($p_msg) {
         return $hostids;
     }
     
-
+    function zbxeConfigValue ($param, $id = 0) {
+        $query = 'select tx_value from zbxe_preferences where userid = '
+                . $id . " and tx_option = " . quotestr($param);
+//        var_dump("<br>[$query]");
+        $retorno = valorCampo($query, 'tx_value');
+        return $retorno;
+    }
 
 global $ZBXE_VAR, $ZBXE_MENU;
 $ZBXE_VAR = array();
@@ -172,7 +176,7 @@ while ($row = DBfetch($res)) {
         $ZBXE_VAR[$row['tx_option']] = $row['tx_value'];
     }
 }
-//var_dump($ZBXE_MENU);
+//var_dump($ZBXE_VAR);
 unset($tmp);
 // Calcula o tamanho do nome da empresa no grafico
 $ZBXE_VAR['map_date_width'] = 120 + round((strlen($ZBXE_VAR['map_company'].' ')*5));

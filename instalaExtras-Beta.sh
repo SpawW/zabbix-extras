@@ -256,7 +256,7 @@ corTituloMapa() {
     ARQUIVO="include/classes/sysmaps/CMapPainter.php";
     # Substituindo a cor do titulo do mapa =====================================
     COR='blue';
-    sed -i "s/'titleColor' => '.*'/'titleColor' => '$COR'/" $ARQUIVO;
+    sed -i "s/'titleColor' => '.*'/'titleColor' => '#$COR'/" $ARQUIVO;
     # Removendo o titulo dos mapas =============================================
     ESCONDE='S';
     if ["$ESCONDE" -eq "S" ]; then
@@ -272,7 +272,7 @@ corTituloMapa() {
     sed -i "s/'border' => .*,/'border' => $BORDA,/" $ARQUIVO;
     # Define a cor de fundo do mapa ============================================
     CORFUNDO='false';
-    sed -i "s/'bgColor' => '.*',/'bgColor' => '$CORFUNDO',/" $ARQUIVO;
+    sed -i "s/'bgColor' => '.*',/'bgColor' => '#$CORFUNDO',/" $ARQUIVO;
 #'borderColor' => 'black'
     # Arquivo com as principais definicoes dos mapas ===========================
     ARQUIVO="include/classes/sysmaps/CCanvas.php";
@@ -308,35 +308,105 @@ customMapas() {
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
     FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
     if [ ! -z $INIINST ]; then
-        installMgs "U" "cores mapa"; #echo "--> Upgrade install (cores mapa)...";
+        installMgs "U" "cores mapa"; 
     else
-        installMgs "N" "cores mapa"; #echo "--> Clean Install (cores mapa)...";
+        installMgs "N" "cores mapa"; 
         TMP='$this->options = array(';
         TMP_FIM="'drawAreas' => true";
         INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
         FIMINST=`cat $ARQUIVO | sed -ne "/$TMP_FIM/{=;q;}"`;
     fi
     sed -i "$INIINST,$FIMINST d" $ARQUIVO;
-    TXT_CUSTOM="global \$ZBXE_VAR;\n\$this->options = array(\n'map' => array(\n  'bgColor' => \$ZBXE_VAR['map_background_color'],";
-    TXT_CUSTOM="$TXT_CUSTOM\n  'borderColor' => \$ZBXE_VAR['map_border_color'], \n  'titleColor' => \$ZBXE_VAR['map_title_color'],";
+    TXT_CUSTOM="global \$ZBXE_VAR;\n\$this->options = array(\n'map' => array(\n  'bgColor' => 'red',";
+    TXT_CUSTOM="$TXT_CUSTOM\n  'borderColor' => 'darkred', \n  'titleColor' => 'green',";
     TXT_CUSTOM="$TXT_CUSTOM\n  'border' => \$ZBXE_VAR['map_border_show'], 'drawAreas' => true";
+# Mudado por conta da validacao de cores do modulo ...
+#    TXT_CUSTOM="global \$ZBXE_VAR;\n\$this->options = array(\n'map' => array(\n  'bgColor' => \$ZBXE_VAR['map_background_color'],";
+#    TXT_CUSTOM="$TXT_CUSTOM\n  'borderColor' => \$ZBXE_VAR['map_border_color'], \n  'titleColor' => \$ZBXE_VAR['map_title_color'],";
+#    TXT_CUSTOM="$TXT_CUSTOM\n  'border' => \$ZBXE_VAR['map_border_show'], 'drawAreas' => true";
+#
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
-    # ------- customizacao para adicionar o nome da empresa nos mapas ----------
-    # Arquivo com as principais definicoes dos mapas ===========================
+
+    # ------- Modificacao no canvas para suportar as cores e o nome da empresa -
     ARQUIVO="include/classes/sysmaps/CCanvas.php";
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
     FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
     if [ ! -z $INIINST ]; then
-        installMgs "U" "empresa"; #echo "--> Upgrade install (empresa)...";
+        installMgs "U" "empresa"; 
     else
-        installMgs "N" ""; #echo "--> Clean Install (empresa)...";
+        installMgs "N" "empresa"; 
         TMP='imagestring($this->canvas';
         INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
         FIMINST=$INIINST;
     fi
     sed -i "$INIINST,$FIMINST d" $ARQUIVO;
-    TXT_CUSTOM="global \$ZBXE_VAR;\n imagestring(\$this->canvas, 0, \$this->width - \$ZBXE_VAR['map_date_width'], \$this->height - 12, \$ZBXE_VAR[\"map_company\"].' '.\$date, \$this->getColor(\$ZBXE_VAR[\"map_date_color\"]));";
+    TXT_CUSTOM="global \$ZBXE_VAR;\n imagestring(\$this->canvas, 0, \$this->width - \$ZBXE_VAR['map_date_width'], \$this->height - 12, \$ZBXE_VAR[\"map_company\"].' '.\$date, \$this->getColor('darkgreen'));";
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
+# Adicao de funcao para calculo de cores personalizadas
+    TAG_INICIO='##Zabbix-Extras-function-custom';
+    TAG_FINAL="$TAG_INICIO-FIM";
+    INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
+    FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
+    if [ ! -z $INIINST ]; then
+        installMgs "U" "funcao adicional para cores"; 
+    else
+        installMgs "N" "funcao adicional para cores"; 
+        TMP='class CCanvas {';
+        INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
+        FIMINST=$INIINST;
+    fi
+    sed -i "$INIINST,$FIMINST d" $ARQUIVO;
+    TXT_CUSTOM="global \$ZBXE_VAR;\n";
+    TXT_CUSTOM="$TXT_CUSTOM function zbxeHtmlColorToRGB(\$color){ \n\t \$hexcolor = str_split(\$color, 2); \n";
+    TXT_CUSTOM="$TXT_CUSTOM \t\$bincolor[0] = hexdec(\"0x{\$hexcolor[0]}\"); \n\t \$bincolor[1] = hexdec(\"0x{\$hexcolor[1]}\"); \n";
+    TXT_CUSTOM="$TXT_CUSTOM \t\$bincolor[2] = hexdec(\"0x{\$hexcolor[2]}\"); \n\t return \$bincolor; \n }";
+    TXT_CUSTOM="$TXT_CUSTOM \n\nclass CCanvas {";
+    sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
+# Customizando cores padrao para suportar cores dinamicas
+    TAG_INICIO='##Zabbix-Extras-color-custom';
+    TAG_FINAL="$TAG_INICIO-FIM";
+    INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
+    FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
+    if [ ! -z $INIINST ]; then
+        installMgs "U" "customizando cores padroes"; 
+    else
+        installMgs "N" "customizando cores padroes"; 
+        TMP="blue";
+        INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
+        FIMINST=$INIINST;
+    fi
+    sed -i "$INIINST,$FIMINST d" $ARQUIVO;
+    TXT_CUSTOM="global \$ZBXE_VAR;\n ";
+    TXT_CUSTOM="$TXT_CUSTOM \$tmp = zbxeHtmlColorToRGB(\$ZBXE_VAR['map_background_color']); ";
+    TXT_CUSTOM="$TXT_CUSTOM \n \$this->colors['red'] = imagecolorallocate(\$this->canvas, \$tmp[0],\$tmp[1], \$tmp[2]); \n";
+    TXT_CUSTOM="$TXT_CUSTOM \$tmp = zbxeHtmlColorToRGB(\$ZBXE_VAR['map_border_color']); ";
+    TXT_CUSTOM="$TXT_CUSTOM \n \$this->colors['darkred'] = imagecolorallocate(\$this->canvas, \$tmp[0],\$tmp[1], \$tmp[2]); \n";
+    TXT_CUSTOM="$TXT_CUSTOM \$tmp = zbxeHtmlColorToRGB(\$ZBXE_VAR['map_title_color']); ";
+    TXT_CUSTOM="$TXT_CUSTOM \n \$this->colors['green'] = imagecolorallocate(\$this->canvas, \$tmp[0],\$tmp[1], \$tmp[2]); \n";
+    TXT_CUSTOM="$TXT_CUSTOM \$tmp = zbxeHtmlColorToRGB(\$ZBXE_VAR['map_date_color']); ";
+    TXT_CUSTOM="$TXT_CUSTOM \n \$this->colors['darkgreen'] = imagecolorallocate(\$this->canvas, \$tmp[0],\$tmp[1], \$tmp[2]); \n";
+    TXT_CUSTOM="$TXT_CUSTOM \n\t\t\$this->colors['blue'] = imagecolorallocate(\$this->canvas, 0, 0, 255);";
+    sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
+
+    # ------- customizacao para esconder o título dos mapas --------------------
+    ARQUIVO="include/classes/sysmaps/CMapPainter.php";
+    TAG_INICIO='##Zabbix-Extras-map-title-custom';
+    TAG_FINAL="$TAG_INICIO-FIM";
+    INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
+    FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
+    if [ ! -z $INIINST ]; then
+        installMgs "U" "esconde titulo"; 
+    else
+        installMgs "N" "esconde titulo"; 
+        TMP='\$this->canvas->drawTitle';
+        INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
+        FIMINST=$INIINST;
+    fi
+    sed -i "$INIINST,$FIMINST d" $ARQUIVO;
+    TXT_CUSTOM="global \$ZBXE_VAR;\n if (intval(\$ZBXE_VAR['map_title_show']) > 0) { \n"
+    TXT_CUSTOM="$TXT_CUSTOM \$this->canvas->drawTitle(\$this->mapData['name'], \$this->options['map']['titleColor']); \n }";
+    sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
+
 }
 customLogo() {
     echo "-> Configurando suporte a logotipo personalizado...";
@@ -404,7 +474,7 @@ instalaPortletNS() {
     fi
     sed -i "$INIINST,$FIMINST d" $ARQUIVO;
     #TXT_CUSTOM="new CSpan(\$status['items_count_not_supported'], 'unknown')";
-    TXT_CUSTOM="new CLink(\$status['items_count_not_supported']\, 'zabbix-ns.php?groupid=0&hostid=0')";
+    TXT_CUSTOM="new CLink(\$status['items_count_not_supported']\, 'zbxe-ns.php?groupid=0&hostid=0')";
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
 }
 
@@ -545,6 +615,55 @@ instalaZE() {
 #set +x;
     instalaLiteral;
 }
+customProfile() {
+# Adicao de Aba no profile do usuario para permitir configuracoes adicionais ---
+    ARQUIVO="profile.php";
+    TAG_INICIO='##Zabbix-Extras-gui-custom';
+    TAG_FINAL="$TAG_INICIO-FIM";
+    INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
+    FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
+    if [ ! -z $INIINST ]; then
+        installMgs "U" "personalizando profile"; 
+    else
+        installMgs "N" "personalizando profile"; 
+        TMP='title';
+        INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
+        FIMINST=$INIINST;
+    fi
+    sed -i "$INIINST,$FIMINST d" $ARQUIVO;
+    TXT_CUSTOM="\n require_once ('include/views/zbxe.users.extra.edit.php');\n";
+    TXT_CUSTOM="$TXT_CUSTOM \n \$page['title'] = _('User profile');";
+    sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
+# 
+    modifica "$ARQUIVO" "field-global" "Ajustando fields para modo global" '$fields = array(' 'global $fields;\n'
+    modifica "$ARQUIVO" "check-fields" "Adicionando parametros personalizados" 'check_fields($fields);' 'zbxeFields();'
+    modifica "$ARQUIVO" "check-fields-rules" "Adicionando regra de negocio" '\/\/ secondary actions' 'zbxeControler();'
+    modifica "include/views/administration.users.edit.php" "users-interface" "Adicionando aba do extras no profile" '$userForm->addItem($userTab);' '$userTab = zbxeView($userTab);'
+}
+
+modifica() {
+# $1 = Nome do arquivo
+# $2 = TAG
+# $3 = TAG Humana
+# $4 = Texto identificador de inicio
+# $5 = Texto customizado
+    ARQUIVO="$1";
+    TAG_INICIO="##Zabbix-Extras-$2-custom";
+    TAG_FINAL="$TAG_INICIO-FIM";
+    INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
+    FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
+    if [ ! -z $INIINST ]; then
+        installMgs "U" "$3"; 
+    else
+        installMgs "N" "$3"; 
+        TMP="$4";
+        INIINST=`cat $ARQUIVO | sed -ne "/$TMP/{=;q;}"`;
+        FIMINST=$INIINST;
+    fi
+    sed -i "$INIINST,$FIMINST d" $ARQUIVO;
+    TXT_CUSTOM="$5 \n $4";
+    sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
+}
 
 identificaDistro;
 preReq;
@@ -560,6 +679,7 @@ instalaGeo;
 instalaArvore;
 instalaZE;
 instalaMenus;
+customProfile;
 
 echo "Parametros usados para instalacao:";
 echo "URL do Zabbix: [$URL_FRONTEND]";

@@ -33,7 +33,7 @@
 	require_once 'include/reports.inc.php';
 	require_once('include/zbxe_visual_imp.php');
 	$page['title']	= _zeT('Not Supported Items');
-	$page['file']	= 'zabbix-ns.php';
+	$page['file']	= 'zbxe-ns.php';
 	$page['hist_arg'] = array('groupid', 'hostid','graphid');
 	$page['scripts'] = array('class.calendar.js', 'scriptaculous.js?load=effects');
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);

@@ -31,7 +31,7 @@
 	
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
 	$page['title'] 		= _zeT('Storage Costs');
-	$page['file'] 		= 'zabbix-sc.php';
+	$page['file'] 		= 'zbxe-sc.php';                                    
 	$page['hist_arg'] 	= array('hostid','groupid');
 
 	include_once('include/page_header.php');
