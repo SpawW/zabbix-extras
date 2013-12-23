@@ -11,4 +11,4 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/zbxe_visual_imp.php';
 header( "Content-type: image/png" );
 $query = "SELECT image FROM images WHERE name = '".$ZBXE_VAR['logo_company']."'";
-echo  zbxeFieldValue($query,'image');
+echo  zbx_unescape_image(zbxeFieldValue($query,'image'));

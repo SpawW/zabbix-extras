@@ -65,7 +65,8 @@ function _zeT ($p_msg) {
     function preparaQuery ($p_query) {
         $result	= DBselect($p_query);
         if (!$result) { 
-            die("Invalid query [$p_query].".mysql_error()); 
+            global $DB;
+            die("Invalid query [$p_query].". ( $DB['TYPE'] == ZBX_DB_POSTGRESQL ? "" : mysql_error())); 
             return 0;
         } else { return $result; } 
     }

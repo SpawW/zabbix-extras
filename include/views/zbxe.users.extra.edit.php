@@ -36,7 +36,7 @@ function zbxeControler() {
     if (isset($_REQUEST['save'])) {
 //var_dump($_REQUEST);
         if (isset ($_REQUEST['xbxe_clean']) && $_REQUEST['xbxe_clean'] == "yes") {
-            $query = "delete from `zbxe_preferences`  where userid = " . CWebUser::$data['userid'];
+            $query = "delete from zbxe_preferences  where userid = " . CWebUser::$data['userid'];
 //var_dump($query);
             preparaQuery($query);
         }
@@ -103,7 +103,8 @@ function zbxeShowTranslation () {
     $userFormExtra = new CFormList('userFormExtraTra');
     
     $userFormExtra->addRow(_zeT('English String'), _zeT('Translation for') . " " . CWebUser::$data['lang']);
-    $res = DBselect('select tx_original, tx_new from zbxe_translation where lang="'.CWebUser::$data['lang'].'" order by tx_original');
+    $res = DBselect('select tx_original, tx_new from zbxe_translation where lang='
+            .quotestr(CWebUser::$data['lang']).' order by tx_original');
     $i=0;
     while ($row = DBfetch($res)) {
         $tx_new = new CTextBox("translate[$i][new]", $row['tx_new'], ZBX_TEXTBOX_STANDARD_SIZE);
