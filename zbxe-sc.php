@@ -145,8 +145,11 @@ INNER JOIN hosts_groups hgr
 . "\n order by host_name, item_key " ;
                 $report		= Array();
                 if ($view == "G") {
-                    $baseQuery = "SELECT host_name, hostid, SUM( history_costs ) AS history_costs, SUM( trends_costs ) AS trends_costs FROM ("
-                            . $baseQuery . ") hitem group by hostid order by host_name";
+                    $baseQuery = "SELECT hitem.host_name, hitem.hostid"
+                            . ", SUM( history_costs ) AS history_costs, SUM( trends_costs ) AS trends_costs"
+                            . " FROM (" . $baseQuery . ") hitem "
+                            . " Group by hitem.hostid, hitem.host_name "
+                            . " order by hitem.host_name, hitem.hostid";
                     $result = DBselect($baseQuery);
                     $cont = $historyTotal = $trendTotal = $storageTotal	= 0;
                     while($row = DBfetch($result)){
