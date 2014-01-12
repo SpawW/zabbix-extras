@@ -610,6 +610,9 @@ instalaZE() {
     cp -Rp * "$CAMINHO_FRONTEND";
     echo "Iniciando banco de dados...";
 #set -x;
+    if [ -f "./zbxe-inicia-bd.php" ]; then
+        rm "./zbxe-inicia-bd.php";
+    fi
     wget "$URL_FRONTEND/zbxe-inicia-bd.php" ;
     rm "./zbxe-inicia-bd.php";
 #set +x;
