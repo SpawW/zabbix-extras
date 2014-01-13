@@ -30,7 +30,7 @@ idioma() {
         --radiolist 'Informe o idioma (Enter the language for the installer) '  \
         0 0 0                                    \
         pt   'Portugues / Brasil'  on    \
-        en   'Ingles'   off   \
+        en   'English'   off   \
         2> $TMP_DIR/resposta_dialog.txt
     OPCOES=`cat $TMP_DIR/resposta_dialog.txt `;
     if [ "`echo $OPCOES| wc -m`" -eq 3 ]; then
