@@ -533,7 +533,7 @@ instalaArvore() {
     #cat "$CAMINHO_FRONTEND/extras/service-tree/__conf.php" | grep -v "^\$ZABBIX" > "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
 set -x
     TMP="\$ZABBIX_CONF = '$CAMINHO_FRONTEND/conf/zabbix.conf.php'";
-    echo "\n$TMP;" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
+    echo "$TMP;" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
     TMP="$URL_FRONTEND";
     echo "\$ZABBIX_API = '$TMP';" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
 set +x;
