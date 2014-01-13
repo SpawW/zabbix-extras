@@ -388,7 +388,7 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 		}
 		$tituloGrafico .= $descUnidade;
 		$script = "function fnGrafico () { ".
-		"window.open(\"zabbix-cat-chart-builder.php?p_title=".
+		"window.open(\"zbxe-cat-chart-builder.php?p_title=".
 		$tituloGrafico."&p_points=".$points."'\",\"graficoZabbixCat\",\"width=720,height=350,top=130,left=150,scrollbars=yes,resizable=no\");"
 		.'};';
 		insert_js ($script);
