@@ -620,9 +620,10 @@ instalaZE() {
 #set +x;
     instalaLiteral;
 }
-customProfile() {
+
+commonUserChange() {
+    ARQUIVO="$1";
 # Adicao de Aba no profile do usuario para permitir configuracoes adicionais ---
-    ARQUIVO="profile.php";
     TAG_INICIO='##Zabbix-Extras-gui-custom';
     TAG_FINAL="$TAG_INICIO-FIM";
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
@@ -639,10 +640,22 @@ customProfile() {
     TXT_CUSTOM="\n require_once ('include/views/zbxe.users.extra.edit.php');\n";
     TXT_CUSTOM="$TXT_CUSTOM \n \$page['title'] = _('User profile');";
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
-# 
+
     modifica "$ARQUIVO" "field-global" "Ajustando fields para modo global" '$fields = array(' 'global $fields;\n'
     modifica "$ARQUIVO" "check-fields" "Adicionando parametros personalizados" 'check_fields($fields);' 'zbxeFields();'
+}
+
+customProfile() {
+    ARQUIVO="profile.php";
+    commonUserChange "$ARQUIVO";
+# Especifico do profile.php
     modifica "$ARQUIVO" "check-fields-rules" "Adicionando regra de negocio" '\/\/ secondary actions' 'zbxeControler();'
+    ARQUIVO="users.php";
+    commonUserChange "$ARQUIVO";
+# Especifico do users.php
+    TMPTAG="validate_sort_and_sortorder('alias', ZBX_SORT_UP);";
+    modifica "$ARQUIVO" "check-fields-rules" "Adicionando regra de negocio" "$TMPTAG" 'zbxeControler();'
+# Adicao das tabs 
     modifica "include/views/administration.users.edit.php" "users-interface" "Adicionando aba do extras no profile" '$userForm->addItem($userTab);' '$userTab = zbxeView($userTab);'
 }
 
@@ -675,7 +688,8 @@ preReq;
 idioma;
 caminhoFrontend;
 
-instalaArvore;
+customProfile;
+#instalaArvore;
 exit;
 #confirmaInstalacao;
 

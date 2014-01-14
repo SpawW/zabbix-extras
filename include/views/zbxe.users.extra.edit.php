@@ -20,6 +20,14 @@ function zbxeFields() {
 }
 function zbxeControler() {
     global $fields, $ZBXE_VAR, $CAMPOS;
+    global $_SERVER;
+    if (strpos($_SERVER["REQUEST_URI"],"users.php") > 0 && get_request('userid',-1) > -1) {
+        $userid = get_request('userid', 0);
+//        var_dump("id de usuario". $userid);
+    } else {
+        $userid = CWebUser::$data['userid'];
+    }
+    
     // Salvando tradução ------------==================--------------===========
     $translation = get_request('translate', array());
     foreach ($translation as $number => $curString) {
@@ -36,27 +44,30 @@ function zbxeControler() {
     if (isset($_REQUEST['save'])) {
 //var_dump($_REQUEST);
         if (isset ($_REQUEST['xbxe_clean']) && $_REQUEST['xbxe_clean'] == "yes") {
-            $query = "delete from zbxe_preferences  where userid = " . CWebUser::$data['userid'];
+            $query = "delete from zbxe_preferences  where userid = " . $userid;
 //var_dump($query);
             preparaQuery($query);
+        } else {
+            $_REQUEST['xbxe_clean'] = get_request('xbxe_clean');
         }
         foreach ($ZBXE_VAR as $key => $value) {
 //var_dump ("<br>--".$key);
             if (strpos($key,'_show') == 0 && $_REQUEST['xbxe_clean'] != "yes") {
                 $tmp = get_request($key);
                 // Atualizando dados de usuario ------------------------------------
-                if (zbxeConfigValue($key,CWebUser::$data['userid'] ) != $tmp && strlen($tmp) > 0) {
+//                var_dump("$key - $tmp - " . zbxeConfigValue($key,$userid ) . "<br>");
+                if (zbxeConfigValue($key,$userid ) != $tmp && strlen($tmp) > 0) {
+//                    var_dump("oi<br>");
                     // Verifica se ja existe registro para o usuario, se nao existir insere
-                    //var_dump(zbxeConfigValue($key,CWebUser::$data['userid'] ));
-                    if (zbxeConfigValue($key,CWebUser::$data['userid'] ) == "") {
+                    if (zbxeConfigValue($key,$userid ) == "") {
                         $query = "insert into zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES ("
-                          . CWebUser::$data['userid'] . ", " . quotestr($key). ", ". quotestr($tmp)
+                          . $userid . ", " . quotestr($key). ", ". quotestr($tmp)
                           . " ,1 ) " ;
                     } else {
                         $query = "update zbxe_preferences set tx_value = " . quotestr($tmp)
-                           . " where userid = ". CWebUser::$data['userid'] ." and tx_option = " . quotestr($key) . " " ;
+                           . " where userid = ". $userid ." and tx_option = " . quotestr($key) . " " ;
                     }
-    //                var_dump($query);
+//                    var_dump($query);
                     preparaQuery($query);
                 }
             }
@@ -80,6 +91,7 @@ function zbxeControler() {
 }
 
 function zbxeView($userTab) {
+    global $_SERVER;
     // -----------------------------------------------------------------------------
     zbxeControler();
 
@@ -89,9 +101,11 @@ function zbxeView($userTab) {
     $userTab->addTab('zeTab', _zeT('Extras'), $userFormExtra);
     // Personalizações globais -------------------------------------------------
     if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_SUPER_ADMIN))) {
-        $userTab->addTab('zeTabAdmin', _zeT('Extras - Default'), $userFormExtraAdmin);
-        // Personalização de traduções ---------------------------------------------
-        $userTab->addTab('zeTabTrans', _zeT('Translate'), zbxeShowTranslation());
+        if (strpos($_SERVER["REQUEST_URI"],"users.php?form=update&userid=") < 1) {
+            $userTab->addTab('zeTabAdmin', _zeT('Extras - Default'), $userFormExtraAdmin);
+            // Personalização de traduções ---------------------------------------------
+            $userTab->addTab('zeTabTrans', _zeT('Translate'), zbxeShowTranslation());
+        }
     }
     return $userTab;
 }
@@ -117,7 +131,12 @@ function zbxeShowTranslation () {
 
 function zbxeShowPreferences ($id) {
     //global $ZBXE_VAR;
-    $userid = ($id != "" ? 0 : CWebUser::$data['userid']);
+    global $_SERVER;
+    if (strpos($_SERVER["REQUEST_URI"],"users.php?form=update&userid=") > 0) {
+        $userid = get_request('userid', 0);
+    } else {
+        $userid = ($id != "" ? 0 : CWebUser::$data['userid']);
+    }
     
     $userFormExtra = new CFormList('userFormExtra'.$id);
     // Interface Web
@@ -146,7 +165,7 @@ function zbxeShowPreferences ($id) {
         ), SPACE, SPACE));
 
     $userFormExtra->addRow(_zeT('Maps'), new CDiv($mapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
-    if ($userid > 0) { 
+    if (CWebUser::$data['userid'] > 0) { 
         $userFormExtra->addRow(_zeT('Delete User Personalization'), new CCheckBox('xbxe_clean'));
     }
     return $userFormExtra;

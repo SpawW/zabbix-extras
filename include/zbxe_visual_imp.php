@@ -148,7 +148,7 @@ function _zeT ($p_msg) {
     function zbxeConfigValue ($param, $id = 0) {
         $query = 'select tx_value from zbxe_preferences where userid = '
                 . $id . " and tx_option = " . quotestr($param);
-//        var_dump("<br>[$query]");
+        //var_dump("<br>[$query]<br>");
         $retorno = valorCampo($query, 'tx_value');
         return $retorno;
     }
