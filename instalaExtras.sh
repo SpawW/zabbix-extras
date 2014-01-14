@@ -5,6 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
+VERSAO_INST="2.0.1";
 DATA_BACKUP=`date +%Y%m%d`;
 
 installMgs() {
@@ -26,7 +27,7 @@ idioma() {
         mkdir $TMP_DIR;
     fi
     dialog \
-        --title 'Zabbix Extras Installer'        \
+        --title 'Zabbix Extras Installer ['$VERSAO_INST']'        \
         --radiolist 'Informe o idioma (Enter the language for the installer) '  \
         0 0 0                                    \
         pt   'Portugues / Brasil'  on    \
@@ -531,10 +532,12 @@ instalaArvore() {
     cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree";
     # Alterar arquivos
     #cat "$CAMINHO_FRONTEND/extras/service-tree/__conf.php" | grep -v "^\$ZABBIX" > "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
+set -x
     TMP="\$ZABBIX_CONF = '$CAMINHO_FRONTEND/conf/zabbix.conf.php'";
     echo "$TMP;" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
     TMP="$URL_FRONTEND";
     echo "\$ZABBIX_API = '$TMP';" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
+set +x;
     instalaArvoreDeamon;
     instalaArvoreJS;
 }
@@ -618,9 +621,10 @@ instalaZE() {
 #set +x;
     instalaLiteral;
 }
-customProfile() {
+
+commonUserChange() {
+    ARQUIVO="$1";
 # Adicao de Aba no profile do usuario para permitir configuracoes adicionais ---
-    ARQUIVO="profile.php";
     TAG_INICIO='##Zabbix-Extras-gui-custom';
     TAG_FINAL="$TAG_INICIO-FIM";
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
@@ -637,10 +641,22 @@ customProfile() {
     TXT_CUSTOM="\n require_once ('include/views/zbxe.users.extra.edit.php');\n";
     TXT_CUSTOM="$TXT_CUSTOM \n \$page['title'] = _('User profile');";
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
-# 
+
     modifica "$ARQUIVO" "field-global" "Ajustando fields para modo global" '$fields = array(' 'global $fields;\n'
     modifica "$ARQUIVO" "check-fields" "Adicionando parametros personalizados" 'check_fields($fields);' 'zbxeFields();'
+}
+
+customProfile() {
+    ARQUIVO="profile.php";
+    commonUserChange "$ARQUIVO";
+# Especifico do profile.php
     modifica "$ARQUIVO" "check-fields-rules" "Adicionando regra de negocio" '\/\/ secondary actions' 'zbxeControler();'
+    ARQUIVO="users.php";
+    commonUserChange "$ARQUIVO";
+# Especifico do users.php
+    TMPTAG="validate_sort_and_sortorder('alias', ZBX_SORT_UP);";
+    modifica "$ARQUIVO" "check-fields-rules" "Adicionando regra de negocio" "$TMPTAG" 'zbxeControler();'
+# Adicao das tabs 
     modifica "include/views/administration.users.edit.php" "users-interface" "Adicionando aba do extras no profile" '$userForm->addItem($userTab);' '$userTab = zbxeView($userTab);'
 }
 
@@ -672,6 +688,10 @@ identificaDistro;
 preReq;
 idioma;
 caminhoFrontend;
+
+#customProfile;
+#instalaArvore;
+#exit;
 #confirmaInstalacao;
 
 suporteBDCustom;
