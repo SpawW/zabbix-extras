@@ -5,6 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
+VERSAO_INST="2.0.1-beta";
 DATA_BACKUP=`date +%Y%m%d`;
 
 installMgs() {
@@ -26,7 +27,7 @@ idioma() {
         mkdir $TMP_DIR;
     fi
     dialog \
-        --title 'Zabbix Extras Installer'        \
+        --title 'Zabbix Extras Installer ['$VERSAO_INST']'        \
         --radiolist 'Informe o idioma (Enter the language for the installer) '  \
         0 0 0                                    \
         pt   'Portugues / Brasil'  on    \
