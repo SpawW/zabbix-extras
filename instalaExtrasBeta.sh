@@ -689,9 +689,9 @@ preReq;
 idioma;
 caminhoFrontend;
 
-customProfile;
+#customProfile;
 #instalaArvore;
-exit;
+#exit;
 #confirmaInstalacao;
 
 suporteBDCustom;
