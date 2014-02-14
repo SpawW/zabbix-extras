@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.0.1";
+VERSAO_INST="2.0.1-rc1";
 DATA_BACKUP=`date +%Y%m%d`;
 
 installMgs() {
@@ -104,23 +104,21 @@ identificaDistro() {
     TMP=`cat  /etc/issue | head -n1 | tr "[:upper:]" "[:lower:]" | sed 's/release//g' | sed 's/  / /g' | sed 's/welcome\ to\ //g' `;
     LINUX_DISTRO=`echo $TMP | head -n1 | awk -F' ' '{print $1}'` ;
     LINUX_VER=`echo $TMP | sed 's/release//g' | awk -F' ' '{print $2}'`;
-    if [ -f /etc/redhat-release ]; then
+#    if [ -f /etc/redhat-release ]; then
+    if [ -f /etc/redhat-release -o -f /etc/system-release ]; then
         PATHDEF="/var/www/html";
-        RESTART_XINETD='service xinetd restart';
         GERENCIADOR_PACOTES='yum install -y ';
     else
         if [ `which zypper 2>&-  | wc -l` -eq 1 ]; then
             PATHDEF="/usr/share/zabbix";
-            RESTART_XINETD='/etc/init.d/xinetd restart';
             GERENCIADOR_PACOTES='zypper install -y ';
         else
             PATHDEF="/var/www";
-            RESTART_XINETD='/etc/init.d/xinetd restart';
             GERENCIADOR_PACOTES='apt-get install -y ';
         fi
     fi
     case $LINUX_DISTRO in
-	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse")
+	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse" | "opensuse")
             CAMINHO_RCLOCAL="/etc/rc.local";
             echo "-- Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
             ;;
@@ -148,72 +146,6 @@ caminhoFrontend() {
     dialog --inputbox "$M_BASE\n$M_URL" 0 0 "http://localhost/zabbix" 2> $TMP_DIR/resposta_dialog.txt;
     URL_FRONTEND=`cat $TMP_DIR/resposta_dialog.txt`;
 }
-downloadPacote() {
-    dialog --yesno "$M_PATCH" 7 60;
-    response=$?
-    case $response in
-       0) DOWNLOAD="S"; 
-          CAMINHO_EXTRAS="/tmp/tmpInstallZabbixExtras.tgz";
-    ;;
-       1) DOWNLOAD="N"; 
-          dialog --inputbox "$M_PATCH_CAMINHO:" 0 0 "/tmp/tmpInstallZabbixExtras.tgz" 2> $TMP_DIR/resposta_dialog.txt;
-          CAMINHO_EXTRAS=`cat $TMP_DIR/resposta_dialog.txt`;
-          # Questionando o usuario sobre o que executar -----------------------------------------------
-          if [ ! -f "$CAMINHO_EXTRAS" ]; then
-              echo $M_PATCH_ERRO"($CAMINHO_EXTRAS). "$M_ERRO_ABORT;
-              exit 0;
-          fi
-    ;;
-       255) echo "[ESC] $M_ERRO_ABORT."; exit 0; ;;
-    esac
-}
-selecionaModulos() {
-    dialog --checklist "$M_INSTALL_ALL"  \
-        0 0 0                                    \
-        cat  "$M_ZABBIX_CAT"  on    \
-        sc   "$M_ZABBIX_SC"   on   \
-        ns   "$M_ZABBIX_NS" on    \
-        em   "$M_ZABBIX_EM" on    \
-        2> $TMP_DIR/resposta_dialog.txt;
-
-    OPCOES=`cat $TMP_DIR/resposta_dialog.txt | sed 's/\"//g'`;
-    if [ ` echo $OPCOES | grep "cat" | wc -l ` -eq "1" ]; then
-      ZABBIX_CAT="S";
-    fi
-    if [ ` echo $OPCOES | grep "sc" | wc -l ` -eq "1" ]; then
-      ZABBIX_SC="S";
-    fi
-    if [ ` echo $OPCOES | grep "ns" | wc -l ` -eq "1" ]; then
-      ZABBIX_NS="S";
-    fi
-    if [ ` echo $OPCOES | grep "em" | wc -l ` -eq "1" ]; then
-      ZABBIX_EM="S";
-    fi
-}
-confirmaInstalacao() {
-    # Apresentando resumo do que sera feito -----------------------------------------------------
-    TMP="$M_RESUMO_FRONT$CAMINHO_FRONTEND.\n$M_RESUMO_PATCH $CAMINHO_EXTRAS.";
-    if [ "$ZABBIX_CAT" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_CAT";
-    fi
-    if [ "$ZABBIX_SC" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_SC";
-    fi
-    if [ "$ZABBIX_NS" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_NS";
-    fi
-    if [ "$ZABBIX_EM" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_EM";
-    fi
-    TMP="$TMP\n$M_RESUMO_INSTALA";
-    dialog --yesno "$TMP" 15 60;
-    response=$?;
-    case $response in
-       0) INSTALAR="S"; ;;
-       1) INSTALAR="N"; exit 0; ;;
-       255) echo "[ESC] $M_ERRO_ABORT."; exit 0; ;;
-    esac
-}
 
 expandePatch() {
     # Download de arquivos para instalacao ------------------------------------------------------
@@ -221,7 +153,7 @@ expandePatch() {
        if [ -f "$CAMINHO_EXTRAS" ]; then
          rm -f "$CAMINHO_EXTRAS";
        fi
-       wget "http://spinola.net.br/zabbix-extras/lastVersion.tgz" -o $CAMINHO_EXTRAS;
+       wget "http://spinola.net.br/zabbix-extras/lastVersion.tgz" -o $CAMINHO_EXTRAS --no-check-certificate;
     fi
     # Instalando arquivos da customizacao -------------------------------------------------------
     clear;
@@ -438,7 +370,7 @@ instalaGeo() {
         rm $ARQ_TMP;
     fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+    wget $REPOS -O $ARQ_TMP --no-check-certificate;
     cd /tmp;
     # Descompacta em TMP
     if [ -e /tmp/zabbix-geolocation-master/ ]; then
@@ -516,7 +448,7 @@ instalaArvore() {
         rm $ARQ_TMP;
     fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+    wget $REPOS -O $ARQ_TMP --no-check-certificate;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -550,7 +482,7 @@ instalaArvoreDeamon() {
         rm $ARQ_TMP;
     fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+    wget $REPOS -O $ARQ_TMP --no-check-certificate;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -574,7 +506,7 @@ instalaArvoreJS() {
         rm $ARQ_TMP;
     fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+    wget $REPOS -O $ARQ_TMP --no-check-certificate;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -601,7 +533,7 @@ instalaZE() {
         rm $ARQ_TMP2;
     fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+    wget $REPOS -O $ARQ_TMP --no-check-certificate;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -616,7 +548,7 @@ instalaZE() {
     if [ -f "./zbxe-inicia-bd.php" ]; then
         rm "./zbxe-inicia-bd.php";
     fi
-    wget "$URL_FRONTEND/zbxe-inicia-bd.php" ;
+    wget "$URL_FRONTEND/zbxe-inicia-bd.php"  --no-check-certificate;
     rm "./zbxe-inicia-bd.php";
 #set +x;
     instalaLiteral;
@@ -688,11 +620,6 @@ identificaDistro;
 preReq;
 idioma;
 caminhoFrontend;
-
-#customProfile;
-#instalaArvore;
-#exit;
-#confirmaInstalacao;
 
 suporteBDCustom;
 customMapas;

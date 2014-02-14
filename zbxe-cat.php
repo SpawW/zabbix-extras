@@ -80,7 +80,7 @@
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null),
 		'itemid' => get_request('itemid', null),
-		'formato' => get_request('itemid', null)
+		'formato' => get_request('formato', null)
 	);
 	$pageFilter = new CPageFilter($options);
 	$startDateDefault 				= 86400*30;

@@ -140,7 +140,7 @@ include_once 'include/page_header.php';
                 '  from items ite ' .
                 '  inner join hosts hos ' .
                 '     on (hos.hostid = ite.hostid) and ' . $filtroSegHosts . 
-                ' where ite.state = 1 ' .
+                ' where ite.state = 1 and ite.status = 0 ' .
                 (count($hostids) > 0 ? '   and ' .dbConditionInt('hos.hostid',$hostids ) : '').
                 ' order by hos.host, ite.name'
                 ;
