@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.0.1-rc1";
+VERSAO_INST="2.0.1-rc2";
 DATA_BACKUP=`date +%Y%m%d`;
 
 installMgs() {
@@ -118,7 +118,7 @@ identificaDistro() {
         fi
     fi
     case $LINUX_DISTRO in
-	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse" | "opensuse")
+	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse" | "opensuse" | "amazon" )
             CAMINHO_RCLOCAL="/etc/rc.local";
             echo "-- Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
             ;;
