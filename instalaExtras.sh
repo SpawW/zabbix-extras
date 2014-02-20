@@ -16,7 +16,6 @@ registra() {
 installMgs() {
     if [ "$1" = "U" ]; then
         tipo="Upgrade";
-        recriaTabelas;
     else
         tipo="Clean";
     fi
@@ -26,12 +25,13 @@ installMgs() {
 recriaTabelas() {
     dialog \
         --title 'Zabbix Extras BD Update ['$VERSAO_INST']'        \
-        --radiolist $M_UPGRADE_BD  \
+        --radiolist "$M_UPGRADE_BD"  \
         0 0 0                                    \
-        S   $M_UPGRADE_BD_SIM  on    \
-        N   $M_UPGRADE_BD_NAO  off   \
+        S   "$M_UPGRADE_BD_SIM"  on    \
+        N   "$M_UPGRADE_BD_NAO"  off   \
         2> $TMP_DIR/resposta_dialog.txt
     UPDATEBD=`cat $TMP_DIR/resposta_dialog.txt `;
+    registra " Recriar banco [$UPDATEBD] ";
 }
 idioma() {
     # Selecao de Idioma -------------------------------------------------------------------------
@@ -247,6 +247,7 @@ suporteBDCustom() {
     NUMLINHA=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
     if [ ! -z $NUMLINHA ]; then
         installMgs "U" "suporte bd"; #echo "--> Upgrade install...";
+        recriaTabelas;
         sed -i "$NUMLINHA,$ d" $ARQUIVO
     else
         installMgs "N" "suporte bd"; #echo "--> Clean Install...";
