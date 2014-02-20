@@ -5,18 +5,34 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.0.1-rc2";
-DATA_BACKUP=`date +%Y%m%d`;
+VERSAO_INST="2.0.1-rc3";
+UPDATEBD="S";
+#DATA_BACKUP=`date +%Y%m%d`;
 
+registra() {
+    echo $(date)" - $1" >> $TMP_DIR/logInstall.log;
+    echo "--> $1";
+}
 installMgs() {
     if [ "$1" = "U" ]; then
         tipo="Upgrade";
+        recriaTabelas;
     else
         tipo="Clean";
     fi
-    echo "--> $tipo install ($2)...";
+    registra " $tipo install ($2)...";
 }
 
+recriaTabelas() {
+    dialog \
+        --title 'Zabbix Extras BD Update ['$VERSAO_INST']'        \
+        --radiolist $M_UPGRADE_BD  \
+        0 0 0                                    \
+        S   $M_UPGRADE_BD_SIM  on    \
+        N   $M_UPGRADE_BD_NAO  off   \
+        2> $TMP_DIR/resposta_dialog.txt
+    UPDATEBD=`cat $TMP_DIR/resposta_dialog.txt `;
+}
 idioma() {
     # Selecao de Idioma -------------------------------------------------------------------------
     if [ -d $TMP_DIR ]; then
@@ -38,7 +54,7 @@ idioma() {
         INSTALAR="S";
     else
         echo $OPCOES| wc -m
-        echo "Instalacao abortada ($OPCOES)...";
+        registra "Instalacao abortada ($OPCOES)...";
         exit;
     fi
     case $OPCOES in
@@ -59,6 +75,9 @@ idioma() {
       M_RESUMO_FRONT="Caminho do frontend: ";
       M_RESUMO_PATCH="Localizacao dos arquivos do patch: ";
       M_RESUMO_INSTALA="Confirma a instalacao nos moldes acima?";
+      M_UPGRADE_BD="Foi detectada uma instalação anterior. Deseja SUBSTITUIR os dados das tabelas do ZE pelos novos ? Caso a instalação esteja danificada você deverá escolher esta opção!";
+      M_UPGRADE_BD_SIM="Recriar tabelas zbxe";
+      M_UPGRADE_BD_NAO="Manter tabelas zbxe existentes";
             ;;
 	*) 
       M_BASE="This installer will add an extra menu to the end of the menu bar of your environment. For installation are needed to inform some parameters.";
@@ -77,6 +96,9 @@ idioma() {
       M_RESUMO_FRONT="Path to the Zabbix frontend: ";
       M_RESUMO_PATCH="Path to patch files: ";
       M_RESUMO_INSTALA="Confirm installation?";
+      M_UPGRADE_BD="A previous installation was detected. Do you want to REPLACE the data from the tables by the new ZBXE data? If the installation is damaged you must choose this option!";
+      M_UPGRADE_BD_SIM="Re-create zbxe tables";
+      M_UPGRADE_BD_NAO="Preserve zbxe tables";
         ;;
     esac
 }
@@ -85,17 +107,17 @@ preReq() {
     # Verificando e instalando o wget
     RESULT=`which wget 2>&-  | wc -l`;
     if [ "$RESULT" -eq 0 ]; then
-        echo "--> Instalando wget (pre requisito para todo o processo)";
+        registra "Instalando wget (pre requisito para todo o processo)";
         instalaPacote "wget";
     fi
     # Verificando e instalando o dialog
     if [ `which dialog 2>&-  | wc -l` -eq 0 ]; then
-        echo "--> Instalando dialog (pre requisito para todo o processo)";
+        registra "Instalando dialog (pre requisito para todo o processo)";
         instalaPacote "dialog";
     fi
     # Verificando e instalando o unzip
     if [ `which unzip 2>&-  | wc -l` -eq 0 ]; then
-        echo "--> Instalando unzip (pre requisito para todo o processo)";
+        registra "Instalando unzip (pre requisito para todo o processo)";
         instalaPacote "unzip";
     fi
 }
@@ -120,15 +142,15 @@ identificaDistro() {
     case $LINUX_DISTRO in
 	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse" | "opensuse" | "amazon" )
             CAMINHO_RCLOCAL="/etc/rc.local";
-            echo "-- Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
+            registra "Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
             ;;
 	*) 
-            echo "Distribucao nao prevista ($LINUX_DISTRO)... favor contactar $AUTOR"; exit 1; 
+            registra "Distribucao nao prevista ($LINUX_DISTRO)... favor contactar $AUTOR"; exit 1; 
         ;;
     esac
 }
 instalaPacote() {
-    echo "============== Instalando pacote(s) ($1 $2 $3 $4 $5 $6 $7 $8 $9) =================";
+    registra "============== Instalando pacote(s) ($1 $2 $3 $4 $5 $6 $7 $8 $9) =================";
     $GERENCIADOR_PACOTES $1 $2 $3 $4 $5 $6 $7 $8 $9  ${10} \
   ${11} ${12} ${13} ${14} ${15} ${16} ${17} ${18} ${19} ${20} \
   ${21} ${22} ${23} ${24} ${25} ${26} ${27} ${28} ${29} ${30};
@@ -137,9 +159,8 @@ instalaPacote() {
 caminhoFrontend() {
     dialog --inputbox "$M_BASE\n$M_CAMINHO" 0 0 "$PATHDEF" 2> $TMP_DIR/resposta_dialog.txt;
     CAMINHO_FRONTEND=`cat $TMP_DIR/resposta_dialog.txt`;
-    # Questionando o usuario sobre o que executar -----------------------------------------------
     if [ ! -d "$CAMINHO_FRONTEND" ]; then
-        echo $M_ERRO_CAMINHO"($CAMINHO_FRONTEND). "$M_ERRO_ABORT;
+        registra $M_ERRO_CAMINHO"($CAMINHO_FRONTEND). "$M_ERRO_ABORT;
         exit 0;
     fi
     cd $CAMINHO_FRONTEND;
@@ -163,7 +184,7 @@ expandePatch() {
 
 instalaLiteral() {
     # Verificacao de instalacao previa do patch -- Menu.inc.php ------------
-    echo "Instalando patch de literais...";
+    registra "Instalando patch de literais...";
     ARQUIVO="include/func.inc.php";
     TAG_INICIO='\#\#Zabbix\-Extras-Literal';
     TAG_FINAL="$TAG_INICIO-FIM";
@@ -172,10 +193,10 @@ instalaLiteral() {
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
     FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
     if [ ! -z $INIINST ]; then
-      echo "Existe instalacao previa no arquivo... removendo customizacao do patch literal!";
+      registra "Existe instalacao previa no arquivo... removendo customizacao do patch literal!";
       sed -i "$INIINST,$FIMINST d" $ARQUIVO
     fi
-    echo "Instalando tags identificadoras do menu...";
+    registra "Instalando tags identificadoras do menu...";
     NUMLINHA=`cat $ARQUIVO | sed -ne "/\/\/ any other unit/{=;q;}"`;
     sed -i "$NUMLINHA i##Zabbix-Extras-Literal\n##Zabbix-Extras-Literal-FIM" $ARQUIVO
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
@@ -220,7 +241,7 @@ corTituloMapa() {
 #  linha que define a cor do titulo do mapa 33
 
 suporteBDCustom() {
-    echo "-> Configurando suporte a customizacoes que usam banco de dados...";
+    registra "Configurando suporte a customizacoes que usam banco de dados...";
     ARQUIVO="include/config.inc.php";
     TAG_INICIO='##Zabbix-Extras-BD-Support';
     NUMLINHA=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
@@ -234,7 +255,7 @@ suporteBDCustom() {
     echo "require_once dirname(__FILE__).'/zbxe_visual_imp.php';" >> $ARQUIVO;
 }
 customMapas() {
-    echo "-> Configurando suporte a customizacoes nos mapas...";
+    registra "Configurando suporte a customizacoes nos mapas...";
     ARQUIVO="include/classes/sysmaps/CMapPainter.php";
     TAG_INICIO='##Zabbix-Extras-map-custom';
     TAG_FINAL="$TAG_INICIO-FIM";
@@ -342,7 +363,7 @@ customMapas() {
 
 }
 customLogo() {
-    echo "-> Configurando suporte a logotipo personalizado...";
+    registra "Configurando suporte a logotipo personalizado...";
     ARQUIVO="include/page_header.php";
     TAG_INICIO='##Zabbix-Extras-map-custom';
     TAG_FINAL="$TAG_INICIO-FIM";
@@ -391,7 +412,7 @@ instalaGeo() {
 
 
 instalaPortletNS() {
-    echo "-> Configurando portlet com link para itens nao suportados...";
+    registra "Configurando portlet com link para itens nao suportados...";
     ARQUIVO="include/blocks.inc.php";
     TAG_INICIO='##Zabbix-Extras-NS-custom';
     TAG_FINAL="$TAG_INICIO-FIM";
@@ -412,7 +433,7 @@ instalaPortletNS() {
 }
 
 instalaMenus() {
-    echo "-> Instalando menus customizados...";
+    registra "Instalando menus customizados...";
     ARQUIVO="include/menu.inc.php";
     TAG_INICIO='##Zabbix-Extras-Menus-custom';
     TAG_FINAL="$TAG_INICIO-FIM";
@@ -433,14 +454,14 @@ instalaMenus() {
     # Verificação de instalação prévia do patch no javascript --------------
     if [ "`cat js/main.js | grep zbxe | wc -l`" -eq 0 ]; then
         LINHA=`cat js/main.js | sed -ne "/{'empty'\:/{=;q;}"`;
-        echo "--> Instalando menu no javascript...";
+        registra "Instalando menu no javascript...";
         sed -i "106s/'admin': 0/'admin': 0,'zbxe':0/g" js/main.js 
     fi
 
 }
 
 instalaArvore() {
-    instalaPacote "php5-curl php-curl";
+    #instalaPacote "php5-curl php-curl";
     REPOS="https://github.com/SpawW/zabbix-service-tree/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvore.zip";
     DIR_TMP="/tmp/zabbix-service-tree-master/";
@@ -464,12 +485,12 @@ instalaArvore() {
     cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree";
     # Alterar arquivos
     #cat "$CAMINHO_FRONTEND/extras/service-tree/__conf.php" | grep -v "^\$ZABBIX" > "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
-set -x
+#set -x
     TMP="\$ZABBIX_CONF = '$CAMINHO_FRONTEND/conf/zabbix.conf.php'";
     echo "$TMP;" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
     TMP="$URL_FRONTEND";
     echo "\$ZABBIX_API = '$TMP';" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
-set +x;
+#set +x;
     instalaArvoreDeamon;
     instalaArvoreJS;
 }
@@ -524,7 +545,7 @@ instalaArvoreJS() {
 instalaZE() {
     REPOS="https://github.com/SpawW/zabbix-extras/archive/master.zip";
     ARQ_TMP="/tmp/pluginExtras.zip";
-    ARQ_TMP="/tmp/pluginExtrasBD.htm";
+    ARQ_TMP_BD="/tmp/pluginExtrasBD.htm";
     DIR_TMP="/tmp/zabbix-extras-master/";
     if [ -f $ARQ_TMP ]; then
         rm $ARQ_TMP;
@@ -536,20 +557,20 @@ instalaZE() {
     wget $REPOS -O $ARQ_TMP --no-check-certificate;
     cd /tmp;
     # Descompacta em TMP
+    unalias rm;
     if [ -e $DIR_TMP ]; then
-        unalias rm;
         rm -rf $DIR_TMP;
     fi
     unzip $ARQ_TMP;
     cd $DIR_TMP
     cp -Rp * "$CAMINHO_FRONTEND";
-    echo "Iniciando banco de dados...";
+    registra "Iniciando banco de dados...";
 #set -x;
-    if [ -f "./zbxe-inicia-bd.php" ]; then
-        rm "./zbxe-inicia-bd.php";
+    if [ -f "$ARQ_TMP_BD" ]; then
+        rm "$ARQ_TMP_BD";
     fi
-    wget "$URL_FRONTEND/zbxe-inicia-bd.php"  --no-check-certificate;
-    rm "./zbxe-inicia-bd.php";
+    wget "$URL_FRONTEND/zbxe-inicia-bd.php?p_modo_install=$UPDATEBD" -O $ARQ_TMP_BD  --no-check-certificate;
+#    rm "./zbxe-inicia-bd.php";
 #set +x;
     instalaLiteral;
 }
@@ -631,8 +652,11 @@ instalaZE;
 instalaMenus;
 customProfile;
 
-echo "Parametros usados para instalacao:";
-echo "URL do Zabbix: [$URL_FRONTEND]";
-echo "Path do frontend Zabbix: [$CAMINHO_FRONTEND]";
+registra "Parametros usados para instalacao:";
+registra "URL do Zabbix: [$URL_FRONTEND]";
+registra "Path do frontend Zabbix: [$CAMINHO_FRONTEND]";
+registra "Se for necessario suporte favor enviar, por e-mail, os arquivos abaixo:";
+registra "/tmp/pluginExtrasBD.htm";
+registra "$TMP_DIR/logInstall.log";
 exit;
 

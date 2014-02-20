@@ -10,23 +10,18 @@
 require_once('include/config.inc.php');
 require_once('include/zbxe_visual_imp.php');
 
-try {	
-#    $result     = DBselect('drop table zbxe_translation');
-#    $result     = DBselect('drop table zbxe_preferences');
-    $criar_tabelas = "N";
-} catch(Exception $erro) {
-    echo "Instalação limpa." . $erro->getMessage();
-}
-
-
+echo "Banco de dados selecionado: ".$DB['DATABASE']."<br>";
 try {	
     $query = 'select count(*) as total from zbxe_translation';
+    $total = 0;
     $result     = DBselect($query);
     while($row  = DBfetch($result)){
-        $total  = $row['total'];
+        $total  = intval($row['total']);
+        echo "<br>Processo de upgrade...";
     }
 } catch(Exception $erro) {
-    echo "Tabelas ainda não existem..." . $erro->getMessage();
+    $criar_tabelas = "S";
+    echo "<br>Tabelas ainda não existem..." . $erro->getMessage();
 }
 
 function dmlPadrao ($query) {
@@ -39,25 +34,37 @@ function dmlPadrao ($query) {
     return $query;
 }
 
-if ($total == 0) {
-    if ($criar_tabelas == "S") {
-        $query = "CREATE TABLE zbxe_translation (
-          `lang` varchar(255) NOT NULL,
-          `tx_original` varchar(255) NOT NULL,
-          `tx_new` varchar(255) NOT NULL
-        ) ";// ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        echo "Criando zbxe_translation...<br>";
-        preparaQuery(dmlPadrao($query));
-
-        $query = "CREATE TABLE zbxe_preferences (
-          `userid` int NOT NULL,
-          `tx_option` varchar(60) NOT NULL,
-          `tx_value` varchar(255) NOT NULL,
-          `st_ativo` int NOT NULL
-        )";
-        echo "Criando zbxe_preferences...<br>";
-        preparaQuery(dmlPadrao($query));
+if ($total !== 0) {
+    try {	
+        $_REQUEST['p_modo_install'] = getRequest('p_modo_install');
+        if ($_REQUEST['p_modo_install'] == "S") {
+            echo "Criar tabelas...<br>";
+            preparaQuery('drop table zbxe_translation');
+            preparaQuery('drop table zbxe_preferences');
+            $total = 0;
+            echo "Tabelas criadas...<br>";
+        }
+    } catch(Exception $erro) {
+        echo "Instalação limpa." . $erro->getMessage();
     }
+}
+if ($total == 0) {
+    $query = "CREATE TABLE zbxe_translation (
+      `lang` varchar(255) NOT NULL,
+      `tx_original` varchar(255) NOT NULL,
+      `tx_new` varchar(255) NOT NULL
+    ) ";// ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    echo "<br>Criando zbxe_translation...<br>";
+    preparaQuery(dmlPadrao($query));
+
+    $query = "CREATE TABLE zbxe_preferences (
+      `userid` int NOT NULL,
+      `tx_option` varchar(60) NOT NULL,
+      `tx_value` varchar(255) NOT NULL,
+      `st_ativo` int NOT NULL
+    )";
+    echo "<br>Criando zbxe_preferences...<br>";
+    preparaQuery(dmlPadrao($query));
     echo "Populando dados padrões em zbxe_translation...<br>";
 
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Day', 'Day')");
@@ -162,7 +169,8 @@ preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativ
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_geo', 'zbxe-geolocation|Geolocalização', '1')");
 
 } else {
-    echo "Banco já inicializado!<br>";
+    // Modo de upgrade somente -----------------------------------------------------
+    echo "<br>Banco ja inicializado! Serao inseridas apenas linhas complementares...<br>";
 }
 
 // Verificando se e uma estrutura com NODES

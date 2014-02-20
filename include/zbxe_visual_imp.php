@@ -153,6 +153,19 @@ function _zeT ($p_msg) {
         return $retorno;
     }
 
+    function zbxeSubMenus ($menu) {
+        $query = 'select tx_value from zbxe_preferences where tx_option = ' . quotestr($menu);
+        $res = DBselect($query);
+        $retorno = array();        
+        $i = 0;
+        while ($row = DBfetch($res)) {
+            $tmp = explode("|", $row['tx_value']);
+            $retorno[$i] = array('url' => $tmp[0], 'label' => _zeT($tmp[1]));
+            $i += 1;
+        }
+        return $retorno;
+    }
+    
 global $ZBXE_VAR, $ZBXE_MENU;
 $ZBXE_VAR = array();
 $ZBXE_MENU = array(

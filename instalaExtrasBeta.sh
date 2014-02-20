@@ -5,8 +5,9 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.0.1-beta";
+VERSAO_INST="2.0.2-beta";
 DATA_BACKUP=`date +%Y%m%d`;
+OFFLINE="$1";
 
 installMgs() {
     if [ "$1" = "U" ]; then
@@ -17,6 +18,17 @@ installMgs() {
     echo "--> $tipo install ($2)...";
 }
 
+baixaArquivo() {
+    REPOS="$1";
+    ARQ_TMP="$2";
+    if [ ! "$OFFLINE" = "offline" ]; then
+        if [ -f $ARQ_TMP ]; then
+            rm $ARQ_TMP;
+        fi
+        # Baixa repositorio
+        wget $REPOS -O $ARQ_TMP;
+    fi
+}
 idioma() {
     # Selecao de Idioma -------------------------------------------------------------------------
     if [ -d $TMP_DIR ]; then
@@ -148,86 +160,6 @@ caminhoFrontend() {
     dialog --inputbox "$M_BASE\n$M_URL" 0 0 "http://localhost/zabbix" 2> $TMP_DIR/resposta_dialog.txt;
     URL_FRONTEND=`cat $TMP_DIR/resposta_dialog.txt`;
 }
-downloadPacote() {
-    dialog --yesno "$M_PATCH" 7 60;
-    response=$?
-    case $response in
-       0) DOWNLOAD="S"; 
-          CAMINHO_EXTRAS="/tmp/tmpInstallZabbixExtras.tgz";
-    ;;
-       1) DOWNLOAD="N"; 
-          dialog --inputbox "$M_PATCH_CAMINHO:" 0 0 "/tmp/tmpInstallZabbixExtras.tgz" 2> $TMP_DIR/resposta_dialog.txt;
-          CAMINHO_EXTRAS=`cat $TMP_DIR/resposta_dialog.txt`;
-          # Questionando o usuario sobre o que executar -----------------------------------------------
-          if [ ! -f "$CAMINHO_EXTRAS" ]; then
-              echo $M_PATCH_ERRO"($CAMINHO_EXTRAS). "$M_ERRO_ABORT;
-              exit 0;
-          fi
-    ;;
-       255) echo "[ESC] $M_ERRO_ABORT."; exit 0; ;;
-    esac
-}
-selecionaModulos() {
-    dialog --checklist "$M_INSTALL_ALL"  \
-        0 0 0                                    \
-        cat  "$M_ZABBIX_CAT"  on    \
-        sc   "$M_ZABBIX_SC"   on   \
-        ns   "$M_ZABBIX_NS" on    \
-        em   "$M_ZABBIX_EM" on    \
-        2> $TMP_DIR/resposta_dialog.txt;
-
-    OPCOES=`cat $TMP_DIR/resposta_dialog.txt | sed 's/\"//g'`;
-    if [ ` echo $OPCOES | grep "cat" | wc -l ` -eq "1" ]; then
-      ZABBIX_CAT="S";
-    fi
-    if [ ` echo $OPCOES | grep "sc" | wc -l ` -eq "1" ]; then
-      ZABBIX_SC="S";
-    fi
-    if [ ` echo $OPCOES | grep "ns" | wc -l ` -eq "1" ]; then
-      ZABBIX_NS="S";
-    fi
-    if [ ` echo $OPCOES | grep "em" | wc -l ` -eq "1" ]; then
-      ZABBIX_EM="S";
-    fi
-}
-confirmaInstalacao() {
-    # Apresentando resumo do que sera feito -----------------------------------------------------
-    TMP="$M_RESUMO_FRONT$CAMINHO_FRONTEND.\n$M_RESUMO_PATCH $CAMINHO_EXTRAS.";
-    if [ "$ZABBIX_CAT" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_CAT";
-    fi
-    if [ "$ZABBIX_SC" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_SC";
-    fi
-    if [ "$ZABBIX_NS" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_NS";
-    fi
-    if [ "$ZABBIX_EM" = "S" ]; then
-        TMP="$TMP \n$M_ZABBIX_EM";
-    fi
-    TMP="$TMP\n$M_RESUMO_INSTALA";
-    dialog --yesno "$TMP" 15 60;
-    response=$?;
-    case $response in
-       0) INSTALAR="S"; ;;
-       1) INSTALAR="N"; exit 0; ;;
-       255) echo "[ESC] $M_ERRO_ABORT."; exit 0; ;;
-    esac
-}
-
-expandePatch() {
-    # Download de arquivos para instalacao ------------------------------------------------------
-    if [ "$DOWNLOAD" = "S" ]; then
-       if [ -f "$CAMINHO_EXTRAS" ]; then
-         rm -f "$CAMINHO_EXTRAS";
-       fi
-       wget "http://spinola.net.br/zabbix-extras/lastVersion.tgz" -o $CAMINHO_EXTRAS;
-    fi
-    # Instalando arquivos da customizacao -------------------------------------------------------
-    clear;
-    cd $CAMINHO_FRONTEND;
-    tar -xzvf "$CAMINHO_EXTRAS";
-}
 
 instalaLiteral() {
     # Verificacao de instalacao previa do patch -- Menu.inc.php ------------
@@ -265,7 +197,6 @@ corTituloMapa() {
     else 
         EXTRA=""; ESCONDE="";
     fi
-#AQUI !!!!!!!!!!!!!!!!
     sed -i "s/\$this->paintTitle\(\)\;/"$ESCONDE"\$this->paintTitle();/" $ARQUIVO;
 
     # Desabilita a borda do mapa ===============================================
@@ -274,18 +205,12 @@ corTituloMapa() {
     # Define a cor de fundo do mapa ============================================
     CORFUNDO='false';
     sed -i "s/'bgColor' => '.*',/'bgColor' => '#$CORFUNDO',/" $ARQUIVO;
-#'borderColor' => 'black'
     # Arquivo com as principais definicoes dos mapas ===========================
     ARQUIVO="include/classes/sysmaps/CCanvas.php";
     EMPRESA="SERPRO";
     TAMANHO=$((120+$(echo $EMPRESA | wc -c)*4));
- #$this->width - 120, $this->height - 12, $date
     sed -i "s/\$this->width - .*, \$this->height - 12, .*\$date/\$this->width - $TAMANHO, \$this->height - 12, '$EMPRESA '.\$date/" $ARQUIVO;
 }
-# include/classes/sysmaps/CCanvas.php - linha 69
-# include/classes/sysmaps/CMapPainter.php 
-#  linha que printa o titulo: 79 
-#  linha que define a cor do titulo do mapa 33
 
 suporteBDCustom() {
     echo "-> Configurando suporte a customizacoes que usam banco de dados...";
@@ -321,11 +246,6 @@ customMapas() {
     TXT_CUSTOM="global \$ZBXE_VAR;\n\$this->options = array(\n'map' => array(\n  'bgColor' => 'red',";
     TXT_CUSTOM="$TXT_CUSTOM\n  'borderColor' => 'darkred', \n  'titleColor' => 'green',";
     TXT_CUSTOM="$TXT_CUSTOM\n  'border' => \$ZBXE_VAR['map_border_show'], 'drawAreas' => true";
-# Mudado por conta da validacao de cores do modulo ...
-#    TXT_CUSTOM="global \$ZBXE_VAR;\n\$this->options = array(\n'map' => array(\n  'bgColor' => \$ZBXE_VAR['map_background_color'],";
-#    TXT_CUSTOM="$TXT_CUSTOM\n  'borderColor' => \$ZBXE_VAR['map_border_color'], \n  'titleColor' => \$ZBXE_VAR['map_title_color'],";
-#    TXT_CUSTOM="$TXT_CUSTOM\n  'border' => \$ZBXE_VAR['map_border_show'], 'drawAreas' => true";
-#
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
 
     # ------- Modificacao no canvas para suportar as cores e o nome da empresa -
@@ -431,14 +351,16 @@ customLogo() {
 }
 
 instalaGeo() {
-    #REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
     REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
     ARQ_TMP="/tmp/pluginGeo.zip";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
-    # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+    baixaArquivo $REPOS $ARQ_TMP;
+#    if [ ! $OFFLINE = "offline" ]; then
+#        if [ -f $ARQ_TMP ]; then
+#            rm $ARQ_TMP;
+#        fi
+#        # Baixa repositorio
+#        wget $REPOS -O $ARQ_TMP;
+#    fi
     cd /tmp;
     # Descompacta em TMP
     if [ -e /tmp/zabbix-geolocation-master/ ]; then
@@ -512,11 +434,12 @@ instalaArvore() {
     REPOS="https://github.com/SpawW/zabbix-service-tree/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvore.zip";
     DIR_TMP="/tmp/zabbix-service-tree-master/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
+    baixaArquivo $REPOS $ARQ_TMP;
+#    if [ -f $ARQ_TMP ]; then
+#        rm $ARQ_TMP;
+#    fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+#    wget $REPOS -O $ARQ_TMP;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -532,12 +455,10 @@ instalaArvore() {
     cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree";
     # Alterar arquivos
     #cat "$CAMINHO_FRONTEND/extras/service-tree/__conf.php" | grep -v "^\$ZABBIX" > "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
-set -x
     TMP="\$ZABBIX_CONF = '$CAMINHO_FRONTEND/conf/zabbix.conf.php'";
     echo "$TMP;" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
     TMP="$URL_FRONTEND";
     echo "\$ZABBIX_API = '$TMP';" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
-set +x;
     instalaArvoreDeamon;
     instalaArvoreJS;
 }
@@ -546,11 +467,12 @@ instalaArvoreDeamon() {
     REPOS="https://github.com/SpawW/zabbix-service-tree-daemon/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvoreDaemon.zip";
     DIR_TMP="/tmp/zabbix-service-tree-daemon-master/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
+    baixaArquivo $REPOS $ARQ_TMP;
+#    if [ -f $ARQ_TMP ]; then
+#        rm $ARQ_TMP;
+#    fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+#    wget $REPOS -O $ARQ_TMP;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -570,11 +492,12 @@ instalaArvoreJS() {
     REPOS="https://github.com/SpawW/html5-tree-graph/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvoreJS.zip";
     DIR_TMP="/tmp/html5-tree-graph-master/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
+    baixaArquivo $REPOS $ARQ_TMP;
+#    if [ -f $ARQ_TMP ]; then
+#        rm $ARQ_TMP;
+#    fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+#    wget $REPOS -O $ARQ_TMP;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -592,16 +515,17 @@ instalaArvoreJS() {
 instalaZE() {
     REPOS="https://github.com/SpawW/zabbix-extras/archive/master.zip";
     ARQ_TMP="/tmp/pluginExtras.zip";
-    ARQ_TMP="/tmp/pluginExtrasBD.htm";
+#    ARQ_TMP="/tmp/pluginExtrasBD.htm";
     DIR_TMP="/tmp/zabbix-extras-master/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
-    if [ -f $ARQ_TMP2 ]; then
-        rm $ARQ_TMP2;
-    fi
+    baixaArquivo $REPOS $ARQ_TMP;
+#    if [ -f $ARQ_TMP ]; then
+#        rm $ARQ_TMP;
+#    fi AQUI... verificar
+#    if [ -f $ARQ_TMP2 ]; then
+#        rm $ARQ_TMP2;
+#    fi
     # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP;
+#    wget $REPOS -O $ARQ_TMP;
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then

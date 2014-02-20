@@ -140,7 +140,7 @@ INNER JOIN hosts hos
 INNER JOIN hosts_groups hgr
    ON hgr.hostid = it.hostid
 ". ( $groupid > 0 ? " AND hgr.groupid = ".$groupid: "")
-." WHERE it.flags <> 2
+." WHERE it.flags <> 2 and it.type not in (2,17)
 " . ($hostid > 0 ? " AND it.hostid = ".$hostid : "")
 . "\n order by host_name, item_key " ;
                 $report		= Array();
@@ -165,7 +165,9 @@ INNER JOIN hosts_groups hgr
                     }
                 } else {
                     $result			= DBselect($baseQuery);
-                    $cont = $historyTotal = $trendTotal = $storageTotal	= 0;
+                    $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = 0;
+                    $idtotal = 11;
+                    
                     while($row = DBfetch($result)){
                             $report[$cont][0] = $row['host_name'];
                             $report[$cont][1] = $row['item_name'];
@@ -177,10 +179,13 @@ INNER JOIN hosts_groups hgr
                             $report[$cont][7] = round(floatval($row['history_costs']),2);
                             $historyTotal += $report[$cont][7];
                             $report[$cont][8] = round(floatval($row['trends_costs']),2);
-                            $trendTotal += $report[$cont][8];
-                            $report[$cont][10] = ($report[$cont][7]*50)+($report[$cont][8]*128);
-                            $storageTotal += $report[$cont][10];
-                            $report[$cont][9] = convert_units(array ('value' => $report[$cont][10], 'units' => 'B'));
+                            $trendTotal += $report[$cont][8];                            
+                            $report[$cont][$idtotal] = ($report[$cont][7]*50)+($report[$cont][8]*128);
+                            $storageTotal += $report[$cont][$idtotal];
+                            $report[$cont][9] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
+                            $report[$cont][10] = round(1/floatval($row['delay']),4);
+                            $vpsTotal += $report[$cont][10];
+                            $report[$cont][10] .=' vps';
                             $cont++;
                     }
                 }
@@ -193,13 +198,13 @@ INNER JOIN hosts_groups hgr
                     case 'html';
                         if ($view == "G") {
                             $table->setHeader(array(_("Host"),_zeT("History Costs"),_zeT("Trends Costs")
-                                ,_zeT("Storage Costs")
+                                ,_zeT("Storage Costs"),_zeT("VPS")
                             ));	
                         } else {
                             $table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
                                 ,_("History"),_("Trends"),_("Status")
                                 ,_zeT("History Costs"),_zeT("Trends Costs")
-                                ,_zeT("Storage Costs")
+                                ,_zeT("Storage Costs"),_zeT("VPS")
                             ));	
                         }
                         break;			
@@ -229,10 +234,10 @@ INNER JOIN hosts_groups hgr
 		if ($formato !== 'csv') {
                     if ($view == "G") {
                         $table->addRow(array('Total',$historyTotal.' linhas',$trendTotal.' linhas'
-                            ,convert_units(array('value' => $storageTotal,'units' => 'B'))));
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),$vpsTotal.' vps'));
                     } else {
                         $table->addRow(array($descricao,'Total',$historyTotal.' linhas',$trendTotal.' linhas'
-                            ,convert_units(array('value' => $storageTotal,'units' => 'B'))));
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),$vpsTotal.' vps'));
                     }
 		}
 		$numrows = new CDiv();
