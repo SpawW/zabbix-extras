@@ -14,8 +14,8 @@ It changes the frontend of your Zabbix to allow access to new functions, includi
 
 For more install guides (in Brazilian Portuguese), please see http://spinola.net.br/blog or... use Google Translator to get english version: http://translate.google.com.br/translate?sl=pt&tl=en&js=n&prev=_t&hl=pt-BR&ie=UTF-8&u=zabbix.spinola.net.br&act=url.
 
-It also adds two other plugins with very interesting features (but kept by other authors): 
-- Hierarchical Tree Service - SERPRO / Rodrigo Dias 
+It also adds two other plugins with very interesting features (but kept by other Brazilian authors): 
+- HTS - Hierarchical Tree Service - SERPRO / Rodrigo Dias 
 - ZGeo - Plugin Zabbix integration with Google Maps - Aristotenes Araújo.
 
 
