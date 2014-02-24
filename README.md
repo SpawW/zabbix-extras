@@ -8,6 +8,7 @@ It changes the frontend of your Zabbix to allow access to new functions, includi
 - Estimated costs of storage with the items listed 
 - Interrelationships between events (temporal analysis of possible causes and effects)
 - Customization of the logo for the application based on image registered in Zabbix logo (facilitates customization by companies). 
+- Customization of map tile, border and background (colors, visibility)
 - Menus derived from the database (useful for adding your own menus to Zabbix) 
 - Support for literal values ​​in graphs (without using scales)
 
