@@ -16,7 +16,7 @@ For more install guides (in Brazilian Portuguese), please see http://spinola.net
 
 It also adds two other plugins with very interesting features (but kept by other Brazilian authors): 
 - HTS - Hierarchical Tree Service - SERPRO / Rodrigo Dias 
-- ZGeo - Plugin Zabbix integration with Google Maps - Aristotenes Araújo.
+- ZGeo - Plugin Zabbix integration with Google Maps - Aristoteles Araújo.
 
 
 ##
