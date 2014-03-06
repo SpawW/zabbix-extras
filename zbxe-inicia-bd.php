@@ -149,6 +149,8 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('p
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Translate', 'Tradução')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'English String', 'Texto Original')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Translation for', 'Tradução para')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'HS Tree', 'Árvore')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Geolocation', 'Geolocalização')");
 
     // Preferences -----------------------------------------------------------------
 
@@ -165,8 +167,8 @@ preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativ
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_02_em', 'zbxe-em|Event Management', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_03_ns', 'zbxe-ns|Not Supported Items', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_04_sc', 'zbxe-sc|Storage Costs', '1')");
-preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_arvore', 'zbxe-arvore|Árvore', '1')");
-preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_geo', 'zbxe-geolocation|Geolocalização', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_arvore', 'zbxe-arvore|HS Tree', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_geo', 'zbxe-geolocation|Geolocation', '1')");
 
 } else {
     // Modo de upgrade somente -----------------------------------------------------

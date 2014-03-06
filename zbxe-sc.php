@@ -133,7 +133,7 @@
 
 // Localizar todos os hosts que o usuário selecionou -------------------------------------
 		$baseQuery = 
-"SELECT hos.name as host_name, it.hostid, it.name as item_name, it.key_ as item_key, it.delay, it.history, it.trends, it.status , 86400 / it.delay * it.history AS history_costs, it.trends * 24 AS trends_costs
+"SELECT hos.name as host_name, it.hostid, it.name as item_name, it.key_ as item_key, it.delay, it.history, it.trends, it.status , 86400 / it.delay * it.history AS history_costs, it.trends * 24 AS trends_costs, it.itemid as itemid
 FROM items it
 INNER JOIN hosts hos
    ON hos.hostid = it.hostid
@@ -144,6 +144,7 @@ INNER JOIN hosts_groups hgr
 " . ($hostid > 0 ? " AND it.hostid = ".$hostid : "")
 . "\n order by host_name, item_key " ;
                 $report		= Array();
+                // Relatorio por grupos (total do host)=========================
                 if ($view == "G") {
                     $baseQuery = "SELECT hitem.host_name, hitem.hostid"
                             . ", SUM( history_costs ) AS history_costs, SUM( trends_costs ) AS trends_costs"
@@ -164,29 +165,33 @@ INNER JOIN hosts_groups hgr
                         $cont++;
                     }
                 } else {
-                    $result			= DBselect($baseQuery);
+                // Relatorio por item individual ===============================
+                    $result = DBselect($baseQuery);
                     $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = 0;
                     $idtotal = 11;
-                    
+                    $lastItemID = -1;                    
                     while($row = DBfetch($result)){
-                            $report[$cont][0] = $row['host_name'];
-                            $report[$cont][1] = $row['item_name'];
-                            $report[$cont][2] = $row['item_key'];
-                            $report[$cont][3] = $row['delay'];
-                            $report[$cont][4] = $row['history'];
-                            $report[$cont][5] = $row['trends'];
-                            $report[$cont][6] = $row['status'];
-                            $report[$cont][7] = round(floatval($row['history_costs']),2);
-                            $historyTotal += $report[$cont][7];
-                            $report[$cont][8] = round(floatval($row['trends_costs']),2);
-                            $trendTotal += $report[$cont][8];                            
-                            $report[$cont][$idtotal] = ($report[$cont][7]*50)+($report[$cont][8]*128);
-                            $storageTotal += $report[$cont][$idtotal];
-                            $report[$cont][9] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
-                            $report[$cont][10] = round(1/floatval($row['delay']),4);
-                            $vpsTotal += $report[$cont][10];
-                            $report[$cont][10] .=' vps';
-                            $cont++;
+                      if ($lastItemID !== $row['itemid']) {
+                        $report[$cont][0] = $row['host_name'];
+                        $report[$cont][1] = $row['item_name'];
+                        $report[$cont][2] = $row['item_key'];
+                        $report[$cont][3] = $row['delay'];
+                        $report[$cont][4] = $row['history'];
+                        $report[$cont][5] = $row['trends'];
+                        $report[$cont][6] = $row['status'];
+                        $report[$cont][7] = round(floatval($row['history_costs']),2);
+                        $historyTotal += $report[$cont][7];
+                        $report[$cont][8] = round(floatval($row['trends_costs']),2);
+                        $trendTotal += $report[$cont][8];                            
+                        $report[$cont][$idtotal] = ($report[$cont][7]*50)+($report[$cont][8]*128);
+                        $storageTotal += $report[$cont][$idtotal];
+                        $report[$cont][9] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
+                        $report[$cont][10] = round(1/floatval($row['delay']),4);
+                        $vpsTotal += $report[$cont][10];
+                        $report[$cont][10] .=' vps';
+                        $cont++;
+                      }
+                      $lastItemID = $row['itemid'];
                     }
                 }
  // Monta o relatório ----------------------------------------------------------
@@ -210,19 +215,20 @@ INNER JOIN hosts_groups hgr
                         break;			
 		}
 		$linha = array();
+                $linhasDesc = " "._zeT("rows");
 		$cont2 = count($report[0])-1;
 		for ($i = 0; $i < $cont; $i++) {		
                     switch ($formato) {
                         case 'csv';
                             $linhaCSV = "";
                             for ($x = 0; $x < $cont2; $x++) {
-                                $linhaCSV .= quotestr($report[$i][$x].($x == 7 || $x == 8 ? " linhas" : " ")).";";
+                                $linhaCSV .= quotestr($report[$i][$x].($x == 7 || $x == 8 ? $linhasDesc : " ")).";";
                             }
                             $table->addRow(array($linhaCSV));
                             break;
                         case 'html';
                             for ($x = 0; $x < $cont2; $x++) {
-                                $linha[$x] = new CCol($report[$i][$x].($x == 7 || $x == 8 ? " linhas" : " "),1);
+                                $linha[$x] = new CCol($report[$i][$x].($x == 7 || $x == 8 ? $linhasDesc : " "),1);
                             }
                             $table->addRow($linha);
                             break;			
@@ -233,10 +239,10 @@ INNER JOIN hosts_groups hgr
 		$descricao->setAttribute('align','right');
 		if ($formato !== 'csv') {
                     if ($view == "G") {
-                        $table->addRow(array('Total',$historyTotal.' linhas',$trendTotal.' linhas'
+                        $table->addRow(array('Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
                             ,convert_units(array('value' => $storageTotal,'units' => 'B')),$vpsTotal.' vps'));
                     } else {
-                        $table->addRow(array($descricao,'Total',$historyTotal.' linhas',$trendTotal.' linhas'
+                        $table->addRow(array($descricao,'Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
                             ,convert_units(array('value' => $storageTotal,'units' => 'B')),$vpsTotal.' vps'));
                     }
 		}

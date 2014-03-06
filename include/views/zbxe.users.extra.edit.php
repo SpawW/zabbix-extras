@@ -7,7 +7,6 @@
  */
 
 //Inicia Variaveis -------------------------------------------------------------
-//MUDEI    
 function zbxeFields() {
     global $fields, $ZBXE_VAR;
     foreach ($ZBXE_VAR as $key => $value) {
