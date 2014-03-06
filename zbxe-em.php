@@ -907,6 +907,9 @@ if ($mode == "report") { // Custom event report for show only events related
 				$host = $hosts[$host['hostid']];
 
 				$items = array();
+                                // Necessario no zbx 2.2 up ... removeram a funcao itemName
+                                $trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
+                                
 				foreach ($trigger['items'] as $item) {
 					$i = array();
 					$i['itemid'] = $item['itemid'];
@@ -915,7 +918,7 @@ if ($mode == "report") { // Custom event report for show only events related
 						ITEM_VALUE_TYPE_FLOAT,
 						ITEM_VALUE_TYPE_UINT64
 					)) ? 'showgraph' : 'showvalues';
-					$i['name'] = itemName($item);
+					$i['name'] = $item['name'];//itemName($item);
 					$items[] = $i;
 				}
 
