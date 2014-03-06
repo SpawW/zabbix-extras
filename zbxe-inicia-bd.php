@@ -151,6 +151,7 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('p
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Translation for', 'Tradução para')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'HS Tree', 'Árvore')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Geolocation', 'Geolocalização')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'rows', 'linhas')");
 
     // Preferences -----------------------------------------------------------------
 

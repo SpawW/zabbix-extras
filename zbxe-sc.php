@@ -144,30 +144,34 @@ INNER JOIN hosts_groups hgr
 " . ($hostid > 0 ? " AND it.hostid = ".$hostid : "")
 . "\n order by host_name, item_key " ;
                 $report		= Array();
+                    $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = 0;
                 // Relatorio por grupos (total do host)=========================
                 if ($view == "G") {
                     $baseQuery = "SELECT hitem.host_name, hitem.hostid"
-                            . ", SUM( history_costs ) AS history_costs, SUM( trends_costs ) AS trends_costs"
+                            . ", SUM( history_costs ) AS history_costs, SUM( trends_costs ) AS trends_costs, SUM(1/delay) vps_costs"
                             . " FROM (" . $baseQuery . ") hitem "
                             . " Group by hitem.hostid, hitem.host_name "
                             . " order by hitem.host_name, hitem.hostid";
                     $result = DBselect($baseQuery);
-                    $cont = $historyTotal = $trendTotal = $storageTotal	= 0;
+                    $idtotal = 5;
                     while($row = DBfetch($result)){
                         $report[$cont][0] = $row['host_name'];
                         $report[$cont][1] = round(floatval($row['history_costs']),2);
                         $historyTotal += $report[$cont][1];
                         $report[$cont][2] = round(floatval($row['trends_costs']),2);
                         $trendTotal += $report[$cont][2];
-                        $report[$cont][4] = ($report[$cont][1]*50)+($report[$cont][2]*128);
-                        $storageTotal += $report[$cont][4];
-                        $report[$cont][3] = convert_units(array ('value' => $report[$cont][4], 'units' => 'B'));
+                        $report[$cont][$idtotal] = ($report[$cont][1]*50)+($report[$cont][2]*128);
+                        $storageTotal += $report[$cont][$idtotal];
+                        $report[$cont][3] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
+
+                        $report[$cont][4] = round(floatval($row['vps_costs']),4);
+                        $vpsTotal += $report[$cont][4];
+                        $report[$cont][4] .=' vps';
                         $cont++;
                     }
                 } else {
                 // Relatorio por item individual ===============================
                     $result = DBselect($baseQuery);
-                    $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = 0;
                     $idtotal = 11;
                     $lastItemID = -1;                    
                     while($row = DBfetch($result)){
