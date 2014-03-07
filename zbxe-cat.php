@@ -204,13 +204,13 @@
 		$reporttimetab2 = new CTable(null,'calendar');
 		
 		$reporttimetab2->addRow(array(array(bold(_zeT('Analysis')), ': '), array($cmbTimeSource,$cmbAgregation)));
-		$reporttimetab2->addRow(array(array(bold(_zeT("Projection")), ': '), array($cmbTimeProjection,array(bold(_zeT("Amount")), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
+		$reporttimetab2->addRow(array(array(bold(_zeT('Projection')), ': '), array($cmbTimeProjection,array(bold(_zeT('Amount')), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
 		$reporttimetab2->addRow(array(array(bold(_zeT('Formatting')), ': '), array($cmbFormato)));
 /*----------- Implementa o Filtro por período ---------------*/
 		$filter_table->addRow(array(
 			array(bold(_('Group')), ': ', $cmbGroups),
 			array(bold(_('Host')), ': ', $cmbHosts),
-			exibeConteudo ($hostid > 0,array(bold(_('Application')), ': ', $cmbApplications)),
+			exibeConteudo ($hostid > 0,array(bold(_zeT('Application')), ': ', $cmbApplications)),
 			array()
 		));
 		$filter_table->addRow(array(

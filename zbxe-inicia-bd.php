@@ -66,7 +66,8 @@ if ($total == 0) {
     echo "<br>Criando zbxe_preferences...<br>";
     preparaQuery(dmlPadrao($query));
     echo "Populando dados padrões em zbxe_translation...<br>";
-
+    // Translation -------------------------------------------------------------
+    
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Day', 'Day')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Week', 'Week')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Month', 'Month')");
@@ -138,7 +139,7 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('e
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Translate', 'Translate')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'English String', 'English String')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Translation for', 'Translation for')");
-preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Amount', 'Amount')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Amount', 'Qtd')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Color', 'Cor')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Company', 'Empresa')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Border', 'Borda')");
@@ -152,8 +153,76 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('p
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'HS Tree', 'Árvore')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Geolocation', 'Geolocalização')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'rows', 'linhas')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'HS Tree', 'HS Tree')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Geolocation', 'Geolocation')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'VPS', 'VPS')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Data', 'Data')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Possible cause.', 'Possible cause.')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Related incidents', 'Related incidents')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Possible consequence.', 'Possible consequence.')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'VPS', 'VPS')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'rows', 'rows')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Amount', 'Quantité')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Analysis', 'Analysis')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Avg', 'Avg')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Border', 'Bordure')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Capacity and Trends', 'Capacité et Tendances')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Chart', 'Graphique')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Color', 'Couleur')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Company', 'Entreprise')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Correlate', 'Correlate')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Data from history', 'Data from history')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Day', 'Day')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Delete User Personalization', 'Supprimer la personnalisation de l\'utilisateur')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'English String', 'Caractères Anglais')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Enter the parameters for research!', 'Enter the parameters for research!')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Event Management', 'Observateur d\'événements')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Extras - Default', 'Extras - Défaut')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Extras', 'Extras')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Format', 'Format')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Formatting', 'Formatting')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Geolocation', 'Géolocalisation')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'History Costs', 'Historique des coûts')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'HS Tree', 'Arbre HS')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Instant', 'Instant')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Maps', 'Cartes')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Max', 'Max')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Min', 'Min')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Month', 'Month')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Not Supported Items Report', 'Not Supported Items Report')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Not Supported Items', 'Eléments non supportés')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Projection', 'Projection')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Report generated on', 'Report generated on')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'rows', 'lignes')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Storage Costs', 'Coût du stockage')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Translate', 'Traduction')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Translation for', 'Traduction pour')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Trend', 'Trend')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Trends Costs', 'Coût des tendances')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Type', 'Type')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Update Filter', 'Mise à jour du filtre')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Value', 'Value')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'View', 'Vue')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'VPS', 'NPS')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Week', 'Week')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Year', 'Year')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_title_show', '1', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_title_color', '555555', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_border_show', '1', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_background_color', 'FFFF99', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_border_color', '000044', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_date_color', 'FF3333', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_company', 'Zabbix-Extras 2', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'logo_company', 'zbxe_logo', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_01_cat', 'zbxe-cat|Capacity and Trends', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_02_em', 'zbxe-em|Event Management', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_03_ns', 'zbxe-ns|Not Supported Items', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_04_sc', 'zbxe-sc|Storage Costs', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_arvore', 'zbxe-arvore|HS Tree', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_geo', 'zbxe-geolocation|Geolocation', '1')");
 
-    // Preferences -----------------------------------------------------------------
+
+    // Preferences -------------------------------------------------------------
 
     echo "Populando dados padrões em zbxe_preferences...<br>";
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_title_show', '1', '1')");
