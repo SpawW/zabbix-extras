@@ -140,6 +140,12 @@ identificaDistro() {
             GERENCIADOR_PACOTES='apt-get install -y ';
         fi
     fi
+    if [ -f /tmp/upgZabbix/logInstall.log ]; then
+        TMP=`cat /tmp/upgZabbix/logInstall.log | grep "Path do" | tail -n1 | awk -F[ '{print $2}' | awk -F] '{print $1}'`;
+        if [ ! -z $TMP ]; then
+            PATHDEF=$TMP;
+        fi
+    fi
     case $LINUX_DISTRO in
 	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse" | "opensuse" | "amazon" )
             CAMINHO_RCLOCAL="/etc/rc.local";
@@ -165,7 +171,14 @@ caminhoFrontend() {
         exit 0;
     fi
     cd $CAMINHO_FRONTEND;
-    dialog --inputbox "$M_BASE\n$M_URL" 0 0 "http://localhost/zabbix" 2> $TMP_DIR/resposta_dialog.txt;
+    URLZABBIX="http://localhost/zabbix";
+    if [ -f /tmp/upgZabbix/logInstall.log ]; then
+        TMP=`cat /tmp/upgZabbix/logInstall.log | grep "URL do" | tail -n1 | awk -F[ '{print $2}' | awk -F] '{print $1}'`;
+        if [ ! -z $TMP ]; then
+            URLZABBIX=$TMP;
+        fi
+    fi
+    dialog --inputbox "$M_BASE\n$M_URL" 0 0 $URLZABBIX 2> $TMP_DIR/resposta_dialog.txt;
     URL_FRONTEND=`cat $TMP_DIR/resposta_dialog.txt`;
 }
 
