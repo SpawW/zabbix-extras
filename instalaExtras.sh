@@ -399,8 +399,8 @@ customLogo() {
 }
 
 instalaGeo() {
-    #REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
-    REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
+    REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
+    #REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
     ARQ_TMP="/tmp/pluginGeo.zip";
     if [ -f $ARQ_TMP ]; then
         rm $ARQ_TMP;
