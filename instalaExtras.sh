@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.0.1-rc3";
+VERSAO_INST="2.1.0-alfa-01";
 UPDATEBD="S";
 #DATA_BACKUP=`date +%Y%m%d`;
 
