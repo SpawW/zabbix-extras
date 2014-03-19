@@ -34,4 +34,4 @@ After the install... refresh zabbix interface (F5) and use the new Menu item cal
 ### About the author
 
 - Zabbix-Extras Built by [Adail Horst](http://spinola.net.br)
-- Submit your issues using [the Github issue tracker](hhttps://github.com/SpawW/zabbix-extras/issues)
+- Submit your issues using [the Github issue tracker](https://github.com/SpawW/zabbix-extras/issues)
