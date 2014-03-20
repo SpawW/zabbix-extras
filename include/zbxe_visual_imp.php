@@ -1,11 +1,29 @@
 <?php
 
-/* 
- * Objetivo: Gestao de melhorias e customizacoes visuais no zabbix -------------
- * Adail Horst - http://spinola.net.br/blog
- * Parte integrante do zabbix-extras
- * Nao e permitida qualquer alteracao que renomeie ou complique a identificacao do produto
- */
+/* Used for inicial development: 
+** Objective: Common functions used by Zabbix-Extras Module
+** Copyright 2014 - Adail Horst - http://spinola.net.br/blog
+**
+** This file is part of Zabbix-Extras.
+** It is not authorized any change that would mask the existence of the plugin. 
+** The menu names, logos, authorship and other items identificatory plugin 
+** should always be maintained.
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** If not, see http://www.gnu.org/licenses/.
+**/
 
 # Zabbix-Extras - Global Variables Start
 function zbxeFieldValue ($query, $field) {
@@ -167,7 +185,7 @@ function _zeT ($p_msg) {
     }
     
 global $ZBXE_VAR, $ZBXE_MENU;
-$ZBXE_VAR = array();
+$ZBXE_VAR = $ZBXE_SUBMENU = array();
 $ZBXE_MENU = array(
 		'label'				=> _('Extras'),
 		'user_type'			=> USER_TYPE_ZABBIX_ADMIN,
@@ -182,14 +200,18 @@ $res = DBselect('SELECT userid, tx_option, tx_value from zbxe_preferences zpre '
 $i=0;
 while ($row = DBfetch($res)) {
     if (strpos ($row['tx_option'], 'menu_') !== false) {
-        $tmp = explode("|", $row['tx_value']);
-        $ZBXE_MENU['pages'][$i] = array('url' => $tmp[0].'.php', 'label' => _zeT($tmp[1]));
-        $i += 1;
-        //array("file" => $tmp[0],"title" => $tmp[1]);
+        if (strpos ($row['tx_option'], 'submenu_') !== false) {
+            $ZBXE_SUBMENU[count($ZBXE_SUBMENU)] = $row['tx_value'];
+        } else {
+            $tmp = explode("|", $row['tx_value']);
+            $ZBXE_MENU['pages'][$i] = array('url' => $tmp[0].'.php', 'label' => _zeT($tmp[1]));
+            $i += 1;
+        }
     } else {
         $ZBXE_VAR[$row['tx_option']] = $row['tx_value'];
     }
 }
+$ZBXE_MENU['pages'][0]['sub_pages'] = $ZBXE_SUBMENU;
 //var_dump($ZBXE_VAR);
 unset($tmp);
 // Calcula o tamanho do nome da empresa no grafico
