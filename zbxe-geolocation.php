@@ -1,6 +1,11 @@
 <?php
 /*
-** Pequenos ajustes feitos por Adail Horst visando compatibilidade com Zbx 2.2
+** This file is part of Zabbix-Extras.
+** It is not authorized any change that would mask the existence of the plugin. 
+** The menu names, logos, authorship and other items identificatory plugin 
+** should always be maintained.
+**
+** Comments from Original file:
 ** CTIC - SSPDS-CE
 ** Copyright (C) 2012-2013 CTIC - SSPDS-CE
 **
