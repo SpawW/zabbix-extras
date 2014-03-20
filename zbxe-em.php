@@ -1,10 +1,12 @@
 <?php
-/* Utilizei como base inicial para o desenvolvimento o "events.php" e alguns outros arquivos do Frontend do Zabbix
-** Objetivo: Proceder com pesquisa de correlacionamento de eventos
-** Adail Horst - http://spinola.net.br/blog
-
-** Zabbix
-** Copyright (C) 2000-2012 Zabbix SIA
+/* Used for inicial development: "events.php" from Zabbix INC
+** Objective: Interrelationships between events (temporal analysis of possible causes and effects)
+** Copyright 2014 - Adail Horst - http://spinola.net.br/blog
+**
+** This file is part of Zabbix-Extras.
+** It is not authorized any change that would mask the existence of the plugin. 
+** The menu names, logos, authorship and other items identificatory plugin 
+** should always be maintained.
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +21,7 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** If not, see http://www.gnu.org/licenses/.
 **/
 
 
