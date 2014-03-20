@@ -5,6 +5,9 @@
 ** Copyright 2014 - Adail Horst - http://spinola.net.br/blog
 **
 ** This file is part of Zabbix-Extras.
+** It is not authorized any change that would mask the existence of the plugin. 
+** The menu names, logos, authorship and other items identificatory plugin 
+** should always be maintained.
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
