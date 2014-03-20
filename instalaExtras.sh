@@ -7,6 +7,8 @@ AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
 VERSAO_INST="2.1.0-alfa-01";
 UPDATEBD="S";
+BRANCH="Zabbix-Extras-2.0.1";
+#BRANCH="master";
 #DATA_BACKUP=`date +%Y%m%d`;
 
 registra() {
@@ -558,7 +560,7 @@ instalaArvoreJS() {
     # Alterar arquivos
 }
 instalaZE() {
-    REPOS="https://github.com/SpawW/zabbix-extras/archive/master.zip";
+    REPOS="https://github.com/SpawW/zabbix-extras/archive/$BRANCH.zip";
     ARQ_TMP="/tmp/pluginExtras.zip";
     ARQ_TMP_BD="/tmp/pluginExtrasBD.htm";
     DIR_TMP="/tmp/zabbix-extras-master/";
@@ -634,6 +636,7 @@ modifica() {
 # $3 = TAG Humana
 # $4 = Texto identificador de inicio
 # $5 = Texto customizado
+# $6 = indica que a tag de inicio devera ficar antes do texto customizado
     ARQUIVO="$1";
     TAG_INICIO="##Zabbix-Extras-$2-custom";
     TAG_FINAL="$TAG_INICIO-FIM";
@@ -648,9 +651,34 @@ modifica() {
         FIMINST=$INIINST;
     fi
     sed -i "$INIINST,$FIMINST d" $ARQUIVO;
-    TXT_CUSTOM="$5 \n $4";
+    if [ -z $6 ]; then
+        TXT_CUSTOM="$5 \n $4";
+    else
+        TXT_CUSTOM="$4 \n $5";
+    fi
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
 }
+
+customItemKey() {
+    ARQUIVO="include/views/js/configuration.item.edit.js.php";
+    IDENT="if (type == 0 || type == 7 || type == 3 || type == 5 || type == 8 || type == 17) {";
+    # Alterando o script JS
+    modifica "$ARQUIVO" "live-item-key" "Adicionando suporte para verificacao em tempo real de chave" "$IDENT" "jQuery('#keyButtonTest').prop('disabled', !(type == 0 || type == 7));"
+    
+    # Alterando o formulario de edicao de itens
+    ARQUIVO="include/views/configuration.item.edit.php";
+    IDENT="\t: null";
+#    IDENT="         'formlist')\n       : null";
+    NOVO=", (!\$this->data['limited'] ? new CButton('keyButtonTest', _('Test'),";
+    NOVO=$NOVO"'return PopUp(\"zbxe_item_test.php?hostid='.\$this->data['hostid'].'&itemid='.\$this->data['itemid'].'&";
+    NOVO=$NOVO"itemkey=\"+document.getElementById(";
+    NOVO=$NOVO"\\\'key\\\').value)";
+    NOVO=$NOVO"','formlist') : null )";
+    # Alterando o script JS
+    modifica "$ARQUIVO" "live-item-key" "Adicionando botao para suporte a verificacao em tempo real de chave" "$IDENT" "$NOVO" "S"
+    
+}
+
 
 identificaDistro;
 preReq;
@@ -660,6 +688,8 @@ caminhoFrontend;
 suporteBDCustom;
 customMapas;
 customLogo;
+customItemKey;
+
 instalaPortletNS;
 instalaGeo;
 instalaArvore;

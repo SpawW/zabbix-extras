@@ -253,6 +253,7 @@ preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativ
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_04_sc', 'zbxe-sc|Storage Costs', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_arvore', 'zbxe-arvore|HS Tree', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_geo', 'zbxe-geolocation|Geolocation', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES ('', 'submenu_01_itemtest', 'zbxe_item_test.php', '1')");
 
 } else {
     // Modo de upgrade somente -----------------------------------------------------
