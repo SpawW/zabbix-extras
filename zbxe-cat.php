@@ -1,13 +1,15 @@
 <?php
-/* Utilizei como base inicial para o desenvolvimento o "hostprofiles.php" e alguns outros arquivos do Frontend do Zabbix
-** Objetivo: Relatório de tendência de item
-** Adail Horst - http://spinola.net.br/blog
 
-#2012 - Dica de Elton Ferreira - Adicionar exportação CSV
-
-** Comentários do arquivo original -------------------------------------------
-** ZABBIX
-** Copyright (C) 2000-2010 SIA Zabbix
+/* Used for inicial development: Used as motivation file "hostprofiles.php" and another Zabbix Frontend files
+** Objective: Report of capacity and trends
+** Copyright 2014 - Adail Horst - http://spinola.net.br/blog
+** #2012 - Dica de Elton Ferreira - Adicionar exportação CSV
+** 
+** This file is part of Zabbix-Extras.
+**
+** It is not authorized any change that would mask the existence of the plugin. 
+** The menu names, logos, authorship and other items identificatory plugin 
+** should always be maintained.
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
