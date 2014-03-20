@@ -1,8 +1,12 @@
 <?php
-/*
-** Pequenos ajustes feitos por Adail Horst visando compatibilidade com Zbx 2.2
-** CTIC - SSPDS-CE
-** Copyright (C) 2012-2013 CTIC - SSPDS-CE
+/* Used for inicial development: zbxe-geolocation.php
+** Objective: Integration with Hierarquical Service Tree - SERPRO plugin
+** Copyright 2014 - Adail Horst - http://spinola.net.br/blog
+**
+** This file is part of Zabbix-Extras.
+** It is not authorized any change that would mask the existence of the plugin. 
+** The menu names, logos, authorship and other items identificatory plugin 
+** should always be maintained.
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,12 +21,9 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-**
-** Contacts:
-** Leandro Alves Machado - Analista de Sistemas - leandro.machado@sspds.ce.gov.br
-** Aristoteles Araujo - Analista de Sistemas - aristoteles.araujo@sspds.ce.gov.br
-**
+** If not, see http://www.gnu.org/licenses/.
 **/
+
 ?>
 <?php
 require_once('include/config.inc.php');

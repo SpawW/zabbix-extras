@@ -563,7 +563,7 @@ instalaZE() {
     REPOS="https://github.com/SpawW/zabbix-extras/archive/$BRANCH.zip";
     ARQ_TMP="/tmp/pluginExtras.zip";
     ARQ_TMP_BD="/tmp/pluginExtrasBD.htm";
-    DIR_TMP="/tmp/zabbix-extras-master/";
+    DIR_TMP="/tmp/zabbix-extras-$BRANCH/";
     if [ -f $ARQ_TMP ]; then
         rm $ARQ_TMP;
     fi
