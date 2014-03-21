@@ -22,7 +22,12 @@ It also adds two other plugins with very interesting features (but kept by other
 - Hierarchical Tree Service - SERPRO / Rodrigo Dias 
 - ZGeo - Plugin Zabbix integration with Google Maps - Aristotenes Araújo.
 
-
+##
+### News in 2.0.1
+- Realtime item key verification (send arbitrary requests to a zabbix agent for check if the key is supported)
+- Add plugin snmp-builder to "extras" package (with HSTree and Geolocation)
+- Installer now support off-line instalation (for enviroments without access to internet)
+- 
 ##
 ### Installation instructions
 
