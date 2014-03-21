@@ -234,7 +234,6 @@ corTituloMapa() {
     else 
         EXTRA=""; ESCONDE="";
     fi
-#AQUI !!!!!!!!!!!!!!!!
     sed -i "s/\$this->paintTitle\(\)\;/"$ESCONDE"\$this->paintTitle();/" $ARQUIVO;
 
     # Desabilita a borda do mapa ===============================================
@@ -679,6 +678,55 @@ customItemKey() {
     
 }
 
+instalaSNMPB() {
+    # Baixando arquivos do repositório -----------------------------------------
+
+    REPOS="https://github.com/SpawW/snmpbuilder/archive/master.zip";
+    ARQ_TMP="/tmp/pluginSNMPB.zip";
+    DIR_TMP="/tmp/snmpbuilder-master/";
+    DIR_DEST="$CAMINHO_FRONTEND/extras/snmp-builder"
+    if [ -f $ARQ_TMP ]; then
+        rm $ARQ_TMP;
+    fi
+    # Baixa repositorio
+    wget $REPOS -O $ARQ_TMP --no-check-certificate;
+    cd /tmp;
+    # Descompacta em TMP
+    if [ -e $DIR_TMP ]; then
+        unalias rm;
+        rm -rf $DIR_TMP;
+    fi
+    unzip $ARQ_TMP;
+    cd $DIR_TMP
+    if [ ! -e "$DIR_DEST" ]; then
+        mkdir -p "$DIR_DEST";
+    fi
+    cp -Rp * "$CAMINHO_FRONTEND";
+
+    # Alterando o script JS 1
+    ARQUIVO="jsLoader.php";
+    IDENT="'common.js' => '',";
+    modifica "$ARQUIVO" "snmpb-jsscripts1" "Adicionando scripts para o snmp-builder-1" "$IDENT" "'DynTable.js' => 'snmp_builder/',\n'snmp_builder.js' => 'snmp_builder/',"
+
+    # Alterando o script JS 2
+    ARQUIVO="jsLoader.php";
+    IDENT="'jquery.js' => 'jquery/',";
+    modifica "$ARQUIVO" "snmpb-jsscripts2" "Adicionando scripts para o snmp-builder-2" "$IDENT" "'jquery.cookie.js' => 'jquery/',\n'jquery.jstree.js' => 'jquery/',"
+
+    # Adicionando arquivo CSS
+    ARQUIVO="include/page_header.php";
+    IDENT="if ($page['file'] == 'sysmap.php') {";
+    modifica "$ARQUIVO" "snmpb-jsscripts2" "Adicionando scripts para o snmp-builder-2" "$IDENT" "\$pageHeader->addCssFile('js/jquery/themes/mib/style.css');"
+
+    # Alterar arquivos de configuracao do snmp_builder
+    TMP="define('MIBS_ALL_PATH', '$DIR_DEST/mibs');";
+    echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
+    PATH_SNMP=`which snmptranslate | sed 's/\/snmptranslate//g'`;
+    TMP="define('SNMPB_SNMP_PATH','$PATH_SNMP');";
+    echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
+
+ }
+
 
 identificaDistro;
 preReq;
@@ -689,13 +737,13 @@ suporteBDCustom;
 customMapas;
 customLogo;
 customItemKey;
-
 instalaPortletNS;
 instalaGeo;
 instalaArvore;
 instalaZE;
 instalaMenus;
 customProfile;
+instalaSNMPB;
 
 registra "Parametros usados para instalacao:";
 registra "URL do Zabbix: [$URL_FRONTEND]";
