@@ -81,6 +81,8 @@ idioma() {
       M_UPGRADE_BD="Foi detectada uma instalação anterior. Deseja SUBSTITUIR os dados das tabelas do ZE pelos novos ? Caso a instalação esteja danificada você deverá escolher esta opção!";
       M_UPGRADE_BD_SIM="Recriar tabelas zbxe";
       M_UPGRADE_BD_NAO="Manter tabelas zbxe existentes";
+      M_DOWNLOAD_FILES_SIM="Baixar os arquivos mais atuais (recomendado)";
+      M_DOWNLOAD_FILES_NAO="Utilizar os arquivos baixados e salvos manualmente em /tmp";
             ;;
 	*) 
       M_BASE="This installer will add an extra menu to the end of the menu bar of your environment. For installation are needed to inform some parameters.";
@@ -102,6 +104,8 @@ idioma() {
       M_UPGRADE_BD="A previous installation was detected. Do you want to REPLACE the data from the tables by the new ZBXE data? If the installation is damaged you must choose this option!";
       M_UPGRADE_BD_SIM="Re-create zbxe tables";
       M_UPGRADE_BD_NAO="Preserve zbxe tables";
+      M_DOWNLOAD_FILES_SIM="Get from internet latest version of patchs (recomended)";
+      M_DOWNLOAD_FILES_NAO="Use files saved in /tmp";
         ;;
     esac
 }
@@ -182,20 +186,6 @@ caminhoFrontend() {
     fi
     dialog --inputbox "$M_BASE\n$M_URL" 0 0 $URLZABBIX 2> $TMP_DIR/resposta_dialog.txt;
     URL_FRONTEND=`cat $TMP_DIR/resposta_dialog.txt`;
-}
-
-expandePatch() {
-    # Download de arquivos para instalacao ------------------------------------------------------
-    if [ "$DOWNLOAD" = "S" ]; then
-       if [ -f "$CAMINHO_EXTRAS" ]; then
-         rm -f "$CAMINHO_EXTRAS";
-       fi
-       wget "http://spinola.net.br/zabbix-extras/lastVersion.tgz" -o $CAMINHO_EXTRAS --no-check-certificate;
-    fi
-    # Instalando arquivos da customizacao -------------------------------------------------------
-    clear;
-    cd $CAMINHO_FRONTEND;
-    tar -xzvf "$CAMINHO_EXTRAS";
 }
 
 instalaLiteral() {
@@ -403,27 +393,13 @@ instalaGeo() {
     REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
     #REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
     ARQ_TMP="/tmp/pluginGeo.zip";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
-    # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP --no-check-certificate;
-    cd /tmp;
-    # Descompacta em TMP
-    if [ -e /tmp/zabbix-geolocation-master/ ]; then
-        unalias rm;
-        rm -rf /tmp/zabbix-geolocation-master/;
-    fi
-    unzip pluginGeo.zip
-    cd /tmp/zabbix-geolocation-master/
-    # Move para /
-    #mv misc/geolocation.php $CAMINHO_FRONTEND/
-    # Move para /extras    
-    if [ ! -e "$CAMINHO_FRONTEND/extras/geo" ]; then
-        mkdir -p "$CAMINHO_FRONTEND/extras/geo";
-    fi
-    cp -Rp * "$CAMINHO_FRONTEND/extras/geo";
-    # Alterar arquivos
+    DIR_TMP="/tmp/zabbix-geolocation-master/";
+    DIR_DEST="$CAMINHO_FRONTEND/extras/geo";
+
+    downloadPackage "$ARQ_TMP" "$REPOS";
+    unzipPackage "$ARQ_TMP" "$DIR_TMP" "$DIR_DEST";
+    cp -Rp * "$DIR_DEST";
+
 }
 
 
@@ -481,32 +457,18 @@ instalaArvore() {
     REPOS="https://github.com/SpawW/zabbix-service-tree/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvore.zip";
     DIR_TMP="/tmp/zabbix-service-tree-master/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
-    # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP --no-check-certificate;
-    cd /tmp;
-    # Descompacta em TMP
-    if [ -e $DIR_TMP ]; then
-        unalias rm;
-        rm -rf $DIR_TMP;
-    fi
-    unzip $ARQ_TMP;
-    cd $DIR_TMP
-    # Move para /extras    
-    if [ ! -e "$CAMINHO_FRONTEND/extras/service-tree" ]; then
-        mkdir -p "$CAMINHO_FRONTEND/extras/service-tree";
-    fi
-    cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree";
+    DIR_DEST="$CAMINHO_FRONTEND/extras/service-tree"
+
+    downloadPackage "$ARQ_TMP" "$REPOS";
+    unzipPackage "$ARQ_TMP" "$DIR_TMP" "$DIR_DEST";
+    cp -Rp * "$DIR_DEST";
+
     # Alterar arquivos
-    #cat "$CAMINHO_FRONTEND/extras/service-tree/__conf.php" | grep -v "^\$ZABBIX" > "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
-#set -x
     TMP="\$ZABBIX_CONF = '$CAMINHO_FRONTEND/conf/zabbix.conf.php'";
     echo "$TMP;" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
     TMP="$URL_FRONTEND";
     echo "\$ZABBIX_API = '$TMP';" >> "$CAMINHO_FRONTEND/extras/service-tree/__conf.php"
-#set +x;
+
     instalaArvoreDeamon;
     instalaArvoreJS;
 }
@@ -515,23 +477,12 @@ instalaArvoreDeamon() {
     REPOS="https://github.com/SpawW/zabbix-service-tree-daemon/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvoreDaemon.zip";
     DIR_TMP="/tmp/zabbix-service-tree-daemon-master/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
-    # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP --no-check-certificate;
-    cd /tmp;
-    # Descompacta em TMP
-    if [ -e $DIR_TMP ]; then
-        unalias rm;
-        rm -rf $DIR_TMP;
-    fi
-    unzip $ARQ_TMP;
-    cd $DIR_TMP
-    if [ ! -e "$CAMINHO_FRONTEND/extras/service-tree-daemon" ]; then
-        mkdir -p "$CAMINHO_FRONTEND/extras/service-tree-daemon";
-    fi
-    cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree-daemon";
+    DIR_DEST="$CAMINHO_FRONTEND/extras/service-tree-daemon"
+
+    downloadPackage "$ARQ_TMP" "$REPOS";
+    unzipPackage "$ARQ_TMP" "$DIR_TMP" "$DIR_DEST";
+    cp -Rp * "$DIR_DEST";
+
     # Alterar arquivos
 }
 
@@ -539,55 +490,31 @@ instalaArvoreJS() {
     REPOS="https://github.com/SpawW/html5-tree-graph/archive/master.zip";
     ARQ_TMP="/tmp/pluginArvoreJS.zip";
     DIR_TMP="/tmp/html5-tree-graph-master/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
-    # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP --no-check-certificate;
-    cd /tmp;
-    # Descompacta em TMP
-    if [ -e $DIR_TMP ]; then
-        unalias rm;
-        rm -rf $DIR_TMP;
-    fi
-    unzip $ARQ_TMP;
-    cd $DIR_TMP
-    if [ ! -e "$CAMINHO_FRONTEND/extras/service-tree-daemon" ]; then
-        mkdir -p "$CAMINHO_FRONTEND/extras/service-tree-daemon";
-    fi
-    cp -Rp * "$CAMINHO_FRONTEND/extras/service-tree-daemon";
+    DIR_DEST="$CAMINHO_FRONTEND/extras/service-tree-daemon"
+
+    downloadPackage "$ARQ_TMP" "$REPOS";
+    unzipPackage "$ARQ_TMP" "$DIR_TMP" "$DIR_DEST";
+    cp -Rp * "$DIR_DEST";
+
     # Alterar arquivos
 }
 instalaZE() {
     REPOS="https://github.com/SpawW/zabbix-extras/archive/$BRANCH.zip";
-    ARQ_TMP="/tmp/pluginExtras.zip";
     ARQ_TMP_BD="/tmp/pluginExtrasBD.htm";
+    ARQ_TMP="/tmp/pluginExtras.zip";
     DIR_TMP="/tmp/zabbix-extras-$BRANCH/";
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
-    fi
-    if [ -f $ARQ_TMP2 ]; then
-        rm $ARQ_TMP2;
-    fi
-    # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP --no-check-certificate;
-    cd /tmp;
-    # Descompacta em TMP
-    unalias rm;
-    if [ -e $DIR_TMP ]; then
-        rm -rf $DIR_TMP;
-    fi
-    unzip $ARQ_TMP;
-    cd $DIR_TMP
+
+    downloadPackage "$ARQ_TMP" "$REPOS";
+    unzipPackage "$ARQ_TMP" "$DIR_TMP" "$CAMINHO_FRONTEND";
+
     cp -Rp * "$CAMINHO_FRONTEND";
     registra "Iniciando banco de dados...";
-#set -x;
+
     if [ -f "$ARQ_TMP_BD" ]; then
         rm "$ARQ_TMP_BD";
     fi
     wget "$URL_FRONTEND/zbxe-inicia-bd.php?p_modo_install=$UPDATEBD" -O $ARQ_TMP_BD  --no-check-certificate;
-#    rm "./zbxe-inicia-bd.php";
-#set +x;
+
     instalaLiteral;
 }
 
@@ -685,11 +612,64 @@ instalaSNMPB() {
     ARQ_TMP="/tmp/pluginSNMPB.zip";
     DIR_TMP="/tmp/snmpbuilder-master/";
     DIR_DEST="$CAMINHO_FRONTEND/extras/snmp-builder"
-    if [ -f $ARQ_TMP ]; then
-        rm $ARQ_TMP;
+
+    downloadPackage "$ARQ_TMP" "$REPOS";
+    unzipPackage "$ARQ_TMP" "$DIR_TMP" "$DIR_DEST";
+    cp -Rp * "$CAMINHO_FRONTEND";
+
+
+    # Alterando o script JS 1
+    ARQUIVO="$CAMINHO_FRONTEND/jsLoader.php";
+    IDENT="'common.js' => '',";
+    modifica "$ARQUIVO" "snmpb-jsscripts1" "Adicionando scripts para o snmp-builder-1" "$IDENT" "'DynTable.js' => 'snmp_builder/',\n'snmp_builder.js' => 'snmp_builder/',"
+
+    # Alterando o script JS 2
+    ARQUIVO="$CAMINHO_FRONTEND/jsLoader.php";
+    IDENT="'jquery.js' => 'jquery\/',";
+    modifica "$ARQUIVO" "snmpb-jsscripts2" "Adicionando scripts para o snmp-builder-2" "$IDENT" "'jquery.cookie.js' => 'jquery/',\n'jquery.jstree.js' => 'jquery/'," "S"
+    # Adicionando arquivo CSS
+    ARQUIVO="$CAMINHO_FRONTEND/include/page_header.php";
+    IDENT="if (\$page\['file'\] == 'sysmap.php') {";
+    modifica "$ARQUIVO" "snmpb-jsscripts2" "Adicionando scripts para o snmp-builder-2" "$IDENT" "\$pageHeader->addCssFile('js/jquery/themes/mib/style.css');"
+
+    # Alterar arquivos de configuracao do snmp_builder
+    TMP="define('MIBS_ALL_PATH', '$DIR_DEST/mibs');";
+    echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
+    PATH_SNMP=`which snmptranslate | sed 's/\/snmptranslate//g'`;
+    TMP="define('SNMPB_SNMP_PATH','$PATH_SNMP');";
+    echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
+
+}
+
+downloadFiles() {
+    dialog \
+        --title 'Download Files'        \
+        --radiolist "$M_PATCH"  \
+        0 0 0                                    \
+        S   "$M_DOWNLOAD_FILES_SIM"  on    \
+        N   "$M_DOWNLOAD_FILES_NAO"  off   \
+        2> $TMP_DIR/resposta_dialog.txt
+    DOWNLOADFILES=`cat $TMP_DIR/resposta_dialog.txt `;
+    registra " Baixar Arquivos [$DOWNLOADFILES] ";
+}
+
+downloadPackage() {
+    ARQ_TMP="$1";
+    REPOS="$2";
+    if [ "$DOWNLOADFILES" = "S" ]; then
+        if [ -f $ARQ_TMP ]; then
+            rm $ARQ_TMP;
+        fi
+        # Baixa repositorio
+        wget $REPOS -O $ARQ_TMP --no-check-certificate;
     fi
-    # Baixa repositorio
-    wget $REPOS -O $ARQ_TMP --no-check-certificate;
+}
+
+unzipPackage() {
+    ARQ_TMP="$1";
+    DIR_TMP="$2";
+    DIR_DEST="$3";
+    
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
@@ -701,37 +681,13 @@ instalaSNMPB() {
     if [ ! -e "$DIR_DEST" ]; then
         mkdir -p "$DIR_DEST";
     fi
-    cp -Rp * "$CAMINHO_FRONTEND";
-
-    # Alterando o script JS 1
-    ARQUIVO="jsLoader.php";
-    IDENT="'common.js' => '',";
-    modifica "$ARQUIVO" "snmpb-jsscripts1" "Adicionando scripts para o snmp-builder-1" "$IDENT" "'DynTable.js' => 'snmp_builder/',\n'snmp_builder.js' => 'snmp_builder/',"
-
-    # Alterando o script JS 2
-    ARQUIVO="jsLoader.php";
-    IDENT="'jquery.js' => 'jquery/',";
-    modifica "$ARQUIVO" "snmpb-jsscripts2" "Adicionando scripts para o snmp-builder-2" "$IDENT" "'jquery.cookie.js' => 'jquery/',\n'jquery.jstree.js' => 'jquery/',"
-
-    # Adicionando arquivo CSS
-    ARQUIVO="include/page_header.php";
-    IDENT="if ($page['file'] == 'sysmap.php') {";
-    modifica "$ARQUIVO" "snmpb-jsscripts2" "Adicionando scripts para o snmp-builder-2" "$IDENT" "\$pageHeader->addCssFile('js/jquery/themes/mib/style.css');"
-
-    # Alterar arquivos de configuracao do snmp_builder
-    TMP="define('MIBS_ALL_PATH', '$DIR_DEST/mibs');";
-    echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
-    PATH_SNMP=`which snmptranslate | sed 's/\/snmptranslate//g'`;
-    TMP="define('SNMPB_SNMP_PATH','$PATH_SNMP');";
-    echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
-
- }
-
+}
 
 identificaDistro;
 preReq;
 idioma;
 caminhoFrontend;
+downloadFiles;
 
 suporteBDCustom;
 customMapas;
@@ -740,10 +696,10 @@ customItemKey;
 instalaPortletNS;
 instalaGeo;
 instalaArvore;
+instalaSNMPB;
 instalaZE;
 instalaMenus;
 customProfile;
-instalaSNMPB;
 
 registra "Parametros usados para instalacao:";
 registra "URL do Zabbix: [$URL_FRONTEND]";
