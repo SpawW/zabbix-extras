@@ -48,11 +48,10 @@
     }
 
     # Code -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // Search for Zabbix Agent default interface 
-    $HOST = "127.0.0.1";
-    $PORT = "10050";
-    $TIMEOUT = "5";
-    
+    $tmp = explode(':',get_request('interface'));
+    $HOST = trim($tmp[0]);
+    $PORT = trim($tmp[1]);
+    $TIMEOUT = get_request('timeout',3);
  /*
  * Display table header
  */
@@ -90,12 +89,18 @@
     $form = new CForm();
     $form->setName('itemkeyform');
     $form->setAttribute('id', 'itemkey');
-    $cmbTimeout	= new CComboBox('formato', $formato, 'javascript: submit();');
+    $cmbTimeout	= new CComboBox('timeout', $TIMEOUT, 'javascript: submit();');
 //    $cmbTimeout->additem("1", "1 " .  _('second') );
     for ($i = 3; $i < 31; $i++) {
         $cmbTimeout->additem($i, $i . " " .  _('seconds') );
     }
     $form->addItem($cmbTimeout);
+    $form->addItem(array(
+        new CInput('hidden', "hostid", get_request('hostid'))
+        , new CInput('hidden', "itemid", get_request('itemid'))
+        , new CInput('hidden', "interface", get_request('interface'))
+        , new CInput('hidden', "itemkey", get_request('itemkey'))
+    ));
     $form->setMethod('get');
 
     $item_wdgt->addPageHeader(
