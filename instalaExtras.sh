@@ -25,6 +25,49 @@ installMgs() {
     registra " $tipo install ($2)...";
 }
 
+
+downloadFiles() {
+    dialog \
+        --title 'Download Files'        \
+        --radiolist "$M_PATCH"  \
+        0 0 0                                    \
+        S   "$M_DOWNLOAD_FILES_SIM"  on    \
+        N   "$M_DOWNLOAD_FILES_NAO"  off   \
+        2> $TMP_DIR/resposta_dialog.txt
+    DOWNLOADFILES=`cat $TMP_DIR/resposta_dialog.txt `;
+    registra " Baixar Arquivos [$DOWNLOADFILES] ";
+}
+
+downloadPackage() {
+    ARQ_TMP="$1";
+    REPOS="$2";
+    if [ "$DOWNLOADFILES" = "S" ]; then
+        if [ -f $ARQ_TMP ]; then
+            rm $ARQ_TMP;
+        fi
+        # Baixa repositorio
+        wget $REPOS -O $ARQ_TMP --no-check-certificate;
+    fi
+}
+
+unzipPackage() {
+    ARQ_TMP="$1";
+    DIR_TMP="$2";
+    DIR_DEST="$3";
+    
+    cd /tmp;
+    # Descompacta em TMP
+    if [ -e $DIR_TMP ]; then
+        unalias rm;
+        rm -rf $DIR_TMP;
+    fi
+    unzip $ARQ_TMP;
+    cd $DIR_TMP
+    if [ ! -e "$DIR_DEST" ]; then
+        mkdir -p "$DIR_DEST";
+    fi
+}
+
 recriaTabelas() {
     dialog \
         --title 'Zabbix Extras BD Update ['$VERSAO_INST']'        \
@@ -596,8 +639,10 @@ customItemKey() {
     IDENT="\t: null";
 #    IDENT="         'formlist')\n       : null";
     NOVO=", (!\$this->data['limited'] ? new CButton('keyButtonTest', _('Test'),";
-    NOVO=$NOVO"'return PopUp(\"zbxe_item_test.php?hostid='.\$this->data['hostid'].'&itemid='.\$this->data['itemid'].'&";
-    NOVO=$NOVO"itemkey=\"+document.getElementById(";
+    NOVO=$NOVO"'iface=document.getElementById(\\\'interfaceid\\\'); ";
+    NOVO=$NOVO" return PopUp(\"zbxe_item_test.php?hostid='.\$this->data['hostid'].'&itemid='.\$this->data['itemid']";
+    NOVO=$NOVO".'&interface=\"+iface.options[iface.selectedIndex].text+\"'";
+    NOVO=$NOVO".'&itemkey=\"+document.getElementById(";
     NOVO=$NOVO"\\\'key\\\').value)";
     NOVO=$NOVO"','formlist') : null )";
     # Alterando o script JS
@@ -639,48 +684,6 @@ instalaSNMPB() {
     TMP="define('SNMPB_SNMP_PATH','$PATH_SNMP');";
     echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
 
-}
-
-downloadFiles() {
-    dialog \
-        --title 'Download Files'        \
-        --radiolist "$M_PATCH"  \
-        0 0 0                                    \
-        S   "$M_DOWNLOAD_FILES_SIM"  on    \
-        N   "$M_DOWNLOAD_FILES_NAO"  off   \
-        2> $TMP_DIR/resposta_dialog.txt
-    DOWNLOADFILES=`cat $TMP_DIR/resposta_dialog.txt `;
-    registra " Baixar Arquivos [$DOWNLOADFILES] ";
-}
-
-downloadPackage() {
-    ARQ_TMP="$1";
-    REPOS="$2";
-    if [ "$DOWNLOADFILES" = "S" ]; then
-        if [ -f $ARQ_TMP ]; then
-            rm $ARQ_TMP;
-        fi
-        # Baixa repositorio
-        wget $REPOS -O $ARQ_TMP --no-check-certificate;
-    fi
-}
-
-unzipPackage() {
-    ARQ_TMP="$1";
-    DIR_TMP="$2";
-    DIR_DEST="$3";
-    
-    cd /tmp;
-    # Descompacta em TMP
-    if [ -e $DIR_TMP ]; then
-        unalias rm;
-        rm -rf $DIR_TMP;
-    fi
-    unzip $ARQ_TMP;
-    cd $DIR_TMP
-    if [ ! -e "$DIR_DEST" ]; then
-        mkdir -p "$DIR_DEST";
-    fi
 }
 
 identificaDistro;
