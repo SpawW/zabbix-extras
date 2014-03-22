@@ -1,6 +1,6 @@
 <?php
 
-/* Used for inicial development: 
+/* Used for inicial development:
 ** Objective: Common functions used by Zabbix-Extras Module
 ** Copyright 2014 - Adail Horst - http://spinola.net.br/blog
 **
