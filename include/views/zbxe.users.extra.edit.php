@@ -6,6 +6,19 @@
  * and open the template in the editor.
  */
 
+// Lista todas as imagens
+function listaImagens() {
+    $iconList = API::Image()->get(array(
+	'filter' => array('imagetype' => IMAGE_TYPE_ICON),
+	'output' => API_OUTPUT_EXTEND,
+	'preservekeys' => true
+    ));
+    order_result($iconList, 'name');
+    foreach ($iconList as $icon) {
+       $data['iconList'][$icon['imageid']] = $icon['name'];
+    }
+    return $data;
+}
 //Inicia Variaveis -------------------------------------------------------------
 function zbxeFields() {
     global $fields, $ZBXE_VAR;
@@ -41,22 +54,23 @@ function zbxeControler() {
     $update = "";
     // Salvando preferencias ===================================================
     if (isset($_REQUEST['save'])) {
-//var_dump($_REQUEST);
         if (isset ($_REQUEST['xbxe_clean']) && $_REQUEST['xbxe_clean'] == "yes") {
             $query = "delete from zbxe_preferences  where userid = " . $userid;
-//var_dump($query);
             preparaQuery($query);
         } else {
             $_REQUEST['xbxe_clean'] = get_request('xbxe_clean');
         }
         foreach ($ZBXE_VAR as $key => $value) {
-//var_dump ("<br>--".$key);
             if (strpos($key,'_show') == 0 && $_REQUEST['xbxe_clean'] != "yes") {
                 $tmp = get_request($key);
                 // Atualizando dados de usuario ------------------------------------
-//                var_dump("$key - $tmp - " . zbxeConfigValue($key,$userid ) . "<br>");
+                //var_dump($key." - ". $tmp);
+                if ($key == "logo_company") {
+                    $data = listaImagens();
+                    $tmp = $data['iconList'][$tmp];
+                }
+
                 if (zbxeConfigValue($key,$userid ) != $tmp && strlen($tmp) > 0) {
-//                    var_dump("oi<br>");
                     // Verifica se ja existe registro para o usuario, se nao existir insere
                     if (zbxeConfigValue($key,$userid ) == "") {
                         $query = "insert into zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES ("
@@ -66,7 +80,6 @@ function zbxeControler() {
                         $query = "update zbxe_preferences set tx_value = " . quotestr($tmp)
                            . " where userid = ". $userid ." and tx_option = " . quotestr($key) . " " ;
                     }
-//                    var_dump($query);
                     preparaQuery($query);
                 }
             }
@@ -130,7 +143,7 @@ function zbxeShowTranslation () {
 
 function zbxeShowPreferences ($id) {
     //global $ZBXE_VAR;
-    global $_SERVER;
+    global $_SERVER, $ZBXE_VAR ;
     if (strpos($_SERVER["REQUEST_URI"],"users.php?form=update&userid=") > 0) {
         $userid = get_request('userid', 0);
     } else {
@@ -167,6 +180,29 @@ function zbxeShowPreferences ($id) {
     if (CWebUser::$data['userid'] > 0) { 
         $userFormExtra->addRow(_zeT('Delete User Personalization'), new CCheckBox('xbxe_clean'));
     }
+    // Personalizacao de logotipo ----------------------------------------------
+if ($id == "") {
+    include('include/views/js/administration.general.iconmap.js.php');
+    $iconMapTable = new CTable();
+    $iconMapTable->setAttribute('id', 'iconMapTable');
+    $data = listaImagens();
+    $firstIconId = 5;
+    foreach ($data['iconList'] as $key => $value) {
+        if ($value == $ZBXE_VAR['logo_company']) {
+            $firstIconId = $key;
+            break;
+        }
+    }
+    $iconsComboBox = new CComboBox('logo_company', $firstIconId);
+    $iconsComboBox->addClass('mappingIcon');
+    $iconsComboBox->addItems($data['iconList']);
+
+    $iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId.'&width='.ZBX_ICON_PREVIEW_WIDTH.
+            '&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
+    $iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$firstIconId);
+        $iconMapTable->addRow(array($iconsComboBox,$iconPreviewImage));
+        $userFormExtra->addRow(_zeT('Personal Logo'), $iconMapTable);
+}
     return $userFormExtra;
 }
 
