@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1.0-alfa-02";
+VERSAO_INST="2.1.0-alfa-03";
 UPDATEBD="S";
 BRANCH="Zabbix-Extras-2.0.1";
 #BRANCH="master";
@@ -126,6 +126,9 @@ idioma() {
       M_UPGRADE_BD_NAO="Manter tabelas zbxe existentes";
       M_DOWNLOAD_FILES_SIM="Baixar os arquivos mais atuais (recomendado)";
       M_DOWNLOAD_FILES_NAO="Utilizar os arquivos baixados e salvos manualmente em /tmp";
+      M_ERRO_DISTRO="Distribucao nao prevista ($LINUX_DISTRO)... favor contactar ";
+      M_DISTRO_SIM="SIM, continue mesmo sem o suporte a instalacao de pacotes (necessario wget, dialog e unzip).";
+      M_DISTRO_NAO="NAO, aborte a instalacao.";
             ;;
 	*) 
       M_BASE="This installer will add an extra menu to the end of the menu bar of your environment. For installation are needed to inform some parameters.";
@@ -149,6 +152,9 @@ idioma() {
       M_UPGRADE_BD_NAO="Preserve zbxe tables";
       M_DOWNLOAD_FILES_SIM="Get from internet latest version of patchs (recomended)";
       M_DOWNLOAD_FILES_NAO="Use files saved in /tmp";
+      M_ERRO_DISTRO="Unkown linux version ($LINUX_DISTRO)... please contact for support: ";
+      M_DISTRO_SIM="YES, continue without support to install OS packages (required wget, dialog and unzip) (S = YES).";
+      M_DISTRO_NAO="NO, stop install.";
         ;;
     esac
 }
@@ -201,7 +207,24 @@ identificaDistro() {
             registra "Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
             ;;
 	*) 
-            registra "Distribucao nao prevista ($LINUX_DISTRO)... favor contactar $AUTOR"; exit 1; 
+            echo "$M_ERRO_DISTRO Required: wget, unzip, dialog";
+            dialog \
+                --title 'Problem'        \
+                --radiolist "$M_ERRO_DISTRO"  \
+                0 0 0                                    \
+                S   "$M_DISTRO_SIM"  on    \
+                N   "$M_DISTRO_NAO"  off   \
+                2> $TMP_DIR/resposta_dialog.txt
+            CONTINUA=`cat $TMP_DIR/resposta_dialog.txt `;
+            registra " Distribuicao nao prevista, continuar [$DOWNLOADFILES] ";
+            if [ "$CONTINUA" = "S" ]; then
+                PATHDEF="/var/www";
+                GERENCIADOR_PACOTES='echo ';
+                CAMINHO_RCLOCAL="/etc/rc.local";
+            else
+                exit 1;
+            fi
+            #registra "Distribucao nao prevista ($LINUX_DISTRO)... favor contactar $AUTOR"; exit 1; 
         ;;
     esac
 }
