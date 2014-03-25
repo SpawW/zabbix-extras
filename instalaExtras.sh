@@ -221,6 +221,7 @@ identificaDistro() {
                 PATHDEF="/var/www";
                 GERENCIADOR_PACOTES='echo ';
                 CAMINHO_RCLOCAL="/etc/rc.local";
+                $LINUX_DISTRO="OUTROS";
             else
                 exit 1;
             fi
