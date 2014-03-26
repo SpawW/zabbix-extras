@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1.0-alfa-04";
+VERSAO_INST="2.1.0-alfa-06";
 UPDATEBD="S";
 BRANCH="Zabbix-Extras-2.0.1";
 #BRANCH="master";
@@ -707,6 +707,9 @@ instalaSNMPB() {
     PATH_SNMP=`which snmptranslate | sed 's/\/snmptranslate//g'`;
     TMP="define('SNMPB_SNMP_PATH','$PATH_SNMP');";
     echo "$TMP;" >> "$DIR_DEST/snmp-builder.conf.php"
+
+    # Configurando permissão da pasta de mibs
+    chmod 777 -R "$DIR_DEST/mibs"
 
 }
 
