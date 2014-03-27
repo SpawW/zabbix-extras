@@ -233,6 +233,22 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('p
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'VPS', 'VPS')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Week', 'Semana')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Year', 'Ano')");
+// Included on 2.1
+// PT-BR
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'SNMP Version', 'Versão do SNMP')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Community', 'Comunidade')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'OID Tree', 'Árvore OID')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'OID Data', 'Dados do OID')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Click to force view as table', 'Clique para forçar visualização em tabela')");
+// fr_FR
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'SNMP Version', 'Version SNMP')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Community', 'Communauté')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'OID Tree', 'Arbre OID')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'OID Data', 'Données OID')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Click to force view as table', 'Cliquez pour forcer la vue en tableau')");
+
+
+
 
 
 
