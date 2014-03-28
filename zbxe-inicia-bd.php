@@ -245,7 +245,7 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('f
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Community', 'Communauté')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'OID Tree', 'Arbre OID')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'OID Data', 'Données OID')");
-preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Click to force view as table', 'Cliquez pour forcer la vue en tableau')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Click to force view as table', 'Cochez pour forcer la vue en tableau')");
 
 
 
