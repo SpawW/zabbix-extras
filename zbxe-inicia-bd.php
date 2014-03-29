@@ -155,7 +155,7 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('f
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Delete User Personalization', 'Supprimer la personnalisation de l''utilisateur')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'English String', 'Chaîne en Anglais')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Enter the parameters for research!', 'Entrez les paramètres pour la recherche !')");
-preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Event Management', 'Observateur d\'événements')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Event Management', 'Observateur d\''événements')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Extras - Default', 'Extras - Défaut')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Extras', 'Extras')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Format', 'Format')");
@@ -168,10 +168,10 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('f
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Max', 'Max')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Min', 'Min')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Month', 'Mois')");
-preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'No events related to the event source or without events compatible with the filter informed.', 'Aucun des événements liés à la source de l''événement ou d\'événements compatibles avec le filtré indiqué.')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'No events related to the event source or without events compatible with the filter informed.', 'Aucun des événements liés à la source de l''événement ou d\''événements compatibles avec le filtré indiqué.')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Not Supported Items Report', 'Rapport des éléments non supportés')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Not Supported Items', 'Eléments non supportés')");
-preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Number of Incidents', 'Nombre d\'incidents')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Number of Incidents', 'Nombre d\''incidents')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Possible consequence.', 'Conséquence possible.')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Projection', 'Projection')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Related incidents', 'Incidents en relation')");
