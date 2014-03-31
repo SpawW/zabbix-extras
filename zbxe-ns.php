@@ -54,6 +54,8 @@ include_once 'include/page_header.php';
 		'agregation'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
 		'num_projection'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null),
 		'formato'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador do formato
+		'order'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador do formato
+		'order_field'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador do formato
 
 		'report_timesince'=>	array(T_ZBX_STR, O_OPT,  null,	null,		'isset({filter})'),
 		'report_timetill'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({filter})')
@@ -68,8 +70,12 @@ include_once 'include/page_header.php';
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null)
 	);
-	$hostid = $_REQUEST['hostid']	= get_request('hostid', 0);
-	$groupid = $_REQUEST['groupid']	= get_request('groupid', 0);
+        // Variaveis
+	$hostid     = $_REQUEST['hostid']	= get_request('hostid', 0);
+	$groupid    = $_REQUEST['groupid']	= get_request('groupid', 0);
+	$order      = get_request('order', 'asc');
+	$orderField = get_request('order_field', 'host');
+        
 	$pageFilter = new CPageFilter($options);
 
 	$filter_table = new CTable('', 'filter_config');
@@ -78,9 +84,22 @@ include_once 'include/page_header.php';
 	$cmbGroups 		= $pageFilter->getGroupsCB(true);
 	$cmbHosts 		= $pageFilter->getHostsCB(true);
 
+	// Combo com os formatos de exibição
+	$cmbOrderField   = new CComboBox('order_field', $orderField, 'javascript: submit();');
+	$cmbOrderField->additem('host', _('Host'));
+	$cmbOrderField->additem('name', _('Name'));
+	$cmbOrderField->additem('error', _('Error'));
+	// Combo o tipo de ordenação
+	$cmbOrder   = new CComboBox('order', $order, 'javascript: submit();');
+	$cmbOrder->additem('asc', _('Ascending'));
+	$cmbOrder->additem('desc', _('Descending'));
+        
+        
 	$filter_table->addRow(array(
 		array(bold(_('Group')), ': ', $cmbGroups),
 		array(bold(_('Host')), ': ', $cmbHosts),
+		array(bold(_('Field')), ': ', $cmbOrderField),
+		array(bold(_('Sort')), ': ', $cmbOrder),
 		array()
 	));
         $groupids = checkAccessGroup ('groupid');
@@ -143,7 +162,7 @@ include_once 'include/page_header.php';
                 '     on (hos.hostid = ite.hostid) and ' . $filtroSegHosts . 
                 ' where ite.state = 1 and ite.status = 0 ' .
                 (count($hostids) > 0 ? '   and ' .dbConditionInt('hos.hostid',$hostids ) : '').
-                ' order by hos.host, ite.name'
+                ' order by ' . $orderField . " " . $order
                 ;
 //        var_dump($sql);
         $result = DBselect($sql);
