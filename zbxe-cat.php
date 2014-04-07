@@ -256,7 +256,7 @@ function campoPadrao ($p_campo,$p_mascara) {
 		while($row_extra = DBfetch($result)){ $tipo = $row_extra['value_type']; }
 		$tabela_log = ($tipo == 0 ? "trends" : "trends_uint");
 		$casasDecimais = ($tipo == 0 ? 4 : 0);
-// =================== Query Base (MySQL e não o lixo do postgres =====================================
+// =================== Query Base (MySQL) =====================================
 $query = "
 select ".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? " DISTINCT ON(momento) ": "" )."it.units, it.description, ano, mes, dia, momento, AVG(valor) as valor
   from items it 
@@ -272,7 +272,7 @@ where hu.clock between ".$report_timesince." and  ".$report_timetill." AND hu.it
 on a.itemid = it.itemid 
 where it.itemid = ".$itemid."
 group by ".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? "units, ano, mes, dia, description, ": "" )." momento
-order by momento
+order by ano, mes, momento
 ";
 	if ($DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 		$query = str_replace('DATE_FORMAT','to_char',$query);
