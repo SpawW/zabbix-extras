@@ -258,7 +258,7 @@ function campoPadrao ($p_campo,$p_mascara) {
 		$casasDecimais = ($tipo == 0 ? 4 : 0);
 // =================== Query Base (MySQL) =====================================
 $query = "
-select ".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? " DISTINCT ON(momento) ": "" )."it.units, it.description, ano, mes, dia, momento, AVG(valor) as valor
+select ".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? " DISTINCT ON(ano,mes,momento) ": "" )."it.units, it.description, ano, mes, dia, momento, AVG(valor) as valor
   from items it 
  inner join 
 (select 
