@@ -50,6 +50,7 @@
 		'hostid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
 		'formato'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador do formato
 		'view'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Identificador da visão que se deseja
+		'nmitem'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	DB_ID,	null), // Exibe ou ignora itens não monitorados
 /* actions */
 		'filter'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
@@ -65,12 +66,13 @@
 		'groupid' => get_request('groupid', null),
 		'hostid' => get_request('hostid', null)
 	);
-	$pageFilter = new CPageFilter($options);
-	$startDateDefault 				= 86400*30;
-	$groupid = $_REQUEST['groupid'] = get_request('groupid', 0);
-	$hostid = $_REQUEST['hostid']	= get_request('hostid', 0);
-	$formato = $_REQUEST['formato']	= get_request('formato', 'html');
-	$view = $_REQUEST['view']	= get_request('view', 'H');
+	$pageFilter         = new CPageFilter($options);
+	$startDateDefault   = 86400*30;
+	$groupid    = $_REQUEST['groupid']      = get_request('groupid', 0);
+	$hostid     = $_REQUEST['hostid']	= get_request('hostid', 0);
+	$formato    = $_REQUEST['formato']	= get_request('formato', 'html');
+	$view       = $_REQUEST['view'] 	= get_request('view', 'H');
+	$nmItem     = $_REQUEST['nmitem'] 	= get_request('nmitem', 'S');
 	
 	// Verificação de segurança =========================================
 
@@ -90,6 +92,10 @@
 	$cmbView = newComboFilterArray(array(
             'H' => _('Item'), 'G' => _('Host')
         ),'view',$view);
+	// Combo com a regra de cálculo
+	$cmbNMItem = newComboFilterArray(array(
+            'S' => _('Show'), 'H' => _('Hide')
+        ),'nmitem',$nmItem);
 
 // FIM Combos de filtro =========================================================
 	$hostprof_wdgt->addHeader($page['title'], array());
@@ -105,6 +111,7 @@
 		array(bold(_('Host')), ': ', $cmbHosts),
 		array(bold(_zeT('Format')), ': ', $cmbFormato),
 		array(bold(_zeT('View')), ': ', $cmbView),
+		array(bold(_zeT('Not monitored items')), ': ', $cmbNMItem),
 		array()
 	));
 	
@@ -142,6 +149,7 @@ INNER JOIN hosts_groups hgr
 ". ( $groupid > 0 ? " AND hgr.groupid = ".$groupid: "")
 ." WHERE it.flags <> 2 and it.type not in (2,17)
 " . ($hostid > 0 ? " AND it.hostid = ".$hostid : "")
+  . ($nmItem == "H" ? " AND it.status = 0 " : "")
 . "\n order by host_name, item_key " ;
                 $report		= Array();
                     $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = 0;
@@ -166,6 +174,9 @@ INNER JOIN hosts_groups hgr
 
                         $report[$cont][4] = round(floatval($row['vps_costs']),4);
                         $vpsTotal += $report[$cont][4];
+                        // Adicionando a unidade
+                        $report[$cont][1] .=' '._zeT('rows');
+                        $report[$cont][2] .=' '._zeT('rows');
                         $report[$cont][4] .=' vps';
                         $cont++;
                     }
@@ -182,7 +193,7 @@ INNER JOIN hosts_groups hgr
                         $report[$cont][3] = $row['delay'];
                         $report[$cont][4] = $row['history'];
                         $report[$cont][5] = $row['trends'];
-                        $report[$cont][6] = $row['status'];
+                        $report[$cont][6] = ($row['status'] == 1 ? _('Not monitored') : _('Active'));
                         $report[$cont][7] = round(floatval($row['history_costs']),2);
                         $historyTotal += $report[$cont][7];
                         $report[$cont][8] = round(floatval($row['trends_costs']),2);
@@ -192,7 +203,11 @@ INNER JOIN hosts_groups hgr
                         $report[$cont][9] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
                         $report[$cont][10] = round(1/floatval($row['delay']),4);
                         $vpsTotal += $report[$cont][10];
+                        // Adicionando a unidade
+                        $report[$cont][7] .=' '._zeT('rows');
+                        $report[$cont][8] .=' '._zeT('rows');
                         $report[$cont][10] .=' vps';
+                        
                         $cont++;
                       }
                       $lastItemID = $row['itemid'];
@@ -226,13 +241,15 @@ INNER JOIN hosts_groups hgr
                         case 'csv';
                             $linhaCSV = "";
                             for ($x = 0; $x < $cont2; $x++) {
-                                $linhaCSV .= quotestr($report[$i][$x].($x == 7 || $x == 8 ? $linhasDesc : " ")).";";
+                                $linhaCSV .= quotestr($report[$i][$x]).";";
+//                                $linhaCSV .= quotestr($report[$i][$x].($x == 7 || $x == 8 ? $linhasDesc : " ")).";";
                             }
                             $table->addRow(array($linhaCSV));
                             break;
                         case 'html';
                             for ($x = 0; $x < $cont2; $x++) {
-                                $linha[$x] = new CCol($report[$i][$x].($x == 7 || $x == 8 ? $linhasDesc : " "),1);
+                                $linha[$x] = new CCol($report[$i][$x],1);
+//                                $linha[$x] = new CCol($report[$i][$x].($x == 7 || $x == 8 ? $linhasDesc : " "),1);
                             }
                             $table->addRow($linha);
                             break;			
