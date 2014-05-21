@@ -34,6 +34,17 @@ function zbxeFieldValue ($query, $field) {
     return $return;
 }
 
+function descItem ($itemName, $itemKey) {
+    if (strpos($itemName,"$") !== false) {
+        $tmp = explode("[",$itemKey);
+        $tmp = explode(",",str_replace("]","",$tmp[1]));
+        for ($i = 0; $i < count($tmp); $i++) {
+            $itemName = str_replace("$".($i+1),$tmp[$i],$itemName);
+        }
+    }
+    return $itemName;
+}
+
 function _zeT ($p_msg) {
     $lang = quotestr(CWebUser::$data['lang']);
     $p_msg2 = quotestr($p_msg);
