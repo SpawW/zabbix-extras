@@ -631,7 +631,9 @@ modifica() {
 # $5 = Texto customizado
 # $6 = indica que a tag de inicio devera ficar antes do texto customizado
     ARQUIVO="$1";
-    TAG_INICIO="##Zabbix-Extras-$2-custom";
+    INI_COMENT="\/\/";
+
+    TAG_INICIO="$INI_COMENT Zabbix-Extras-$2-custom";
     TAG_FINAL="$TAG_INICIO-FIM";
     INIINST=`cat $ARQUIVO | sed -ne "/$TAG_INICIO/{=;q;}"`;
     FIMINST=`cat $ARQUIVO | sed -ne "/$TAG_FINAL/{=;q;}"`;
@@ -653,10 +655,15 @@ modifica() {
 }
 
 customItemKey() {
-    ARQUIVO="include/views/js/configuration.item.edit.js.php";
-    IDENT="if (type == 0 || type == 7 || type == 3 || type == 5 || type == 8 || type == 17) {";
+#    ARQUIVO="include/views/js/configuration.item.edit.js.php";
+#    IDENT="if (type == 0 || type == 7 || type == 3 || type == 5 || type == 8 || type == 17) {";
     # Alterando o script JS
-    modifica "$ARQUIVO" "live-item-key" "Adicionando suporte para verificacao em tempo real de chave" "$IDENT" "jQuery('#keyButtonTest').prop('disabled', !(type == 0 || type == 7));"
+#    modifica "$ARQUIVO" "live-item-key" "Adicionando suporte para verificacao em tempo real de chave" "$IDENT" "jQuery('#keyButtonTest').prop('disabled', !(type == 0 || type == 7));"
+
+    ARQUIVO="include/views/js/configuration.item.edit.js.php";
+    IDENT="var type = parseInt(jQuery('#type').val());";
+    # Alterando o script JS
+    modifica "$ARQUIVO" "live-item-key" "Adicionando suporte para verificacao em tempo real de chave" "$IDENT" "jQuery('#keyButtonTest').prop('disabled', !(type == 0 || type == 7));\n" "S" 
     
     # Alterando o formulario de edicao de itens
     ARQUIVO="include/views/configuration.item.edit.php";
@@ -713,11 +720,20 @@ instalaSNMPB() {
 
 }
 
+#modifica "nada.js.php" ;
+#exit;
+
 identificaDistro;
 preReq;
 idioma;
 caminhoFrontend;
 downloadFiles;
+
+# Criando pasta extras
+if [ ! -e "$CAMINHO_FRONTEND/extras" ]; then
+    mkdir -p "$CAMINHO_FRONTEND/extras";
+fi
+
 
 suporteBDCustom;
 customMapas;
