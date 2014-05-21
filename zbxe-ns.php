@@ -91,8 +91,8 @@ include_once 'include/page_header.php';
 	$cmbOrderField->additem('error', _('Error'));
 	// Combo o tipo de ordenação
 	$cmbOrder   = new CComboBox('order', $order, 'javascript: submit();');
-	$cmbOrder->additem('asc', _('Ascending'));
-	$cmbOrder->additem('desc', _('Descending'));
+	$cmbOrder->additem('asc', _zeT('Ascending'));
+	$cmbOrder->additem('desc', _zeT('Descending'));
         
         
 	$filter_table->addRow(array(
@@ -156,7 +156,7 @@ include_once 'include/page_header.php';
                     $sql_where.=' AND ht.hostid=h.hostid AND ht.templateid='.$hostid;
             }
         }
-        $sql =  'select hos.host, ite.name, ite.itemid, hos.hostid, ite.error, ite.flags ' .
+        $sql =  'select hos.host, ite.name, ite.itemid, hos.hostid, ite.error, ite.flags, ite.key_ ' .
                 '  from items ite ' .
                 '  inner join hosts hos ' .
                 '     on (hos.hostid = ite.hostid) and ' . $filtroSegHosts . 
@@ -173,16 +173,19 @@ include_once 'include/page_header.php';
                 (($hostid == 0) || (1 == $config))? _('Host') : NULL,
                 _('Name'),
                 _('Error'),
+                _('Status'),
         ));
 
         while($row = DBfetch($result)){
-                $table->addRow(array(
-                        get_node_name_by_elid($row['hostid']),
-                        (($hostid == 0) || (1 == $config)) ? $row['host'] : NULL,
-                        ($row['flags'] == 4 ? $row['name']
-                        : new CLink($row['name'], 'items.php?form=update&itemid='.$row['itemid']))
-                        , $row['error']
-                ));
+            $descricao = descItem($row['name'],$row['key_']);
+            $table->addRow(array(
+                get_node_name_by_elid($row['hostid']),
+                (($hostid == 0) || (1 == $config)) ? $row['host'] : NULL,
+                ($row['flags'] == 4 ? $descricao
+                : new CLink($descricao, 'items.php?form=update&itemid='.$row['itemid']))
+                , $row['error']
+                ,new CLink(_('Disable'), 'items.php?group_itemid='.$row['itemid'].'&hostid='.$row['hostid'].'&go=disable')
+            ));
         }
 
         $rep2_wdgt->addItem($table);
