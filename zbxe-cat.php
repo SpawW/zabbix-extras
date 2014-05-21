@@ -33,7 +33,7 @@
 	require_once('include/forms.inc.php');
 	require_once('include/zbxe_visual_imp.php');
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$titulo 		= _zeT('Capacity and Trends');;//'Zabbix-CAT - Capacidade e Tendência';
+	$titulo 		= _zeT('Capacity and Trends');//'Zabbix-CAT - Capacidade e Tendência';
 	$page['title'] 		= $titulo;
 	$page['file'] 		= 'zbxe-cat.php';
 	$page['hist_arg'] 	= array('hostid','groupid','graphid');
@@ -212,7 +212,7 @@
 		$filter_table->addRow(array(
 			array(bold(_('Group')), ': ', $cmbGroups),
 			array(bold(_('Host')), ': ', $cmbHosts),
-			exibeConteudo ($hostid > 0,array(bold(_zeT('Application')), ': ', $cmbApplications)),
+			exibeConteudo ($hostid > 0,array(bold(_('Application')), ': ', $cmbApplications)),
 			array()
 		));
 		$filter_table->addRow(array(
@@ -358,10 +358,10 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
                                         $valor = convert_units(array(
                                             'value' => $report[$i]['valor'],
                                             'units' => $unidade));
-					$valor = new CCol($valor,1);
+					//$valor = new CCol($valor,1);
                                         
 					$tipo = new CCol($report[$i]['tipo'],1);
-					$table->addRow(array($momento,$valor,$tipo));
+					$table->addRow(array($momento,new CCol($valor,1),$tipo));
 					break;			
 			}
 			// Tratando o valor para o gráfico caso seja formatação de Byte
@@ -386,7 +386,8 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 				$descUnidade = " em " . $descUnidade;
 			} else { $fator = 1; $descUnidade = ""; }
 			$valor = round($report[$i]['valor'] / $fator,2);
-			$points .= "'".$report[$i]['momento']."',".$valor."[;]";
+//                        $valor = explode(' ', convert_units(array('value' => $valor,'units' => $unidade)));
+			$points .= "'".$report[$i]['momento']."',".$valor[0]."[;]";
 		}
 		$tituloGrafico .= $descUnidade;
 		$script = "function fnGrafico () { ".
