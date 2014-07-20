@@ -28,6 +28,6 @@
 <?php
 require_once('include/config.inc.php');
 require_once('include/page_header.php');
-echo'<iframe width="98%" height="860" style="margin: 0 auto; display: block;" src="extras/service-tree/index.php"></iframe> ';
+echo'<iframe width="98%" height="550" style="margin: 0 auto; display: block;" src="extras/service-tree/index.php"></iframe> ';
 require_once('include/page_footer.php');
 ?>
