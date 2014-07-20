@@ -1,6 +1,6 @@
 <?php
 /* Utilizei como base inicial para o desenvolvimento o "zabbix-cat.php" e alguns outros arquivos do Frontend do Zabbix
-** Objetivo: Relatório de custo de armazenamento da monitoração
+** Objetivo: Relatório de custo de armazenamento e processamento na monitoração
 ** Adail Horst - http://spinola.net.br/blog
 
 ** Comentários do arquivo original -------------------------------------------
