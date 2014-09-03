@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1.0-alfa-07";
+VERSAO_INST="2.1.0-alfa-08";
 UPDATEBD="S";
 BRANCH="Zabbix-Extras-2.0.1";
 #BRANCH="master";
@@ -216,7 +216,7 @@ identificaDistro() {
                 N   "$M_DISTRO_NAO"  off   \
                 2> $TMP_DIR/resposta_dialog.txt
             CONTINUA=`cat $TMP_DIR/resposta_dialog.txt `;
-            registra " Distribuicao nao prevista, continuar [$DOWNLOADFILES] ";
+            registra " Distribuicao nao prevista, continuar [$DOWNLOADFILES [$LINUX_DISTRO - $LINUX_VER] ";
             if [ "$CONTINUA" = "S" ]; then
                 PATHDEF="/var/www";
                 GERENCIADOR_PACOTES='echo ';
