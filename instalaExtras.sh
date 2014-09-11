@@ -8,8 +8,6 @@ TMP_DIR="/tmp/upgZabbix";
 VERSAO_INST="2.1.0-alfa-08";
 UPDATEBD="S";
 BRANCH="Zabbix-Extras-2.0.1";
-#BRANCH="master";
-#DATA_BACKUP=`date +%Y%m%d`;
 
 registra() {
     [ -d ${TMP_DIR} ] || mkdir ${TMP_DIR}
@@ -306,6 +304,12 @@ corTituloMapa() {
     TAMANHO=$((120+$(echo $EMPRESA | wc -c)*4));
  #$this->width - 120, $this->height - 12, $date
     sed -i "s/\$this->width - .*, \$this->height - 12, .*\$date/\$this->width - $TAMANHO, \$this->height - 12, '$EMPRESA '.\$date/" $ARQUIVO;
+    # Tamanho da fonte do título dos elementos nos mapas =======================
+    ARQUIVO="include/classes/sysmaps/CCanvas.php";
+    EMPRESA="SERPRO";
+    TAMANHO=$((120+$(echo $EMPRESA | wc -c)*4));
+ #$this->width - 120, $this->height - 12, $date
+    sed -i "s/\$this->width - .*, \$this->height - 12, .*\$date/\$this->width - $TAMANHO, \$this->height - 12, '$EMPRESA '.\$date/" $ARQUIVO;
 }
 # include/classes/sysmaps/CCanvas.php - linha 69
 # include/classes/sysmaps/CMapPainter.php 
@@ -457,8 +461,9 @@ customLogo() {
 }
 
 instalaGeo() {
-    REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
-    #REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
+    #REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
+# Repositório emergencial enquanto o Ari nao atualiza o repositorio oficial do zabbix-geo
+    REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
     ARQ_TMP="/tmp/pluginGeo.zip";
     DIR_TMP="/tmp/zabbix-geolocation-master/";
     DIR_DEST="$CAMINHO_FRONTEND/extras/geo";
