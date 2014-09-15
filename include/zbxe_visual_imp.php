@@ -25,6 +25,11 @@
 ** If not, see http://www.gnu.org/licenses/.
 **/
 
+# Recover web paramiter
+function parametroWeb ($nome) {
+    $parametro = "";    
+    return $parametro;
+}
 # Zabbix-Extras - Global Variables Start
 function zbxeFieldValue ($query, $field) {
     $res = DBselect($query);
@@ -152,10 +157,10 @@ function _zeT ($p_msg) {
         )."'";
     }
     function versaoZabbix () {
-        return substr(ZABBIX_VERSION,0,3);
+        return str_replace(".","",substr(ZABBIX_VERSION,0,5));
     }
     function checkAccessGroup ($p_groupid) {
-        if (get_request($p_groupid) && !API::HostGroup()->isReadable(array($_REQUEST[$p_groupid]))) {
+        if (getRequest($p_groupid) && !API::HostGroup()->isReadable(array($_REQUEST[$p_groupid]))) {
             access_deny();
         } else {
             $groupids = array ($_REQUEST[$p_groupid]);
@@ -163,7 +168,7 @@ function _zeT ($p_msg) {
         return $groupids;
     }
     function checkAccessHost ($p_hostid) {
-        if (get_request($p_hostid) && !API::Host()->isReadable(array($_REQUEST[$p_hostid]))) {
+        if (getRequest($p_hostid) && !API::Host()->isReadable(array($_REQUEST[$p_hostid]))) {
             access_deny();
         } else {
             $hostids = array ($_REQUEST[$p_hostid]);
