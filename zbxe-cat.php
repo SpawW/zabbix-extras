@@ -79,26 +79,26 @@
 		'hosts' => array('monitored_hosts' => 1),
 		'items' => array('templated' => 0),
 
-		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null),
-		'itemid' => get_request('itemid', null),
-		'formato' => get_request('formato', null)
+		'groupid' => getRequest('groupid', null),
+		'hostid' => getRequest('hostid', null),
+		'itemid' => getRequest('itemid', null),
+		'formato' => getRequest('formato', null)
 	);
 	$pageFilter = new CPageFilter($options);
 	$startDateDefault 				= 86400*30;
-	$_REQUEST['groupid'] 			= get_request('groupid', 0);
-	$hostid = $_REQUEST['hostid']	= get_request('hostid', 0);
-	$applicationid = $_REQUEST['applicationid']	= get_request('applicationid', 0);
-	$itemid = $_REQUEST['itemid']	= get_request('itemid', 0);
-	$formato = $_REQUEST['formato']	= get_request('formato', 'html');
-	$_REQUEST['report_timesince'] 	= zbxDateToTime(get_request('report_timesince',date('YmdHis', time()-$startDateDefault)));
-	$_REQUEST['report_timetill'] 	= zbxDateToTime(get_request('report_timetill',date('YmdHis')));
+	$_REQUEST['groupid'] 			= getRequest('groupid', 0);
+	$hostid = $_REQUEST['hostid']	= getRequest('hostid', 0);
+	$applicationid = $_REQUEST['applicationid']	= getRequest('applicationid', 0);
+	$itemid = $_REQUEST['itemid']	= getRequest('itemid', 0);
+	$formato = $_REQUEST['formato']	= getRequest('formato', 'html');
+	$_REQUEST['report_timesince'] 	= zbxDateToTime(getRequest('report_timesince',date('YmdHis', time()-$startDateDefault)));
+	$_REQUEST['report_timetill'] 	= zbxDateToTime(getRequest('report_timetill',date('YmdHis')));
 	
-	$report_timesince 	= get_request('report_timesince',time()-$startDateDefault);
-	$report_timetill 	= get_request('report_timetill',time());
+	$report_timesince 	= getRequest('report_timesince',time()-$startDateDefault);
+	$report_timetill 	= getRequest('report_timetill',time());
 	
-	$timeShiftSource 	= get_request('timeshiftsource',0);
-	$timeShiftProjection	= get_request('timeshiftprojection',0);
+	$timeShiftSource 	= getRequest('timeshiftsource',0);
+	$timeShiftProjection	= getRequest('timeshiftprojection',0);
 	// Verificação de segurança =========================================
 
         $groupids = checkAccessGroup ('groupid');
@@ -145,8 +145,8 @@
 	$cmbTimeSource		= new CComboBox('timeshiftsource', $timeShiftSource, 'javascript: submit();');
 	$cmbTimeProjection	= new CComboBox('timeshiftprojection', $timeShiftProjection, 'javascript: submit();');
 	
-	$completo = get_request('itemid',0) > 0;
-	$cmbAgregation	= new CComboBox('agregation', get_request('agregation',0), 'javascript: submit();');
+	$completo = getRequest('itemid',0) > 0;
+	$cmbAgregation	= new CComboBox('agregation', getRequest('agregation',0), 'javascript: submit();');
 	if ($completo) {
 		$intervalDesc 		= array ('',_zeT('Day'),_zeT('Week'),_zeT('Month'),_zeT('Year'));
 		$intervalFactor 	= array (0,1,7,30,365);
@@ -206,7 +206,7 @@
 		$reporttimetab2 = new CTable(null,'calendar');
 		
 		$reporttimetab2->addRow(array(array(bold(_zeT('Analysis')), ': '), array($cmbTimeSource,$cmbAgregation)));
-		$reporttimetab2->addRow(array(array(bold(_zeT('Projection')), ': '), array($cmbTimeProjection,array(bold(_zeT('Amount')), ': '),new CTextBox('num_projection', get_request('num_projection',7), 2))));
+		$reporttimetab2->addRow(array(array(bold(_zeT('Projection')), ': '), array($cmbTimeProjection,array(bold(_zeT('Amount')), ': '),new CTextBox('num_projection', getRequest('num_projection',7), 2))));
 		$reporttimetab2->addRow(array(array(bold(_zeT('Formatting')), ': '), array($cmbFormato)));
 /*----------- Implementa o Filtro por período ---------------*/
 		$filter_table->addRow(array(
@@ -265,7 +265,7 @@ select ".($DB['TYPE'] == ZBX_DB_POSTGRESQL ? " DISTINCT ON(ano,mes,momento) ": "
 hu.itemid,
 DATE_FORMAT(FROM_UNIXTIME(hu.clock), '%Y') as ano, DATE_FORMAT(FROM_UNIXTIME(hu.clock), '%m') as mes, DATE_FORMAT(FROM_UNIXTIME(hu.clock), '%d') as dia, 
 DATE_FORMAT(FROM_UNIXTIME(hu.clock), '".$intervalMask[$timeShiftSource]."') as momento, "
-. $sourceAgregator[get_request('agregation',0)]." as valor
+. $sourceAgregator[getRequest('agregation',0)]." as valor
 from ".$tabela_log." hu 
 where hu.clock between ".$report_timesince." and  ".$report_timetill." AND hu.itemid = " . $itemid . "
 ) a 
@@ -325,7 +325,7 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 				$dataAtual = strtotime($intervalFactor2[$timeShiftProjection], $dataAtual);
 			}
 			// Aplicando o fator de tendência tendência --------------------------
-			for ($i = 0; $i < intval(get_request('num_projection',0)); $i++) {		
+			for ($i = 0; $i < intval(getRequest('num_projection',0)); $i++) {		
 				$format = "d/m/Y";
 				$proximoDia   = date($intervalMask2[$timeShiftProjection], $dataAtual);
 				$dataAtual = strtotime($intervalFactor2[$timeShiftProjection], $dataAtual);
