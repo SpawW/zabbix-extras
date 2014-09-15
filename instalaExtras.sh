@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1.0-alfa-08";
+VERSAO_INST="2.1-beta-09";
 UPDATEBD="S";
 BRANCH="Zabbix-Extras-2.0.1";
 
@@ -105,6 +105,9 @@ idioma() {
 	"pt" )
       M_BASE="Este instalador ira adicionar um menu extra ao final da barra de menus do seu ambiente. Para a correta instalacao sao necessarios alguns parametros.";
       M_CAMINHO="Favor informar o caminho para o frontend do zabbix";
+      M_BASE_PHP="Este instalador ira configurar a diretiva do PHP: short_open_tag, ativando-a. Este passo é necessário para instalar o ZabTree e ZabGeo.";
+      M_CAMINHO_PHP="Favor informar o caminho para o arquivo php.ini";
+      M_ERRO_CAMINHO_PHP="O php.ini nao foi encontrado no caminho informado."
       M_URL="Favor informar a URL do zabbix (usando localhost)";
       M_ERRO_CAMINHO="O caminho informado para o frontend do zabbix nao foi encontrado "
       M_ERRO_ABORT="Instalacao abortada!";
@@ -131,6 +134,9 @@ idioma() {
 	*) 
       M_BASE="This installer will add an extra menu to the end of the menu bar of your environment. For installation are needed to inform some parameters.";
       M_CAMINHO="Please enter the path to the zabbix frontend ";
+      M_BASE_PHP="This installer will configure the PHP: short_open_tag, activating it. This step is required to install and ZabTree ZabGeo.";
+      M_CAMINHO_PHP="Please enter the path to php.ini.";
+      M_ERRO_CAMINHO_PHP="The php.ini file was not found in the path provided."
       M_URL="Please enter the URL to the zabbix frontend (using localhost)";
       M_ERRO_CAMINHO="The informed path to zabbix frontend is not valid "
       M_ERRO_ABORT="Install aborted!";
@@ -173,6 +179,11 @@ preReq() {
     if [ `which unzip 2>&-  | wc -l` -eq 0 ]; then
         registra "Instalando unzip (pre requisito para todo o processo)";
         instalaPacote "unzip";
+    fi
+    # Verificando e instalando o php-curl
+    if [ `which unzip 2>&-  | wc -l` -eq 0 ]; then
+        registra "Instalando php-curl (pre requisito para o ZabGeo e ZabTree)";
+        instalaPacote "php-curl";
     fi
 }
 # Define os parametros especificos de cada distribuicao ========================
@@ -519,7 +530,7 @@ instalaMenus() {
     if [ "`cat js/main.js | grep zbxe | wc -l`" -eq 0 ]; then
         LINHA=`cat js/main.js | sed -ne "/{'empty'\:/{=;q;}"`;
         registra "Instalando menu no javascript...";
-        sed -i "106s/'admin': 0/'admin': 0,'zbxe':0/g" js/main.js 
+        sed -i "104s/'admin': 0/'admin': 0,'zbxe':0/g" js/main.js 
     fi
 
 }
@@ -725,6 +736,24 @@ instalaSNMPB() {
 
 }
 
+configuraPHP() {
+  PATH_PHPINI='/etc/php.ini';
+  dialog --inputbox "$M_BASE_PHP\n$M_CAMINHO_PHP" 0 0 "$PATH_PHPINI" 2> $TMP_DIR/resposta_dialog.txt;
+    PATH_PHPINI=`cat $TMP_DIR/resposta_dialog.txt`;
+    if [ ! -d "$PATH_PHPINI" ]; then
+        registra $M_ERRO_CAMINHO_PHP"($PATH_PHPINI). "$M_ERRO_ABORT;
+        exit 0;
+    fi
+  STATUSPHPINI=`cat $PATH_PHPINI  | grep ^"short_open_tag = Off" | wc -l`;
+  #sed -i 's/short_open_tag = Off/short_open_tag = On/g' /etc/php.ini
+  echo "oi $STATUSPHPINI";
+}
+
+identificaZabbix() {
+  cd $CAMINHO_FRONTEND;
+  VERSAO_ZBX=`cat include/defines.inc.php | grep ZABBIX_VERSION | awk '{print $2}' | awk -F"'" '{print $2}'`;
+  echo "--> Versao Zabbix: "$VERSAO_ZBX;
+}
 #modifica "nada.js.php" ;
 #exit;
 
@@ -732,6 +761,8 @@ identificaDistro;
 preReq;
 idioma;
 caminhoFrontend;
+identificaZabbix;
+echo "saiu"; exit;
 downloadFiles;
 
 # Criando pasta extras
