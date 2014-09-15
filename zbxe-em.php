@@ -35,13 +35,13 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 require_once dirname(__FILE__).'/include/zbxe_visual_imp.php';
 // ****************** Inicialização de variaveis *******************************
 
-$check_range = $_REQUEST['p_check_range']	= get_request('p_check_range', 30);
-$mode = $_REQUEST['p_mode']	= get_request('p_mode', "");
-$triggerid = $_REQUEST['p_triggerid']	= get_request('p_triggerid', "");
-$stime = $_REQUEST['p_stime']	= get_request('p_stime', "");
+$check_range = $_REQUEST['p_check_range']	= getRequest('p_check_range', 30);
+$mode = $_REQUEST['p_mode']	= getRequest('p_mode', "");
+$triggerid = $_REQUEST['p_triggerid']	= getRequest('p_triggerid', "");
+$stime = $_REQUEST['p_stime']	= getRequest('p_stime', "");
 $range = $check_range * 60;
-$reference = $_REQUEST['p_triggerid'] = get_request('p_triggerid',0);
-$min_events = $_REQUEST['p_min_events'] = get_request('p_min_events',6);
+$reference = $_REQUEST['p_triggerid'] = getRequest('p_triggerid',0);
+$min_events = $_REQUEST['p_min_events'] = getRequest('p_min_events',6);
 
 // ****************** Fim Inicialização de variaveis ***************************
 
@@ -137,15 +137,15 @@ if (isset($_REQUEST['filter_rst'])) {
 	$_REQUEST['showUnknown'] = 0;
 }
 
-$source = get_request('triggerid') > 0 ? EVENT_SOURCE_TRIGGERS
-		: get_request('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
+$source = getRequest('triggerid') > 0 ? EVENT_SOURCE_TRIGGERS
+		: getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
-$_REQUEST['triggerid'] = get_request('triggerid', CProfile::get('web.events.filter.triggerid', 0));
-$_REQUEST['showUnknown'] = get_request('showUnknown', CProfile::get('web.events.filter.showUnknown', 0));
+$_REQUEST['triggerid'] = getRequest('triggerid', CProfile::get('web.events.filter.triggerid', 0));
+$_REQUEST['showUnknown'] = getRequest('showUnknown', CProfile::get('web.events.filter.showUnknown', 0));
 
 // Change triggerId filter if change hostId
 if (($_REQUEST['triggerid'] > 0) && isset($_REQUEST['hostid'])) {
-	$hostid = get_request('hostid');
+	$hostid = getRequest('hostid');
 	$oldTriggers = API::Trigger()->get(array(
 		'output' => array(
 			'triggerid',
@@ -260,9 +260,9 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 			'with_items' => 1
 		),
 		'triggers' => array(),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-		'triggerid' => get_request('triggerid', null)
+		'hostid' => getRequest('hostid', null),
+		'groupid' => getRequest('groupid', null),
+		'triggerid' => getRequest('triggerid', null)
 	);
 	$pageFilter = new CPageFilter($options);
 	$_REQUEST['groupid'] = $pageFilter->groupid;
@@ -311,12 +311,12 @@ if ($mode !== "report") {
 
 $r_form = new CForm('get');
 $r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-$r_form->addVar('stime', get_request('stime'));
-$r_form->addVar('period', get_request('period'));
+$r_form->addVar('stime', getRequest('stime'));
+$r_form->addVar('period', getRequest('period'));
 
 // add host and group filters to the form
 if ($source == EVENT_SOURCE_TRIGGERS & $mode == "report") {
-    $r_form->addVar('form_refresh', get_request('form_refresh'));
+    $r_form->addVar('form_refresh', getRequest('form_refresh'));
     $r_form->addVar('p_mode', $mode);
     $r_form->addVar('p_triggerid', $triggerid);
     $r_form->addVar('p_check_range', $check_range);
@@ -364,9 +364,9 @@ if (EVENT_SOURCE_TRIGGERS == $source) {
 	$filterForm->setAttribute('name', 'zbx_filter');
 	$filterForm->setAttribute('id', 'zbx_filter');
 
-	$filterForm->addVar('triggerid', get_request('triggerid'));
-	$filterForm->addVar('stime', get_request('stime'));
-	$filterForm->addVar('period', get_request('period'));
+	$filterForm->addVar('triggerid', getRequest('triggerid'));
+	$filterForm->addVar('stime', getRequest('stime'));
+	$filterForm->addVar('period', getRequest('period'));
 	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
 		$dbTrigger = API::Trigger()->get(array(
 			'triggerids' => $_REQUEST['triggerid'],
@@ -449,7 +449,7 @@ else {
 $firstEvent = API::Event()->get($options);
 // }}} CHECK IF EVENTS EXISTS
 
-$_REQUEST['period'] = get_request('period', SEC_PER_WEEK);
+$_REQUEST['period'] = getRequest('period', SEC_PER_WEEK);
 $effectiveperiod = navigation_bar_calc();
 
 $from = zbxDateToTime($_REQUEST['stime']);
@@ -936,7 +936,7 @@ if ($mode == "report") { // Custom event report for show only events related
                                 //get_event_actions_status($event['eventid']);
 
 				$ack = getEventAckState($event, true);
-                                if (versaoZabbix() == "2.2") {
+                                if (versaoZabbix() == "22") {
                                     $description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
                                             'clock' => $event['clock'],
                                             'ns' => $event['ns']
