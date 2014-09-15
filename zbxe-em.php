@@ -434,16 +434,18 @@ $options = array(
 );
 
 if ($source == EVENT_SOURCE_DISCOVERY) {
-	$options['source'] = EVENT_SOURCE_DISCOVERY;
+    $options['source'] = EVENT_SOURCE_DISCOVERY;
 }
 else {
-	if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
+    if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid'] > 0)) {
 //		$options['triggerids'] = $_REQUEST['triggerid'];
-		$options['objectids'] = $_REQUEST['triggerid'];
-	}
-	$options['object'] = EVENT_OBJECT_TRIGGER;
+            $options['objectids'] = $_REQUEST['triggerid'];
+    }
+    $options['object'] = EVENT_OBJECT_TRIGGER;
 //	$options['filter'] = array('value_changed' => ($_REQUEST['showUnknown'] ? null : TRIGGER_VALUE_CHANGED_YES));
-	$options['nodeids'] = get_current_nodeid();
+    if (versaoZabbix() < 24) {
+        $options['nodeids'] = get_current_nodeid();
+    }
 }
 
 $firstEvent = API::Event()->get($options);
@@ -601,7 +603,7 @@ if ($mode == "report") { // Custom event report for show only events related
     //$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
     
     $options = array(
-            'nodeids' => get_current_nodeid(),
+            'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0),
             'source' => EVENT_SOURCE_TRIGGERS,
             'output' => API_OUTPUT_EXTEND,//API_OUTPUT_SHORTEN,
             'sortfield' => 'eventid',
@@ -724,7 +726,7 @@ if ($mode == "report") { // Custom event report for show only events related
     }
     $table->setHeader(array(
             _zeT('Amount'),
-            is_show_all_nodes() ? _('Node') : null,
+            (versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),
             _('Host'),
             _('Trigger'),
             $eventTitles[1],
@@ -769,7 +771,7 @@ if ($mode == "report") { // Custom event report for show only events related
         if ($CSV_EXPORT) {
                 $csvRows[] = array(
                         zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
-                        is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
+                        (versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
                         $_REQUEST['hostid'] == 0 ? $host['name'] : null,
                         $description,
                         trigger_value2str($event['value']),
@@ -788,7 +790,7 @@ if ($mode == "report") { // Custom event report for show only events related
 } else {
             	$table->setHeader(array(
 			_('Time'),
-			is_show_all_nodes() ? _('Node') : null,
+			(versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),
 			($_REQUEST['hostid'] == 0) ? _('Host') : null,
 			_('Description'),
 			_('Status'),
@@ -801,7 +803,7 @@ if ($mode == "report") { // Custom event report for show only events related
 		if ($CSV_EXPORT) {
 			$csvRows[] = array(
 				_('Time'),
-				is_show_all_nodes() ? _('Node') : null,
+				(versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),
 				($_REQUEST['hostid'] == 0) ? _('Host') : null,
 				_('Description'),
 				_('Status'),
@@ -814,7 +816,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 		if ($pageFilter->hostsSelected) {
 			$options = array(
-				'nodeids' => get_current_nodeid(),
+				'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0),
 				'filter' => array(
 //					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'object' => EVENT_OBJECT_TRIGGER,
@@ -833,7 +835,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 			// trigger options
 			$trigOpt = array(
-				'nodeids' => get_current_nodeid()
+				'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0)
 //				'output' => API_OUTPUT_SHORTEN
 			);
 
@@ -861,7 +863,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 			// query event with extend data
 			$options = array(
-				'nodeids' => get_current_nodeid(),
+				'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0),
 				'eventids' => zbx_objectValues($events, 'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
@@ -984,7 +986,7 @@ if ($mode == "report") { // Custom event report for show only events related
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 						'action'
 					),
-					is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
+					(versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
 					$hostSpan,
 					new CSpan($tr_desc, 'link_menu'),
 					$statusSpan,
@@ -997,7 +999,7 @@ if ($mode == "report") { // Custom event report for show only events related
 				if ($CSV_EXPORT) {
 					$csvRows[] = array(
 						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
-						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
+						(versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
 						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
