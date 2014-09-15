@@ -48,14 +48,14 @@
     }
 
     # Code -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    $tmp = explode(':',get_request('interface'));
+    $tmp = explode(':',getRequest('interface'));
     $HOST = trim($tmp[0]);
     $PORT = trim($tmp[1]);
-    $TIMEOUT = get_request('timeout',3);
+    $TIMEOUT = getRequest('timeout',3);
  /*
  * Display table header
  */
-    $key = get_request('itemkey',"");
+    $key = getRequest('itemkey',"");
     $zabbixAgent = new CZabbixAgent($HOST, $PORT, $TIMEOUT, 0);
     if ($zabbixAgent->isRunning()) {
         $testValue = substr($zabbixAgent->getKey($key),13);
@@ -96,10 +96,10 @@
     }
     $form->addItem($cmbTimeout);
     $form->addItem(array(
-        new CInput('hidden', "hostid", get_request('hostid'))
-        , new CInput('hidden', "itemid", get_request('itemid'))
-        , new CInput('hidden', "interface", get_request('interface'))
-        , new CInput('hidden', "itemkey", get_request('itemkey'))
+        new CInput('hidden', "hostid", getRequest('hostid'))
+        , new CInput('hidden', "itemid", getRequest('itemid'))
+        , new CInput('hidden', "interface", getRequest('interface'))
+        , new CInput('hidden', "itemkey", getRequest('itemkey'))
     ));
     $form->setMethod('get');
 
