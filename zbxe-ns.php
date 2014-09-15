@@ -67,14 +67,14 @@ include_once 'include/page_header.php';
 	$options = array(
 		'groups' => array('monitored_hosts' => 1),
 		'hosts' => array('monitored_hosts' => 1),
-		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null)
+		'groupid' => getRequest('groupid', null),
+		'hostid' => getRequest('hostid', null)
 	);
         // Variaveis
-	$hostid     = $_REQUEST['hostid']	= get_request('hostid', 0);
-	$groupid    = $_REQUEST['groupid']	= get_request('groupid', 0);
-	$order      = get_request('order', 'asc');
-	$orderField = get_request('order_field', 'host');
+	$hostid     = $_REQUEST['hostid']	= getRequest('hostid', 0);
+	$groupid    = $_REQUEST['groupid']	= getRequest('groupid', 0);
+	$order      = getRequest('order', 'asc');
+	$orderField = getRequest('order_field', 'host');
         
 	$pageFilter = new CPageFilter($options);
 
@@ -169,7 +169,9 @@ include_once 'include/page_header.php';
 
         $table = new CTableInfo();
         $table->setHeader(
-                array(is_show_all_nodes() ? _('Node') : null,
+                array(
+                // 2.4 não suporta node
+                (versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),                 
                 (($hostid == 0) || (1 == $config))? _('Host') : NULL,
                 _('Name'),
                 _('Error'),
