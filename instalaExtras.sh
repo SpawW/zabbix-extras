@@ -745,7 +745,7 @@ configuraPHP() {
   fi
   STATUSPHPINI=`cat $PATH_PHPINI  | grep ^"short_open_tag = Off" | wc -l`;
   if [ "$STATUSPHPINI" == "1" ]; then
-    registra "Ativando short_open_tag...";
+    registra "Ativando short_open_tag... lembre-se de reiniciar o Apache!";
     sed -i 's/short_open_tag = Off/short_open_tag = On/g' "$PATH_PHPINI";
   else
     registra "Ja estava ativo short_open_tag!";
@@ -765,7 +765,6 @@ preReq;
 idioma;
 caminhoFrontend;
 identificaZabbix;
-configuraPHP;
 downloadFiles;
 
 # Criando pasta extras
@@ -785,7 +784,9 @@ instalaSNMPB;
 instalaZE;
 instalaMenus;
 customProfile;
+configuraPHP;
 
+registra "Parametros usados para instalacao:";
 registra "Parametros usados para instalacao:";
 registra "URL do Zabbix: [$URL_FRONTEND]";
 registra "Path do frontend Zabbix: [$CAMINHO_FRONTEND]";
