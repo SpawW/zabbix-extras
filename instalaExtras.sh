@@ -596,8 +596,7 @@ instalaZE() {
     if [ -f "$ARQ_TMP_BD" ]; then
         rm "$ARQ_TMP_BD";
     fi
-    wget "$URL_FRONTEND/zbxe-inicia-bd.php?p_modo_install=$UPDATEBD" -O $ARQ_TMP_BD  --no-check-certificate;
-
+    wget "$URL_FRONTEND/zbxe-inicia-bd.php?p_modo_install=$UPDATEBD&p_versao_zbx=$VERSAO_ZBX" -O $ARQ_TMP_BD  --no-check-certificate;
     instalaLiteral;
 }
 
@@ -740,13 +739,17 @@ configuraPHP() {
   PATH_PHPINI='/etc/php.ini';
   dialog --inputbox "$M_BASE_PHP\n$M_CAMINHO_PHP" 0 0 "$PATH_PHPINI" 2> $TMP_DIR/resposta_dialog.txt;
     PATH_PHPINI=`cat $TMP_DIR/resposta_dialog.txt`;
-    if [ ! -d "$PATH_PHPINI" ]; then
-        registra $M_ERRO_CAMINHO_PHP"($PATH_PHPINI). "$M_ERRO_ABORT;
-        exit 0;
-    fi
+  if [ ! -f "$PATH_PHPINI" ]; then
+    registra $M_ERRO_CAMINHO_PHP"($PATH_PHPINI). "$M_ERRO_ABORT;
+    exit 0;
+  fi
   STATUSPHPINI=`cat $PATH_PHPINI  | grep ^"short_open_tag = Off" | wc -l`;
-  #sed -i 's/short_open_tag = Off/short_open_tag = On/g' /etc/php.ini
-  echo "oi $STATUSPHPINI";
+  if [ "$STATUSPHPINI" == "1" ]; then
+    registra "Ativando short_open_tag...";
+    sed -i 's/short_open_tag = Off/short_open_tag = On/g' "$PATH_PHPINI";
+  else
+    registra "Ja estava ativo short_open_tag!";
+  fi
 }
 
 identificaZabbix() {
@@ -762,7 +765,7 @@ preReq;
 idioma;
 caminhoFrontend;
 identificaZabbix;
-echo "saiu"; exit;
+configuraPHP;
 downloadFiles;
 
 # Criando pasta extras
