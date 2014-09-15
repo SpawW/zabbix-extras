@@ -250,26 +250,24 @@ CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
 // page filter
 if ($source == EVENT_SOURCE_TRIGGERS) {
-	$options = array(
-		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_items' => 1
-		),
-		'hosts' => array(
-			'monitored_hosts' => 1,
-			'with_items' => 1
-		),
-		'triggers' => array(),
-		'hostid' => getRequest('hostid', null),
-		'groupid' => getRequest('groupid', null),
-		'triggerid' => getRequest('triggerid', null)
-	);
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-	if ($pageFilter->triggerid > 0) {
-		$_REQUEST['triggerid'] = $pageFilter->triggerid;
-	}
+    $options = array(
+        'groups' => array(
+            'monitored_hosts' => 1,
+            'with_items' => 1
+        ),
+        'hosts' => array(
+            'monitored_hosts' => 1,
+            'with_items' => 1
+        ),
+        'triggers' => array(),
+        'hostid' => getRequest('hostid', null),
+        'groupid' => getRequest('groupid', null),
+        'triggerid' => getRequest('triggerid', null)
+    );
+    $pageFilter = new CPageFilter($options);
+    $_REQUEST['groupid'] = $pageFilter->groupid;
+    $_REQUEST['hostid'] = $pageFilter->hostid;
+    $_REQUEST['triggerid'] = getRequest('triggerid');
 }
 
 $events_wdgt = new CWidget();
@@ -432,7 +430,7 @@ $options = array(
 	'nopermissions' => 1,
 	'limit' => 1
 );
-
+/*
 if ($source == EVENT_SOURCE_DISCOVERY) {
     $options['source'] = EVENT_SOURCE_DISCOVERY;
 }
@@ -447,6 +445,7 @@ else {
         $options['nodeids'] = get_current_nodeid();
     }
 }
+*/
 
 $firstEvent = API::Event()->get($options);
 // }}} CHECK IF EVENTS EXISTS
@@ -770,7 +769,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
         if ($CSV_EXPORT) {
                 $csvRows[] = array(
-                        zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
+                        zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
                         (versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
                         $_REQUEST['hostid'] == 0 ? $host['name'] : null,
                         $description,
@@ -938,7 +937,7 @@ if ($mode == "report") { // Custom event report for show only events related
                                 //get_event_actions_status($event['eventid']);
 
 				$ack = getEventAckState($event, true);
-                                if (versaoZabbix() == "22") {
+                                if (versaoZabbix() > 20) {
                                     $description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
                                             'clock' => $event['clock'],
                                             'ns' => $event['ns']
@@ -982,7 +981,7 @@ if ($mode == "report") { // Custom event report for show only events related
 				}
 
 				$table->addRow(array(
-					new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
+					new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 						'action'
 					),
@@ -998,7 +997,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 				if ($CSV_EXPORT) {
 					$csvRows[] = array(
-						zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
+						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 						(versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
 						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 						$description,
