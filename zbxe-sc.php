@@ -63,16 +63,16 @@
 	$options = array(
 		'groups' => array('monitored_hosts' => 1),
 		'hosts' => array('monitored_hosts' => 1),
-		'groupid' => get_request('groupid', null),
-		'hostid' => get_request('hostid', null)
+		'groupid' => getRequest('groupid', null),
+		'hostid' => getRequest('hostid', null)
 	);
 	$pageFilter         = new CPageFilter($options);
 	$startDateDefault   = 86400*30;
-	$groupid    = $_REQUEST['groupid']      = get_request('groupid', 0);
-	$hostid     = $_REQUEST['hostid']	= get_request('hostid', 0);
-	$formato    = $_REQUEST['formato']	= get_request('formato', 'html');
-	$view       = $_REQUEST['view'] 	= get_request('view', 'H');
-	$nmItem     = $_REQUEST['nmitem'] 	= get_request('nmitem', 'S');
+	$groupid    = $_REQUEST['groupid']      = getRequest('groupid', 0);
+	$hostid     = $_REQUEST['hostid']	= getRequest('hostid', 0);
+	$formato    = $_REQUEST['formato']	= getRequest('formato', 'html');
+	$view       = $_REQUEST['view'] 	= getRequest('view', 'H');
+	$nmItem     = $_REQUEST['nmitem'] 	= getRequest('nmitem', 'S');
 	
 	// Verificação de segurança =========================================
 
@@ -134,7 +134,7 @@
 	$hostprof_wdgt->addFlicker($filter_form, true);
 
 // FIM Formulario de Filtro =========================================================
-	$completo = (get_request('formato','') != '') && ($groupid > 1 || $hostid > 1);
+	$completo = (getRequest('formato','') != '') && ($groupid > 1 || $hostid > 1);
 		
 	if ($completo) {
 
