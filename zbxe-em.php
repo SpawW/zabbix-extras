@@ -648,7 +648,7 @@ if ($mode == "report") { // Custom event report for show only events related
                     $triggerInfo = API::Trigger()->get(array(
                         'output' => array( 'triggerid', 'description' ),
                         'triggerids' => $event2['objectid'],
-                        //'output' => API_OUTPUT_EXTEND,//API_OUTPUT_SHORTEN,
+                        'output' => API_OUTPUT_EXTEND,//API_OUTPUT_SHORTEN,
                         'expandDescription' => true
                         //, 'expandData' => true
                     ));
