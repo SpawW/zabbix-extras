@@ -42,8 +42,11 @@ $stime = $_REQUEST['p_stime']	= getRequest('p_stime', "");
 $range = $check_range * 60;
 $reference = $_REQUEST['p_triggerid'] = getRequest('p_triggerid',0);
 $min_events = $_REQUEST['p_min_events'] = getRequest('p_min_events',6);
-
-$formato_data = (versaoZabbix() < 24 ? EVENTS_ACTION_TIME_FORMAT : DATE_TIME_FORMAT_SECONDS);
+if (versaoZabbix() < 24) {
+    $formato_data = EVENTS_ACTION_TIME_FORMAT;
+} else {
+    $formato_data = DATE_TIME_FORMAT_SECONDS;
+}
 
 // ****************** Fim Inicialização de variaveis ***************************
 
