@@ -137,7 +137,7 @@ $right_widget_width = '800px';
 
 		$file = new CUploadFile($_FILES['mib']);
 
-		$cmd = 'cp -f '.$_FILES['mib']['tmp_name'].' '.MIBS_ALL_PATH.'/'.$_FILES['mib']['name'];
+		$cmd = 'cp -f "'.$_FILES['mib']['tmp_name'].'" "'.MIBS_ALL_PATH.'/'.$_FILES['mib']['name'].'"';
 		exec("LANG=C $cmd 2>&1", $results, $code);
 		if ($code) {
 			show_messages(false, null, _('Import failed'));
