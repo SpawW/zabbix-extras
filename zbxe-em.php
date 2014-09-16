@@ -43,6 +43,8 @@ $range = $check_range * 60;
 $reference = $_REQUEST['p_triggerid'] = getRequest('p_triggerid',0);
 $min_events = $_REQUEST['p_min_events'] = getRequest('p_min_events',6);
 
+$formato_data = (versaoZabbix() < 24 ? EVENTS_ACTION_TIME_FORMAT : DATE_TIME_FORMAT_SECONDS);
+
 // ****************** Fim Inicialização de variaveis ***************************
 
 
@@ -774,7 +776,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
         if ($CSV_EXPORT) {
                 $csvRows[] = array(
-                        zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+                        zbx_date2str($formato_data, $event['clock']),
                         (versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
                         $_REQUEST['hostid'] == 0 ? $host['name'] : null,
                         $description,
@@ -986,7 +988,7 @@ if ($mode == "report") { // Custom event report for show only events related
 				}
 
 				$table->addRow(array(
-					new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+					new CLink(zbx_date2str($formato_data, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 						'action'
 					),
@@ -1002,7 +1004,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 				if ($CSV_EXPORT) {
 					$csvRows[] = array(
-						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+						zbx_date2str($formato_data, $event['clock']),
 						(versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
 						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 						$description,
