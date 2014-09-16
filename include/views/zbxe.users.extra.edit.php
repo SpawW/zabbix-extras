@@ -33,15 +33,15 @@ function zbxeFields() {
 function zbxeControler() {
     global $fields, $ZBXE_VAR, $CAMPOS;
     global $_SERVER;
-    if (strpos($_SERVER["REQUEST_URI"],"users.php") > 0 && get_request('userid',-1) > -1) {
-        $userid = get_request('userid', 0);
+    if (strpos($_SERVER["REQUEST_URI"],"users.php") > 0 && getRequest('userid',-1) > -1) {
+        $userid = getRequest('userid', 0);
 //        var_dump("id de usuario". $userid);
     } else {
         $userid = CWebUser::$data['userid'];
     }
     
     // Salvando tradução ------------==================--------------===========
-    $translation = get_request('translate', array());
+    $translation = getRequest('translate', array());
     foreach ($translation as $number => $curString) {
 //        var_dump($curString);
         $query = "update zbxe_translation set tx_new = " . quotestr($curString['new'])
@@ -58,11 +58,11 @@ function zbxeControler() {
             $query = "delete from zbxe_preferences  where userid = " . $userid;
             preparaQuery($query);
         } else {
-            $_REQUEST['xbxe_clean'] = get_request('xbxe_clean');
+            $_REQUEST['xbxe_clean'] = getRequest('xbxe_clean');
         }
         foreach ($ZBXE_VAR as $key => $value) {
             if (strpos($key,'_show') == 0 && $_REQUEST['xbxe_clean'] != "yes") {
-                $tmp = get_request($key);
+                $tmp = getRequest($key);
                 // Atualizando dados de usuario ------------------------------------
                 //var_dump($key." - ". $tmp);
                 if ($key == "logo_company") {
@@ -86,7 +86,7 @@ function zbxeControler() {
             // Atualizando dados default ---------------------------------------
             if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_SUPER_ADMIN))) {
                 
-                $tmp = get_request($key."_adm");
+                $tmp = getRequest($key."_adm");
                 if (strpos($key,'_show') > 0 && $tmp == "") {
                     $tmp = '0';
                 }
@@ -145,7 +145,7 @@ function zbxeShowPreferences ($id) {
     //global $ZBXE_VAR;
     global $_SERVER, $ZBXE_VAR ;
     if (strpos($_SERVER["REQUEST_URI"],"users.php?form=update&userid=") > 0) {
-        $userid = get_request('userid', 0);
+        $userid = getRequest('userid', 0);
     } else {
         $userid = ($id != "" ? 0 : CWebUser::$data['userid']);
     }
