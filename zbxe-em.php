@@ -46,7 +46,7 @@ if (versaoZabbix() < 240) {
     $formato_data = EVENTS_ACTION_TIME_FORMAT;
 } else {
     $formato_data = DATE_TIME_FORMAT_SECONDS;
-    echo "VERSAO ZABBIX ex: ". versaoZabbix();
+    //echo "VERSAO ZABBIX ex: ". versaoZabbix();
 }
 
 // ****************** Fim Inicialização de variaveis ***************************
