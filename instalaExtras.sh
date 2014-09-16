@@ -12,7 +12,7 @@ BRANCH="Zabbix-Extras-2.0.1";
 registra() {
     [ -d ${TMP_DIR} ] || mkdir ${TMP_DIR}
     echo $(date)" - $1" >> $TMP_DIR/logInstall.log; 
-    echo "--> $1";
+    echo "-->Mensagem $1";
 }
 installMgs() {
     if [ "$1" = "U" ]; then
