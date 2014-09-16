@@ -38,7 +38,7 @@
 	$page['hist_arg'] = array('groupid', 'hostid','graphid');
 	$page['scripts'] = array('class.calendar.js', 'scriptaculous.js?load=effects');
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-
+        
 include_once 'include/page_header.php';
 
 ?>
