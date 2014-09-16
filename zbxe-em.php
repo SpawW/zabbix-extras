@@ -650,15 +650,23 @@ if ($mode == "report") { // Custom event report for show only events related
                     $triggerInfo = API::Trigger()->get(array(
                         'output' => array( 'triggerid', 'description' ),
                         'triggerids' => $event2['objectid'],
-                        'output' => API_OUTPUT_EXTEND,//API_OUTPUT_SHORTEN,
+                        //'output' => API_OUTPUT_EXTEND,//API_OUTPUT_SHORTEN,
+                        'selectHosts' => array('hostid', 'host'),
                         'expandDescription' => true
-                        //, 'expandData' => true
+                        //, 'host' => true
+                        //, (versaoZabbix() < 24 ? 'expandData' => true : null)
                     ));
+                    if (versaoZabbix() < 24) {
+                        $primeiroHostTrigger = $triggerInfo[0]['host'];
+                    } else {
+                        $primeiroHostTrigger = $triggerInfo[0]["hosts"][0]["hostid"];
+                    }
+                    //var_dump($primeiroHostTrigger);
                     if (count($triggerInfo) > 0) {
                         $listaTriggers .= ",".$event2['objectid'];
                         $report[$event2['objectid']] = array("count" => intval(1)
                            , "description" => $triggerInfo[0]['description']
-                           , "host" => $triggerInfo[0]['host']
+                           , "host" => $primeiroHostTrigger
                             //. $event2['objectid'] 
                            , "event1" => iniciaEvento("")
                            , "event2" => iniciaEvento("")
