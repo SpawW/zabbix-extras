@@ -183,7 +183,7 @@ preReq() {
     # Verificando e instalando o php-curl
     if [ `which unzip 2>&-  | wc -l` -eq 0 ]; then
         registra "Instalando php-curl (pre requisito para o ZabGeo e ZabTree)";
-        instalaPacote "php-curl";
+        instalaPacote "php-curl php5-curl";
     fi
 }
 # Define os parametros especificos de cada distribuicao ========================
