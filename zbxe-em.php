@@ -708,7 +708,12 @@ if ($mode == "report") { // Custom event report for show only events related
                 $msg = "Possible consequence.";
                 $dep_type = "DEP_UP";
             }
-            $img = new Cimg('images/general/arrow_'.$tipo.'2.png', $dep_type);
+            // versao zabbix
+            if (versaoZabbix() < 24) {
+                $img = new Cimg('images/general/arrow_'.$tipo.'2.png', $dep_type);
+            } else {
+                $img = new CImg('images/general/arrow_'.$tipo.'2.png', $dep_type);
+            }
             $img->setAttribute('style', 'vertical-align: top; border: 0px;');
             $img->setHint(_zeT($msg)."\n". _zeT('Related incidents') . ": " . $qtd . "\n". $hint);
             return $img;
