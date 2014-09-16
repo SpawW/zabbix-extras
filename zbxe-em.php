@@ -42,10 +42,11 @@ $stime = $_REQUEST['p_stime']	= getRequest('p_stime', "");
 $range = $check_range * 60;
 $reference = $_REQUEST['p_triggerid'] = getRequest('p_triggerid',0);
 $min_events = $_REQUEST['p_min_events'] = getRequest('p_min_events',6);
-if (versaoZabbix() < 24) {
+if (versaoZabbix() < 240) {
     $formato_data = EVENTS_ACTION_TIME_FORMAT;
 } else {
     $formato_data = DATE_TIME_FORMAT_SECONDS;
+    echo "VERSAO ZABBIX ex: ". versaoZabbix();
 }
 
 // ****************** Fim Inicialização de variaveis ***************************
@@ -607,7 +608,7 @@ if ($mode == "report") { // Custom event report for show only events related
     //$options['triggerids'] = zbx_objectValues($triggers, 'triggerid');
     
     $options = array(
-            'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0),
+            'nodeids' => (versaoZabbix() < 240 ? get_current_nodeid() : 0),
             'source' => EVENT_SOURCE_TRIGGERS,
             'output' => API_OUTPUT_EXTEND,//API_OUTPUT_SHORTEN,
             'sortfield' => 'eventid',
@@ -659,7 +660,7 @@ if ($mode == "report") { // Custom event report for show only events related
                         //, 'host' => true
                         //, (versaoZabbix() < 24 ? 'expandData' => true : null)
                     ));
-                    if (versaoZabbix() < 24) {
+                    if (versaoZabbix() < 240) {
                         $primeiroHostTrigger = $triggerInfo[0]['host'];
                     } else {
                         $primeiroHostTrigger = $triggerInfo[0]["hosts"][0]["hostid"];
@@ -722,7 +723,7 @@ if ($mode == "report") { // Custom event report for show only events related
                 $dep_type = "DEP_UP";
             }
             // versao zabbix
-            if (versaoZabbix() < 24) {
+            if (versaoZabbix() < 240) {
                 $img = new Cimg('images/general/arrow_'.$tipo.'2.png', $dep_type);
             } else {
                 $img = new CImg('images/general/arrow_'.$tipo.'2.png', $dep_type);
@@ -743,7 +744,7 @@ if ($mode == "report") { // Custom event report for show only events related
     }
     $table->setHeader(array(
             _zeT('Amount'),
-            (versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),
+            (versaoZabbix() < 240 ? (is_show_all_nodes() ? _('Node') : null) : null),
             _('Host'),
             _('Trigger'),
             $eventTitles[1],
@@ -788,7 +789,7 @@ if ($mode == "report") { // Custom event report for show only events related
         if ($CSV_EXPORT) {
                 $csvRows[] = array(
                         zbx_date2str($formato_data, $event['clock']),
-                        (versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
+                        (versaoZabbix() < 240 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
                         $_REQUEST['hostid'] == 0 ? $host['name'] : null,
                         $description,
                         trigger_value2str($event['value']),
@@ -807,7 +808,7 @@ if ($mode == "report") { // Custom event report for show only events related
 } else {
             	$table->setHeader(array(
 			_('Time'),
-			(versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),
+			(versaoZabbix() < 240 ? (is_show_all_nodes() ? _('Node') : null) : null),
 			($_REQUEST['hostid'] == 0) ? _('Host') : null,
 			_('Description'),
 			_('Status'),
@@ -820,7 +821,7 @@ if ($mode == "report") { // Custom event report for show only events related
 		if ($CSV_EXPORT) {
 			$csvRows[] = array(
 				_('Time'),
-				(versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),
+				(versaoZabbix() < 240 ? (is_show_all_nodes() ? _('Node') : null) : null),
 				($_REQUEST['hostid'] == 0) ? _('Host') : null,
 				_('Description'),
 				_('Status'),
@@ -833,7 +834,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 		if ($pageFilter->hostsSelected) {
 			$options = array(
-				'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0),
+				'nodeids' => (versaoZabbix() < 240 ? get_current_nodeid() : 0),
 				'filter' => array(
 //					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'object' => EVENT_OBJECT_TRIGGER,
@@ -852,7 +853,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 			// trigger options
 			$trigOpt = array(
-				'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0)
+				'nodeids' => (versaoZabbix() < 240 ? get_current_nodeid() : 0)
 //				'output' => API_OUTPUT_SHORTEN
 			);
 
@@ -880,7 +881,7 @@ if ($mode == "report") { // Custom event report for show only events related
 
 			// query event with extend data
 			$options = array(
-				'nodeids' => (versaoZabbix() < 24 ? get_current_nodeid() : 0),
+				'nodeids' => (versaoZabbix() < 240 ? get_current_nodeid() : 0),
 				'eventids' => zbx_objectValues($events, 'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
@@ -1003,7 +1004,7 @@ if ($mode == "report") { // Custom event report for show only events related
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 						'action'
 					),
-					(versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
+					(versaoZabbix() < 240 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
 					$hostSpan,
 					new CSpan($tr_desc, 'link_menu'),
 					$statusSpan,
@@ -1016,7 +1017,7 @@ if ($mode == "report") { // Custom event report for show only events related
 				if ($CSV_EXPORT) {
 					$csvRows[] = array(
 						zbx_date2str($formato_data, $event['clock']),
-						(versaoZabbix() < 24 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
+						(versaoZabbix() < 240 ? (is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null) : null),
 						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
