@@ -650,7 +650,7 @@ if ($mode == "report") { // Custom event report for show only events related
                         'triggerids' => $event2['objectid'],
                         //'output' => API_OUTPUT_EXTEND,//API_OUTPUT_SHORTEN,
                         'expandDescription' => true
-                        , 'expandData' => true
+                        //, 'expandData' => true
                     ));
                     if (count($triggerInfo) > 0) {
                         $listaTriggers .= ",".$event2['objectid'];
