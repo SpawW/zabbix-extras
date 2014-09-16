@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1-RC1";
+VERSAO_INST="2.1-RC2";
 UPDATEBD="S";
 BRANCH="Zabbix-Extras-2.0.1";
 
@@ -737,6 +737,12 @@ instalaSNMPB() {
 
 configuraPHP() {
   PATH_PHPINI='/etc/php.ini';
+  if [ -f /tmp/upgZabbix/logInstall.log ]; then
+    TMP=`cat /tmp/upgZabbix/logInstall.log | grep "Path do php.ini" | tail -n1 | awk -F[ '{print $2}' | awk -F] '{print $1}'`;
+    if [ ! -z $TMP ]; then
+        PATH_PHPINI=$TMP;
+    fi
+  fi
   dialog --inputbox "$M_BASE_PHP\n$M_CAMINHO_PHP" 0 0 "$PATH_PHPINI" 2> $TMP_DIR/resposta_dialog.txt;
     PATH_PHPINI=`cat $TMP_DIR/resposta_dialog.txt`;
   if [ ! -f "$PATH_PHPINI" ]; then
@@ -765,6 +771,7 @@ preReq;
 idioma;
 caminhoFrontend;
 identificaZabbix;
+configuraPHP;
 downloadFiles;
 
 # Criando pasta extras
@@ -784,12 +791,11 @@ instalaSNMPB;
 instalaZE;
 instalaMenus;
 customProfile;
-configuraPHP;
 
-registra "Parametros usados para instalacao:";
 registra "Parametros usados para instalacao:";
 registra "URL do Zabbix: [$URL_FRONTEND]";
 registra "Path do frontend Zabbix: [$CAMINHO_FRONTEND]";
+registra "Path do php.ini: [$PATH_PHPINI]";
 registra "Se for necessario suporte favor enviar, por e-mail, os arquivos abaixo:";
 registra "/tmp/pluginExtrasBD.htm";
 registra "$TMP_DIR/logInstall.log";
