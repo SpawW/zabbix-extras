@@ -171,7 +171,7 @@ include_once 'include/page_header.php';
         $table->setHeader(
                 array(
                 // 2.4 não suporta node
-                (versaoZabbix() < 24 ? (is_show_all_nodes() ? _('Node') : null) : null),                 
+                (versaoZabbix() < 240 ? (is_show_all_nodes() ? _('Node') : null) : null),                 
                 (($hostid == 0) || (1 == $config))? _('Host') : NULL,
                 _('Name'),
                 _('Error'),
@@ -181,7 +181,7 @@ include_once 'include/page_header.php';
         while($row = DBfetch($result)){
             $descricao = descItem($row['name'],$row['key_']);
             $table->addRow(array(
-                (versaoZabbix() < 24 ? get_node_name_by_elid($row['hostid']) : null),
+                (versaoZabbix() < 240 ? get_node_name_by_elid($row['hostid']) : null),
                 (($hostid == 0) || (1 == $config)) ? $row['host'] : NULL,
                 ($row['flags'] == 4 ? $descricao
                 : new CLink($descricao, 'items.php?form=update&itemid='.$row['itemid']))
