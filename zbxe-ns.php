@@ -181,7 +181,7 @@ include_once 'include/page_header.php';
         while($row = DBfetch($result)){
             $descricao = descItem($row['name'],$row['key_']);
             $table->addRow(array(
-                get_node_name_by_elid($row['hostid']),
+                (versaoZabbix() < 24 ? get_node_name_by_elid($row['hostid']), null),
                 (($hostid == 0) || (1 == $config)) ? $row['host'] : NULL,
                 ($row['flags'] == 4 ? $descricao
                 : new CLink($descricao, 'items.php?form=update&itemid='.$row['itemid']))
