@@ -769,7 +769,7 @@ identificaZabbix() {
 identificaDistro;
 preReq;
 idioma;
- caminhoFrontend;
+caminhoFrontend;
 identificaZabbix;
 configuraPHP;
 downloadFiles;
