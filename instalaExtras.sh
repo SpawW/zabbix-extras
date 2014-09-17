@@ -205,7 +205,7 @@ identificaDistro() {
         fi
     fi
     if [ -f /tmp/upgZabbix/logInstall.log ]; then
-        TMP=`cat /tmp/upgZabbix/logInstall.log | grep "Path do" | tail -n1 | awk -F[ '{print $2}' | awk -F] '{print $1}'`;
+        TMP=`cat /tmp/upgZabbix/logInstall.log | grep "Path do frontend" | tail -n1 | awk -F[ '{print $2}' | awk -F] '{print $1}'`;
         if [ ! -z $TMP ]; then
             PATHDEF=$TMP;
         fi
