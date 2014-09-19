@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1-RC4";
+VERSAO_INST="2.1-RC5";
 UPDATEBD="S";
 BRANCH="Zabbix-Extras-2.0.1";
 
