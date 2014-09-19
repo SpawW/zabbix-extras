@@ -191,8 +191,8 @@ function zbxeShowPreferences ($id) {
     }
     // Habilita customização de gráfico preenchido no dados recentes
     $cmbGraphType = new CComboBox('zbxe_graph_filled'.$id, zbxeConfigValue('zbxe_graph_filled',$userid));
-    $cmbGraphType->addItem('GRAPH_TYPE_NORMAL', _('Normal'));
-    $cmbGraphType->addItem('GRAPH_TYPE_STACKED', _('Stacked'));
+    $cmbGraphType->addItem('0', _('Normal'));
+    $cmbGraphType->addItem('1', _('Stacked'));
     $userFormExtra->addRow(_zeT('Latest data - Graph type'), $cmbGraphType);
     // Personalizacao de logotipo ----------------------------------------------
     if ($id == "") {
