@@ -99,7 +99,7 @@ include_once 'include/page_header.php';
 		array(bold(_('Group')), ': ', $cmbGroups),
 		array(bold(_('Host')), ': ', $cmbHosts),
 		array(bold(_('Field')), ': ', $cmbOrderField),
-		array(bold(_('Sort')), ': ', $cmbOrder),
+		array(bold(_zeT('Sort')), ': ', $cmbOrder),
 		array()
 	));
         $groupids = checkAccessGroup ('groupid');
