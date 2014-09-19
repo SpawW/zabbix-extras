@@ -462,6 +462,11 @@ $right_widget_width = '800px';
 	else{
 // Build widget
 
+        // Header Table
+	$filter_table = new CTable('', 'filter_config');
+	$filter_table->setAttribute('border',0);
+	$filter_table->setAttribute('width','100%');
+        
 	//Header
 	$form = new CForm();
 	$form->cleanItems();
@@ -493,8 +498,8 @@ $right_widget_width = '800px';
 	{
 		$cmbTemplates->addItem($temp['key'], $temp['host']);
 	}
-	$form->addItem(array(_('Template').':'.SPACE,$cmbTemplates,SPACE));
-	
+//	$form->addItem(array(_('Template').':'.SPACE,$cmbTemplates,SPACE));
+
 	//Mib selector
 	$cmbMibs = new CComboBox('mib',$mib,'javascript: submit();');
 	$paths = explode(':', MIBS_ALL_PATH);
@@ -519,30 +524,44 @@ $right_widget_width = '800px';
 		
 	}
 	
-	$form->addItem(array(_('MIB').':'.SPACE,$cmbMibs,SPACE));
+//	$form->addItem(array(_('MIB').':'.SPACE,$cmbMibs,SPACE));
+        $filter_table->addRow(array(
+            array(_('Template').':'.SPACE,$cmbTemplates,SPACE),
+            array(_('MIB').':'.SPACE,$cmbMibs,SPACE),
+            array()
+        ));
+        
 	
 	// server ip textbox
 	$ipbServer = new CTextBox('server_ip', $server_ip);
-	$form->addItem(array(_('Host').':'.SPACE,$ipbServer,SPACE));
+//	$form->addItem(array(_('Host').':'.SPACE,$ipbServer,SPACE));
 	
 	// server port hidden
 	$hidPort = new CTag('server_port', $server_port);
-	$form->addItem(array($hidPort));
+//	$form->addItem(array($hidPort));
 
 	// snmp version selector
 	$cmbSnmpVersion = new CComboBox('snmp_version', $snmp_version);
 	foreach (array(ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C) as $v) {
 	    $cmbSnmpVersion->addItem($v, ($v == ITEM_TYPE_SNMPV1) ? '1':'2c');
 	}
-	$form->addItem(array(_zeT('SNMP Version').':'.SPACE,$cmbSnmpVersion,SPACE));
+	//$form->addItem(array(_zeT('SNMP Version').':'.SPACE,$cmbSnmpVersion,SPACE));
 
 	// community textbox
 	$tbCommunity = new CTextBox('community', $community);
-	$form->addItem(array(_zeT('Community').':'.SPACE,$tbCommunity ,SPACE));
+	//$form->addItem(array(_zeT('Community').':'.SPACE,$tbCommunity ,SPACE));
 	
 	// MIB import button
 	$btnImport = new CSubmit('form', _('Import').' '._('MIB'));
-	$form->addItem($btnImport);
+	//$form->addItem($btnImport);
+
+        $filter_table->addRow(array(
+            array(_('Host').':'.SPACE,$ipbServer,SPACE,$hidPort,_zeT('SNMP Version').':'.SPACE,$cmbSnmpVersion,SPACE),
+            //array(),
+            array(_zeT('Community').':'.SPACE,$tbCommunity ,SPACE),
+            $btnImport
+        ));
+        $form->addItem($filter_table);
 	
 	$snmp_wdgt->addHeader(_('SNMP Builder'), $form);
 	
