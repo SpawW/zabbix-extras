@@ -30,6 +30,11 @@ function zbxeFields() {
     $fields['translate']  = array(T_ZBX_STR, O_OPT, P_SYS, null, null);    
 //    var_dump($fields);
 }
+function manutencaoDados(){
+//    show_error_message(var_dump($_REQUEST));
+//    exit;
+    return (/*isset($_REQUEST['form']) && */(isset($_POST['update']) || isset($_POST['add'])));
+}
 function zbxeControler() {
     global $fields, $ZBXE_VAR, $CAMPOS;
     global $_SERVER;
@@ -39,11 +44,10 @@ function zbxeControler() {
     } else {
         $userid = CWebUser::$data['userid'];
     }
-    
     // Salvando tradução ------------==================--------------===========
     $translation = getRequest('translate', array());
     foreach ($translation as $number => $curString) {
-//        var_dump($curString);
+//        show_error_message($curString);
         $query = "update zbxe_translation set tx_new = " . quotestr($curString['new'])
            . " where tx_original = " . quotestr($curString['original'])
            . " and lang = " . quotestr(CWebUser::$data['lang']);
@@ -52,11 +56,15 @@ function zbxeControler() {
 
     // Garante que todas os registros alterados estão no local correto ---------
     $update = "";
+    // provavelmente a ação... que nao é mais salvar...
     // Salvando preferencias ===================================================
-    if (isset($_REQUEST['save'])) {
-        if (isset ($_REQUEST['xbxe_clean']) && $_REQUEST['xbxe_clean'] == "yes") {
-            $query = "delete from zbxe_preferences  where userid = " . $userid;
-            preparaQuery($query);
+    if (manutencaoDados() == true) {
+                                                // Necessario por conta do 2.4 e 2.2... o valor em 1 é "yes" e no outro "1"...
+        if (isset ($_REQUEST['xbxe_clean']) && ($_REQUEST['xbxe_clean'] == "yes" || $_REQUEST['xbxe_clean'] == "1") ) {
+            DBexecute('DELETE FROM zbxe_preferences WHERE '.dbConditionInt('userid', array($userid)));
+            //DBcommit();
+            //$query = "delete from zbxe_preferences  where userid = " . $userid;
+            //preparaQuery($query);
         } else {
             $_REQUEST['xbxe_clean'] = getRequest('xbxe_clean');
         }
@@ -64,7 +72,7 @@ function zbxeControler() {
             if (strpos($key,'_show') == 0 && $_REQUEST['xbxe_clean'] != "yes") {
                 $tmp = getRequest($key);
                 // Atualizando dados de usuario ------------------------------------
-                //var_dump($key." - ". $tmp);
+                //show_error_message($key." - ". $tmp);
                 if ($key == "logo_company") {
                     $data = listaImagens();
                     $tmp = $data['iconList'][$tmp];
@@ -99,6 +107,8 @@ function zbxeControler() {
                 }
             }
         }
+//            var_dump($_REQUEST);
+//    echo "oi"; exit;
     }
 }
 
