@@ -56,10 +56,9 @@ unzipPackage() {
     cd /tmp;
     # Descompacta em TMP
     if [ -e $DIR_TMP ]; then
-        unalias rm;
         rm -rf $DIR_TMP;
     fi
-    unzip $ARQ_TMP;
+    unzip $ARQ_TMP > /tmp/tmp_unzip_ze.log;
     cd $DIR_TMP
     if [ ! -e "$DIR_DEST" ]; then
         mkdir -p "$DIR_DEST";
@@ -621,21 +620,25 @@ commonUserChange() {
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
 
     modifica "$ARQUIVO" "field-global" "Ajustando fields para modo global" '$fields = array(' 'global $fields;\n'
-    modifica "$ARQUIVO" "check-fields" "Adicionando parametros personalizados" 'check_fields($fields);' 'zbxeFields();'
+    modifica "$ARQUIVO" "check-fields" "Adicionando parametros personalizados" 'check_fields($fields);' 'zbxeFields();' 
 }
 
 customProfile() {
+# Especifico do profile.php
     ARQUIVO="profile.php";
     commonUserChange "$ARQUIVO";
-# Especifico do profile.php
-    modifica "$ARQUIVO" "check-fields-rules" "Adicionando regra de negocio" '\/\/ secondary actions' 'zbxeControler();'
+    modifica "$ARQUIVO" "profile-rules" "profile.php Adicionando regra de negocio" '\/\/ secondary actions' 'zbxeControler();'
+# Especifico do users.php
     ARQUIVO="users.php";
     commonUserChange "$ARQUIVO";
-# Especifico do users.php
-    TMPTAG="validate_sort_and_sortorder('alias', ZBX_SORT_UP);";
-    modifica "$ARQUIVO" "check-fields-rules" "Adicionando regra de negocio" "$TMPTAG" 'zbxeControler();'
+#2.2    TMPTAG="validate_sort_and_sortorder('alias', ZBX_SORT_UP);";
+#tag para 2.4
+    TMPTAG='check_fields($fields);';
+    modifica "$ARQUIVO" "users-rules" "users.php Adicionando regra de negocio" "$TMPTAG" 'zbxeControler();' 
 # Adicao das tabs 
-    modifica "include/views/administration.users.edit.php" "users-interface" "Adicionando aba do extras no profile" '$userForm->addItem($userTab);' '$userTab = zbxeView($userTab);'
+    ARQUIVO="include/views/administration.users.edit.php";
+    #commonUserChange "$ARQUIVO";
+    modifica "$ARQUIVO" "users-tab" "Adicionando aba do extras no profile" '$userForm->addItem($userTab);' '$userTab = zbxeView($userTab);' 
 }
 
 modifica() {
@@ -763,8 +766,11 @@ identificaZabbix() {
   VERSAO_ZBX=`cat include/defines.inc.php | grep ZABBIX_VERSION | awk '{print $2}' | awk -F"'" '{print $2}'`;
   echo "--> Versao Zabbix: "$VERSAO_ZBX;
 }
-#modifica "nada.js.php" ;
-#exit;
+
+# Removendo aliases
+unalias rm;
+
+#Instalando
 
 identificaDistro;
 preReq;
