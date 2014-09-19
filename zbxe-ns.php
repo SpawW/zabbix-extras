@@ -185,7 +185,7 @@ include_once 'include/page_header.php';
                 (($hostid == 0) || (1 == $config)) ? $row['host'] : NULL,
                 ($row['flags'] == 4 ? $descricao
                 : new CLink($descricao, 'items.php?form=update&itemid='.$row['itemid']))
-                , $row['error']
+                , substr($row['error'],0,70)
                 ,new CLink(_('Disable'), 'items.php?group_itemid='.$row['itemid'].'&hostid='.$row['hostid'].'&go=disable')
             ));
         }
