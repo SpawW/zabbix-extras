@@ -44,6 +44,7 @@
 <?php
   $tmp = $_REQUEST['p_points'];
   $tmp = explode("[;]",$tmp);
+  $tmp2 = "";
   for ($i = 0; $i < count($tmp)-1; $i++) {
 	  $tmp2 .= ($i == 0 ? "" : ",")."[".$tmp[$i]."]";
   }
