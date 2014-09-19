@@ -93,12 +93,11 @@ function zbxeControler() {
             }
             // Atualizando dados default ---------------------------------------
             if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_SUPER_ADMIN))) {
-                
                 $tmp = getRequest($key."_adm");
                 if (strpos($key,'_show') > 0 && $tmp == "") {
                     $tmp = '0';
                 }
-//                var_dump("<br>--> Config Admin: $key ". zbxeConfigValue($key,0) . " - novo valor [$tmp]");
+                //var_dump("<br>--> Config Admin: $key ". zbxeConfigValue($key,0) . " - novo valor [$tmp]");
                 if (zbxeConfigValue($key,0) != $tmp && strlen($tmp) > 0) {                    
                     $query = "update zbxe_preferences set tx_value = " . quotestr($tmp)
                        . " where userid = 0 and tx_option = " . quotestr($key) . " " ;
@@ -108,7 +107,7 @@ function zbxeControler() {
             }
         }
 //            var_dump($_REQUEST);
-//    echo "oi"; exit;
+    //exit;
     }
 }
 
@@ -159,7 +158,7 @@ function zbxeShowPreferences ($id) {
     } else {
         $userid = ($id != "" ? 0 : CWebUser::$data['userid']);
     }
-    
+    //var_dump($ZBXE_VAR);
     $userFormExtra = new CFormList('userFormExtra'.$id);
     // Interface Web
     $companyTable = new CTable();
@@ -187,32 +186,38 @@ function zbxeShowPreferences ($id) {
         ), SPACE, SPACE));
 
     $userFormExtra->addRow(_zeT('Maps'), new CDiv($mapTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
-    if (CWebUser::$data['userid'] > 0) { 
+    if (CWebUser::$data['userid'] > 0 && ($id == "")) { 
         $userFormExtra->addRow(_zeT('Delete User Personalization'), new CCheckBox('xbxe_clean'));
     }
+    // Habilita customização de gráfico preenchido no dados recentes
+    $cmbGraphType = new CComboBox('zbxe_graph_filled'.$id, zbxeConfigValue('zbxe_graph_filled',$userid));
+    $cmbGraphType->addItem('GRAPH_TYPE_NORMAL', _('Normal'));
+    $cmbGraphType->addItem('GRAPH_TYPE_STACKED', _('Stacked'));
+    $userFormExtra->addRow(_zeT('Latest data - Graph type'), $cmbGraphType);
     // Personalizacao de logotipo ----------------------------------------------
-if ($id == "") {
-    include('include/views/js/administration.general.iconmap.js.php');
-    $iconMapTable = new CTable();
-    $iconMapTable->setAttribute('id', 'iconMapTable');
-    $data = listaImagens();
-    $firstIconId = 5;
-    foreach ($data['iconList'] as $key => $value) {
-        if ($value == $ZBXE_VAR['logo_company']) {
-            $firstIconId = $key;
-            break;
+    if ($id == "") {
+        include('include/views/js/administration.general.iconmap.js.php');
+        $iconMapTable = new CTable();
+        $iconMapTable->setAttribute('id', 'iconMapTable');
+        $data = listaImagens();
+        $firstIconId = 5;
+        foreach ($data['iconList'] as $key => $value) {
+            if ($value == $ZBXE_VAR['logo_company']) {
+                $firstIconId = $key;
+                break;
+            }
         }
-    }
-    $iconsComboBox = new CComboBox('logo_company', $firstIconId);
-    $iconsComboBox->addClass('mappingIcon');
-    $iconsComboBox->addItems($data['iconList']);
+        $iconsComboBox = new CComboBox('logo_company', $firstIconId);
+        $iconsComboBox->addClass('mappingIcon');
+        $iconsComboBox->addItems($data['iconList']);
 
-    $iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId.'&width='.ZBX_ICON_PREVIEW_WIDTH.
-            '&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null, 'pointer preview');
-    $iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$firstIconId);
+        $iconPreviewImage = new CImg('imgstore.php?iconid='.$firstIconId.'&width='
+            .ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT
+            , _('Preview'), null, null, 'pointer preview');
+        $iconPreviewImage->setAttribute('data-image-full', 'imgstore.php?iconid='.$firstIconId);
         $iconMapTable->addRow(array($iconsComboBox,$iconPreviewImage));
         $userFormExtra->addRow(_zeT('Personal Logo'), $iconMapTable);
-}
+    }
     return $userFormExtra;
 }
 
