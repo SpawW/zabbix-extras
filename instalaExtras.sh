@@ -307,24 +307,17 @@ corTituloMapa() {
     # Define a cor de fundo do mapa ============================================
     CORFUNDO='false';
     sed -i "s/'bgColor' => '.*',/'bgColor' => '#$CORFUNDO',/" $ARQUIVO;
-#'borderColor' => 'black'
     # Arquivo com as principais definicoes dos mapas ===========================
     ARQUIVO="include/classes/sysmaps/CCanvas.php";
     EMPRESA="SERPRO";
     TAMANHO=$((120+$(echo $EMPRESA | wc -c)*4));
- #$this->width - 120, $this->height - 12, $date
     sed -i "s/\$this->width - .*, \$this->height - 12, .*\$date/\$this->width - $TAMANHO, \$this->height - 12, '$EMPRESA '.\$date/" $ARQUIVO;
     # Tamanho da fonte do título dos elementos nos mapas =======================
     ARQUIVO="include/classes/sysmaps/CCanvas.php";
     EMPRESA="SERPRO";
     TAMANHO=$((120+$(echo $EMPRESA | wc -c)*4));
- #$this->width - 120, $this->height - 12, $date
     sed -i "s/\$this->width - .*, \$this->height - 12, .*\$date/\$this->width - $TAMANHO, \$this->height - 12, '$EMPRESA '.\$date/" $ARQUIVO;
 }
-# include/classes/sysmaps/CCanvas.php - linha 69
-# include/classes/sysmaps/CMapPainter.php 
-#  linha que printa o titulo: 79 
-#  linha que define a cor do titulo do mapa 33
 
 suporteBDCustom() {
     registra "Configurando suporte a customizacoes que usam banco de dados...";
@@ -471,9 +464,9 @@ customLogo() {
 }
 
 instalaGeo() {
-    #REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
+    REPOS="https://github.com/aristotelesaraujo/zabbix-geolocation/archive/master.zip";
 # Repositório emergencial enquanto o Ari nao atualiza o repositorio oficial do zabbix-geo
-    REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
+    #REPOS="https://github.com/SpawW/zabbix-geolocation/archive/master.zip";
     ARQ_TMP="/tmp/pluginGeo.zip";
     DIR_TMP="/tmp/zabbix-geolocation-master/";
     DIR_DEST="$CAMINHO_FRONTEND/extras/geo";
@@ -639,6 +632,14 @@ customProfile() {
     ARQUIVO="include/views/administration.users.edit.php";
     #commonUserChange "$ARQUIVO";
     modifica "$ARQUIVO" "users-tab" "Adicionando aba do extras no profile" '$userForm->addItem($userTab);' '$userTab = zbxeView($userTab);' 
+# Customizacao do tipo de grafico padrao
+    ARQUIVO="history.php";
+    TMPTAG='GRAPH_TYPE_NORMAL)';
+    #commonUserChange "$ARQUIVO";
+#\$ZBXE_VAR['map_border_show']
+    sed -i "s/$TMPTAG/\$ZBXE_VAR['zbxe_graph_filled'])/" $ARQUIVO;
+    #modifica "$ARQUIVO" "graph-type" "Customizacao do tipo de grafico dos dados recentes" $TMPTAG '' 
+
 }
 
 modifica() {
