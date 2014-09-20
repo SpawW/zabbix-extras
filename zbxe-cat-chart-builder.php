@@ -26,10 +26,12 @@
 **/
 ?>
 <!DOCTYPE html>
-
 <html>
 <head>
-	<title>Zabbix-CAT Chart Builder</title>
+    <title>Zabbix-CAT Chart Builder</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="Author" content="Adail Horst" />
+    <meta charset="utf-8" />
     <link class="include" rel="stylesheet" type="text/css" href="jqplot/dist/jquery.jqplot.min.css" />
   
   <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="../excanvas.js"></script><![endif]-->
@@ -59,7 +61,9 @@ $(document).ready(function(){
 		// Will animate plot on calls to plot1.replot({resetAxes:true})
 //		animateReplot: true,
 		// Give the plot a title.
-		title: '<?php echo $_REQUEST['p_title'];?>',
+		title: '<?php 
+$titulo = htmlentities($_REQUEST['p_title'], ENT_QUOTES, 'UTF-8');
+echo $titulo;?>',
     axesDefaults: {
         tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
         tickOptions: {
