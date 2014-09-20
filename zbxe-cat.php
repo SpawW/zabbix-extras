@@ -386,9 +386,11 @@ return " - " . date('d/m/y',mktime(0, 0, 0, 1, (4 + ($week-1) * 7 + ($tmp)), $ye
 				$descUnidade = " em " . $descUnidade;
 			} else { $fator = 1; $descUnidade = ""; }
 			$valor = round($report[$i]['valor'] / $fator,2);
+                        //var_dump($valor[0]);
 //                        $valor = explode(' ', convert_units(array('value' => $valor,'units' => $unidade)));
-			$points .= "'".$report[$i]['momento']."',".$valor[0]."[;]";
+			$points .= "'".$report[$i]['momento']."',".(is_array($valor) ? $valor[0] : $valor)."[;]";
 		}
+                //var_dump($points);
 		$tituloGrafico .= $descUnidade;
 		$script = "function fnGrafico () { ".
 		"window.open(\"zbxe-cat-chart-builder.php?p_title=".
