@@ -7,7 +7,7 @@ AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
 VERSAO_INST="2.1-RC6";
 UPDATEBD="S";
-BRANCH="Zabbix-Extras-2.0.1";
+BRANCH="ZE2.1";
 
 registra() {
     [ -d ${TMP_DIR} ] || mkdir ${TMP_DIR}
