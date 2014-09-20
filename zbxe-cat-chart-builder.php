@@ -62,7 +62,7 @@ $(document).ready(function(){
 //		animateReplot: true,
 		// Give the plot a title.
 		title: '<?php 
-$titulo = htmlentities($_REQUEST['p_title'], ENT_QUOTES, 'UTF-8');
+$titulo = htmlspecialchars_decode ($_REQUEST['p_title'], ENT_COMPAT);
 echo $titulo;?>',
     axesDefaults: {
         tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
