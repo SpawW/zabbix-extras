@@ -137,7 +137,6 @@
 	$completo = (getRequest('formato','') != '') && ($groupid > 1 || $hostid > 1);
 		
 	if ($completo) {
-
 // Localizar todos os hosts que o usuário selecionou -------------------------------------
 		$baseQuery = 
 "SELECT hos.name as host_name, it.hostid, it.name as item_name, it.key_ as item_key, it.delay, it.history, it.trends, it.status , 86400 / it.delay * it.history AS history_costs, it.trends * 24 AS trends_costs, it.itemid as itemid
@@ -152,7 +151,7 @@ INNER JOIN hosts_groups hgr
   . ($nmItem == "H" ? " AND it.status = 0 " : "")
 . "\n order by host_name, item_key " ;
                 $report		= Array();
-                    $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = 0;
+                $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = (float) 0;
                 // Relatorio por grupos (total do host)=========================
                 if ($view == "G") {
                     $baseQuery = "SELECT hitem.host_name, hitem.hostid"
@@ -172,8 +171,8 @@ INNER JOIN hosts_groups hgr
                         $storageTotal += $report[$cont][$idtotal];
                         $report[$cont][3] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
 
-                        $report[$cont][4] = round(floatval($row['vps_costs']),4);
-                        $vpsTotal += $report[$cont][4];
+                        $report[$cont][4] = (float) round(floatval($row['vps_costs']),4);
+                        $vpsTotal += (float) $report[$cont][4];
                         // Adicionando a unidade
                         $report[$cont][1] .=' '._zeT('rows');
                         $report[$cont][2] .=' '._zeT('rows');
@@ -202,7 +201,7 @@ INNER JOIN hosts_groups hgr
                         $storageTotal += $report[$cont][$idtotal];
                         $report[$cont][9] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
                         $report[$cont][10] = round(1/floatval($row['delay']),4);
-                        $vpsTotal += $report[$cont][10];
+                        $vpsTotal += (float) $report[$cont][10];
                         // Adicionando a unidade
                         $report[$cont][7] .=' '._zeT('rows');
                         $report[$cont][8] .=' '._zeT('rows');
@@ -261,10 +260,11 @@ INNER JOIN hosts_groups hgr
 		if ($formato !== 'csv') {
                     if ($view == "G") {
                         $table->addRow(array('Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
-                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),$vpsTotal.' vps'));
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps'));
                     } else {
+                        var_dump($vpsTotal);
                         $table->addRow(array($descricao,'Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
-                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),$vpsTotal.' vps'));
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps'));
                     }
 		}
 		$numrows = new CDiv();

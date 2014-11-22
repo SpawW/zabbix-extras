@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1";
+VERSAO_INST="2.1.1";
 UPDATEBD="S";
 BRANCH="ZE2.1";
 
@@ -317,6 +317,9 @@ corTituloMapa() {
     EMPRESA="SERPRO";
     TAMANHO=$((120+$(echo $EMPRESA | wc -c)*4));
     sed -i "s/\$this->width - .*, \$this->height - 12, .*\$date/\$this->width - $TAMANHO, \$this->height - 12, '$EMPRESA '.\$date/" $ARQUIVO;
+    # Ajuste de cor no titulo dos elementos do mapa
+    # Ajuste de cor no titulo dos elementos do mapa
+
 }
 
 suporteBDCustom() {
@@ -515,7 +518,6 @@ instalaMenus() {
         FIMINST=$INIINST;
     fi
     sed -i "$INIINST,$FIMINST d" $ARQUIVO;
-    #TXT_CUSTOM="new CSpan(\$status['items_count_not_supported'], 'unknown')";
     TXT_CUSTOM="global \$ZBXE_MENU;\n\$ZBX_MENU['zbxe'] = \$ZBXE_MENU;\n\/**";
     sed -i "$INIINST i$TAG_INICIO\n$TXT_CUSTOM\n$TAG_FINAL" $ARQUIVO
     # Verificação de instalação prévia do patch no javascript --------------
@@ -523,15 +525,20 @@ instalaMenus() {
         LINHA=`cat js/main.js | sed -ne "/{'empty'\:/{=;q;}"`;
         registra "Instalando menu no javascript...";
         sed -i "104s/'admin': 0/'admin': 0,'zbxe':0/g" js/main.js 
+        # Ajuste do Copyright
+        IDENT="by Zabbix SIA'";
+        sed -i "84s/$IDENT/by Zabbix SIA'.ZE_COPY/" include/page_footer.php
     fi
 
 }
 
 instalaArvore() {
     #instalaPacote "php5-curl php-curl";
-    REPOS="https://github.com/SpawW/zabbix-service-tree/archive/master.zip";
+    #REPOS="https://github.com/SpawW/zabbix-service-tree/archive/master.zip";
+    REPOS="https://github.com/SpawW/zabbix-service-tree/archive/2.4.zip"
     ARQ_TMP="/tmp/pluginArvore.zip";
-    DIR_TMP="/tmp/zabbix-service-tree-master/";
+    #DIR_TMP="/tmp/zabbix-service-tree-master/";
+    DIR_TMP="/tmp/zabbix-service-tree-2.4/";
     DIR_DEST="$CAMINHO_FRONTEND/extras/service-tree"
 
     downloadPackage "$ARQ_TMP" "$REPOS";
