@@ -798,8 +798,8 @@ $right_widget_width = '800px';
 		');
 		
 		insert_js("
-			var oidview = new DynTable('oidview',{'headers' : ['"._('OID Name')."','"._('Type of information')."','"._('Value')."']});
-			var itemlist = new DynTable('itemlist',{'headers' : ['"._('SNMP OID')."','"._('Description')."','"._('Type of information')."','"._('Data type')."','"._('Units')."','"._('Custom multiplier')."','"._('Delta')."'], 'observer' : {'tr': onClickItem}});
+			var oidview = new DynTable('oidview',{'headers' : ['"._zeT('OID Name')."','"._('Type of information')."','"._('Value')."']});
+			var itemlist = new DynTable('itemlist',{'headers' : ['".  _zeT('SNMP OID')."','"._('Description')."','"._('Type of information')."','"._('Data type')."','"._('Units')."','"._('Custom multiplier')."','"._('Delta')."'], 'observer' : {'tr': onClickItem}});
 		");
 	} // if ($mib)
 	} // if(isset($_REQUEST['import'])){
