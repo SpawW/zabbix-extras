@@ -24,6 +24,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ** If not, see http://www.gnu.org/licenses/.
 **/
+define("ZE_VER", "2.1.1");
+define("ZE_COPY", ", ZE ".ZE_VER);
 
 # Recover web paramiter
 function parametroWeb ($nome) {
@@ -232,4 +234,8 @@ $ZBXE_MENU['pages'][0]['sub_pages'] = $ZBXE_SUBMENU;
 unset($tmp);
 // Calcula o tamanho do nome da empresa no grafico
 $ZBXE_VAR['map_date_width'] = 120 + round((strlen($ZBXE_VAR['map_company'].' ')*5));
+// Configurar o MapElementTitleColor
+//$tmp = $ZBXE_VAR['map_element_title_color'] == "" ? ;
+$ZBXE_VAR['map_element_title_color_rgb'] = (isset($ZBXE_VAR['map_element_title_color']) ? hex2rgb($ZBXE_VAR['map_element_title_color']) : array(255,255,255) );
+//var_dump($ZBXE_VAR['map_element_title_color']);
 # Zabbix-Extras - Global Variables End
