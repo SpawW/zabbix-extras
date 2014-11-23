@@ -792,7 +792,7 @@ $right_widget_width = '800px';
 					
 					}).bind("select_node.jstree", function(e, data) {
 						var selectedObj = data.rslt.obj;
-						clickTree(selectedObj.attr("id"), 0, null, ["'._('OID Name').'", "'._('Type of information').'", "'._('Value').'"]);
+						clickTree(selectedObj.attr("id"), 0, null, ["'._zeT('OID Name').'", "'._('Type of information').'", "'._('Value').'"]);
 					});
 				});
 		');
