@@ -525,7 +525,10 @@ instalaMenus() {
         LINHA=`cat js/main.js | sed -ne "/{'empty'\:/{=;q;}"`;
         registra "Instalando menu no javascript...";
         sed -i "104s/'admin': 0/'admin': 0,'zbxe':0/g" js/main.js 
+    fi
+    if [ "`cat include/page_footer.php | grep ZE | wc -l`" -eq 0 ]; then
         # Ajuste do Copyright
+        registra "Instalando menu no javascript...";
         IDENT="by Zabbix SIA'";
         sed -i "84s/$IDENT/by Zabbix SIA'.ZE_COPY/" include/page_footer.php
     fi
