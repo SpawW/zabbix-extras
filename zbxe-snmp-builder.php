@@ -526,8 +526,8 @@ $right_widget_width = '800px';
 	
 //	$form->addItem(array(_('MIB').':'.SPACE,$cmbMibs,SPACE));
         $filter_table->addRow(array(
-            array(_('Template').':'.SPACE,$cmbTemplates,SPACE),
-            array(_('MIB').':'.SPACE,$cmbMibs,SPACE),
+            array(_('Template').SPACE,$cmbTemplates,SPACE),
+            array(_('MIB').SPACE,$cmbMibs,SPACE),
             array()
         ));
         
@@ -556,9 +556,9 @@ $right_widget_width = '800px';
 	//$form->addItem($btnImport);
 
         $filter_table->addRow(array(
-            array(_('Host').':'.SPACE,$ipbServer,SPACE,$hidPort,_zeT('SNMP Version').':'.SPACE,$cmbSnmpVersion,SPACE),
+            array(_('Host').SPACE,$ipbServer,SPACE,$hidPort,_zeT('SNMP Version').SPACE,$cmbSnmpVersion,SPACE),
             //array(),
-            array(_zeT('Community').':'.SPACE,$tbCommunity ,SPACE),
+            array(_zeT('Community').SPACE,$tbCommunity ,SPACE),
             $btnImport
         ));
         $form->addItem($filter_table);
@@ -650,8 +650,8 @@ $right_widget_width = '800px';
 	$item_params_tbl = new CTable();
 	$item_params_tbl->attr('class', 'formtable');
 	$item_params_tbl->addStyle("width: 100%; align: left");
-	$item_params_tbl->addRow(array(_('Interval').':', $itemDelay, _('History').':', $itemHistory, 
-					_('Trends').':', $itemTrends));
+	$item_params_tbl->addRow(array(_('Interval'), $itemDelay, _('History'), $itemHistory, 
+					_('Trends'), $itemTrends));
 	$item_params_div->addItem($item_params_tbl);
 	$item_params_w->addItem($item_params_div);
 	$right_tab->addRow($empty_row);
@@ -703,15 +703,15 @@ $right_widget_width = '800px';
 	$graph_params_tbl1->attr('class', 'formtable');
 	$graph_params_tbl1->addStyle("width: 100%; align: left; border-width: 0 0 0 0;");
 	$graph_params_tbl1->addRow(array(_('Create graph'),$graphCreate,
-					_('Name').':',$graphName, 
-					_('Width').':',$graphWidth, _('Height').':',$graphHeight,
-					_('Graph type').':',$cmbGraphType));
+					_('Name'),$graphName, 
+					_('Width'),$graphWidth, _('Height'),$graphHeight,
+					_('Graph type'),$cmbGraphType));
         $graph_params_tbl2 = new CTable();
 	$graph_params_tbl2->attr('class', 'formtable');
 	$graph_params_tbl2->addStyle("width: 100%; align: left; border-width: 0 0 0 0;");
-	$graph_params_tbl2->addRow(array(_('Function').':',$cmbGraphFunc, 
-					_('Draw style').':',$cmbDrawType, 
-					_('Y axis side').':',$cmbYaxisside));
+	$graph_params_tbl2->addRow(array(_('Function'),$cmbGraphFunc, 
+					_('Draw style'),$cmbDrawType, 
+					_('Y axis side'),$cmbYaxisside));
 	$graph_params_tbl->addRow($graph_params_tbl1);
 	$graph_params_tbl->addRow($graph_params_tbl2);
 	$graph_params_div->addItem($graph_params_tbl);
@@ -726,7 +726,7 @@ $right_widget_width = '800px';
 	$action_w= new CWidget();
 	$action_w->setClass('header');
 	
-	$action_w->addHeader(array(new CButton('save',_('Save'),'javascript: onSaveItems()'), SPACE, new CButton('clear',_('Clear'),'javascript: onClearItems()')));
+	$action_w->addHeader(array(new CButton('save',_('Add'),'javascript: onSaveItems()'), SPACE, new CButton('clear',_('Clear'),'javascript: onClearItems()')));
 	$right_tab->addRow($empty_row);
 	$right_tab->addRow($action_w);
 	
