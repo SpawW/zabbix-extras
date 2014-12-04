@@ -24,7 +24,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ** If not, see http://www.gnu.org/licenses/.
 **/
-define("ZE_VER", "2.1.1");
+define("ZE_VER", "2.1.2");
 define("ZE_COPY", ", ZE ".ZE_VER);
 
 # Recover web paramiter

@@ -5,7 +5,7 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1.1";
+VERSAO_INST="2.1.2";
 UPDATEBD="S";
 BRANCH="ZE2.1";
 
