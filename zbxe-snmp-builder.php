@@ -134,7 +134,6 @@ $right_widget_width = '800px';
 
 // IMPORT ///////////////////////////////////
 	if (isset($_REQUEST['import']) && isset($_FILES['mib'])) {
-
 		$file = new CUploadFile($_FILES['mib']);
 
 		$cmd = 'cp -f "'.$_FILES['mib']['tmp_name'].'" "'.MIBS_ALL_PATH.'/'.$_FILES['mib']['name'].'"';
@@ -483,6 +482,9 @@ $right_widget_width = '800px';
 		
 		$importForm = new CView('administration.snmp_builder', $data);
 
+// Bug de importação no 2.4
+//var_dump($importForm);
+//var_dump("passou1");
 		$import_wdgt->addItem($importForm->render());
 		$import_wdgt->show();
 	} else {
