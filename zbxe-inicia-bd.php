@@ -239,8 +239,6 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('p
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Week', 'Semana')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Year', 'Ano')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_GB', 'Application', 'Aplicação')");
-// Included on 2.1
-// PT-BR
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'SNMP Version', 'Versão do SNMP')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Community', 'Comunidade')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'OID Tree', 'Árvore OID')");
@@ -248,21 +246,31 @@ preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('p
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Click to force view as table', 'Clique para forçar visualização em tabela')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Ascending', 'Ascendente')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Descending', 'Descendente')");
-// fr_FR
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'SNMP Version', 'Version SNMP')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Community', 'Communauté')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'OID Tree', 'Arbre OID')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'OID Data', 'Données OID')");
 preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('fr_FR', 'Click to force view as table', 'Cochez pour forcer la vue en tableau')");
-
-
-
-
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'SNMP Builder', 'SNMP Builder')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Number of Incidents', 'Número de incidentes')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'No events related to the event source or without events compatible with the filter informed.', 'Não há eventos relacionados com a origem do evento ou sem eventos compatíveis com o filtro informado.')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Possible consequence.', 'Possível consequência.')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Related incidents', 'Incidentes relacionados')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Possible cause.', 'Possível causa.')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Sort', 'Ordenar')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Not monitored items', 'Itens não monitorados')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Latest data - Graph type', 'Dados recentes - Tipo do gráfico')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'Personal Logo', 'Logotipo personalizado')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('en_gb', 'SNMP Builder', 'SNMP Builder')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'OID Name', 'Nome do OID')");
+preparaQuery("INSERT INTO zbxe_translation (lang, tx_original, tx_new) VALUES('pt_BR', 'SNMP OID', 'SNMP OID')");
 
 
     // Preferences -------------------------------------------------------------
 
     echo "Populando dados padrões em zbxe_preferences...<br>";
+
+
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_title_show', '1', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_title_color', '555555', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'map_border_show', '1', '1')");
@@ -275,10 +283,8 @@ preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativ
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_02_em', 'zbxe-em|Event Management', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_03_ns', 'zbxe-ns|Not Supported Items', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_04_sc', 'zbxe-sc|Storage Costs', '1')");
-preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES ('0', 'submenu_01_itemtest', 'zbxe_item_test.php', '1')");
+preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'submenu_01_itemtest', 'zbxe_item_test.php', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'zbxe_graph_filled', '0', '1')");
-
-# Linhas que adicionam menus para os plugins de terceiros
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_snmpbuilder', 'zbxe-snmp-builder|SNMP Builder', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_arvore', 'zbxe-arvore|HS Tree', '1')");
 preparaQuery("INSERT INTO zbxe_preferences (userid, tx_option, tx_value, st_ativo) VALUES('0', 'menu_09_geo', 'zbxe-geolocation|Geolocation', '1')");
