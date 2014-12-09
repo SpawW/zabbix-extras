@@ -42,6 +42,18 @@
 		$arrayDesc = explode("\n",$texto);
 		return new CTag('div', 'yes', $arrayDesc, 'text');
 	}
+        // Calculo de UBMs
+        function totalUBM ($vps,$gb) {
+            $refVPS     = 0.15;
+            $refGB      = 0.07;
+            $fatorVPS   = 0.59;
+            $fatorGB    = 0.29;
+            $fatorHost  = 0.12;
+            // Transformando de bytes para GB
+            $gb = round($gb/1024/1024/1000,4);
+            //return ($gb/1024/1024);
+            return round ((($vps*100/$refVPS)/100*$fatorVPS)+(($gb*100/$refGB)/100*$fatorGB)+$fatorHost,2);
+        }
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -151,7 +163,7 @@ INNER JOIN hosts_groups hgr
   . ($nmItem == "H" ? " AND it.status = 0 " : "")
 . "\n order by host_name, item_key " ;
                 $report		= Array();
-                $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = (float) 0;
+                $cont = $historyTotal = $trendTotal = $storageTotal	= $vpsTotal = $ubmTotal = (float) 0;
                 // Relatorio por grupos (total do host)=========================
                 if ($view == "G") {
                     $baseQuery = "SELECT hitem.host_name, hitem.hostid"
@@ -160,7 +172,7 @@ INNER JOIN hosts_groups hgr
                             . " Group by hitem.hostid, hitem.host_name "
                             . " order by hitem.host_name, hitem.hostid";
                     $result = DBselect($baseQuery);
-                    $idtotal = 5;
+                    $idVPS = 4; $idUBM = 5; $idtotal = 6; 
                     while($row = DBfetch($result)){
                         $report[$cont][0] = $row['host_name'];
                         $report[$cont][1] = round(floatval($row['history_costs']),2);
@@ -170,19 +182,20 @@ INNER JOIN hosts_groups hgr
                         $report[$cont][$idtotal] = ($report[$cont][1]*50)+($report[$cont][2]*128);
                         $storageTotal += $report[$cont][$idtotal];
                         $report[$cont][3] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
-
-                        $report[$cont][4] = (float) round(floatval($row['vps_costs']),4);
-                        $vpsTotal += (float) $report[$cont][4];
+                        $report[$cont][$idVPS] = (float) round(floatval($row['vps_costs']),4);
+                        $vpsTotal += (float) $report[$cont][$idVPS];
+                        $report[$cont][$idUBM] = totalUBM($report[$cont][4], $report[$cont][$idtotal]);
+                        $ubmTotal += (float) $report[$cont][$idUBM];
                         // Adicionando a unidade
                         $report[$cont][1] .=' '._zeT('rows');
                         $report[$cont][2] .=' '._zeT('rows');
-                        $report[$cont][4] .=' vps';
+                        $report[$cont][$idVPS] .=' vps';
                         $cont++;
                     }
                 } else {
                 // Relatorio por item individual ===============================
                     $result = DBselect($baseQuery);
-                    $idtotal = 11;
+                    $idVPS = 10; $idtotal = 12; $idUBM = 11;
                     $lastItemID = -1;                    
                     while($row = DBfetch($result)){
                       if ($lastItemID !== $row['itemid']) {
@@ -200,13 +213,14 @@ INNER JOIN hosts_groups hgr
                         $report[$cont][$idtotal] = ($report[$cont][7]*50)+($report[$cont][8]*128);
                         $storageTotal += $report[$cont][$idtotal];
                         $report[$cont][9] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
-                        $report[$cont][10] = round(1/floatval($row['delay']),4);
-                        $vpsTotal += (float) $report[$cont][10];
+                        $report[$cont][$idVPS] = round(1/floatval($row['delay']),4);
+                        $vpsTotal += (float) $report[$cont][$idVPS];
+                        $report[$cont][$idUBM] = totalUBM($report[$cont][4], $report[$cont][$idtotal]);
+                        $ubmTotal += (float) $report[$cont][$idUBM];
                         // Adicionando a unidade
                         $report[$cont][7] .=' '._zeT('rows');
                         $report[$cont][8] .=' '._zeT('rows');
                         $report[$cont][10] .=' vps';
-                        
                         $cont++;
                       }
                       $lastItemID = $row['itemid'];
@@ -219,15 +233,16 @@ INNER JOIN hosts_groups hgr
                         $table->setHeader(array("Dados"));	
                         break;
                     case 'html';
+                        // Cabeçalho do relatorio HTML
                         if ($view == "G") {
                             $table->setHeader(array(_("Host"),_zeT("History Costs"),_zeT("Trends Costs")
-                                ,_zeT("Storage Costs"),_zeT("VPS")
+                                ,_zeT("Storage Costs"),_zeT("VPS"),_zeT("BMU")
                             ));	
                         } else {
                             $table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
                                 ,_("History"),_("Trends"),_("Status")
                                 ,_zeT("History Costs"),_zeT("Trends Costs")
-                                ,_zeT("Storage Costs"),_zeT("VPS")
+                                ,_zeT("Storage Costs"),_zeT("VPS"),_zeT("BMU")
                             ));	
                         }
                         break;			
@@ -250,6 +265,8 @@ INNER JOIN hosts_groups hgr
                                 $linha[$x] = new CCol($report[$i][$x],1);
 //                                $linha[$x] = new CCol($report[$i][$x].($x == 7 || $x == 8 ? $linhasDesc : " "),1);
                             }
+                            // Calculo de UBM por host
+                            //$linha[$cont2] = new CCol(totalUBM($report[$i][],$report[$i][]),1);                            
                             $table->addRow($linha);
                             break;			
                     }
@@ -260,11 +277,11 @@ INNER JOIN hosts_groups hgr
 		if ($formato !== 'csv') {
                     if ($view == "G") {
                         $table->addRow(array('Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
-                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps'));
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps',$ubmTotal));
                     } else {
                         var_dump($vpsTotal);
                         $table->addRow(array($descricao,'Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
-                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps'));
+                            ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps'),$ubmTotal);
                     }
 		}
 		$numrows = new CDiv();

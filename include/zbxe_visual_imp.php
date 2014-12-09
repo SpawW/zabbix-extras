@@ -82,8 +82,8 @@ function _zeT ($p_msg) {
             }
             return $cmbRange;
     }
-    function newComboFilterArray ($array, $name, $value) {
-            $cmbRange 	= new CComboBox($name, $value, 'javascript: submit();');
+    function newComboFilterArray ($array, $name, $value, $reload = true) {
+            $cmbRange 	= new CComboBox($name, $value, ($reload ? 'javascript: submit();' : ''));
             $cmbRange->additem('', 'Selecione...');
             foreach ($array as $k => $v) {
                 $cmbRange->additem($k, $v);
