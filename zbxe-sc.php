@@ -216,7 +216,7 @@ INNER JOIN hosts_groups hgr
                         $report[$cont][9] = convert_units(array ('value' => $report[$cont][$idtotal], 'units' => 'B'));
                         $report[$cont][$idVPS] = round(1/floatval($row['delay']),4);
                         $vpsTotal += (float) $report[$cont][$idVPS];
-                        $report[$cont][$idUBM] = totalUBM($report[$cont][4], $report[$cont][$idtotal]);
+                        $report[$cont][$idUBM] = totalUBM($report[$cont][$idVPS], $report[$cont][$idtotal]);
                         $ubmTotal += (float) $report[$cont][$idUBM];
                         // Adicionando a unidade
                         $report[$cont][7] .=' '._zeT('rows');
