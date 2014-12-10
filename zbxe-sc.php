@@ -30,7 +30,7 @@
 	require_once('include/zbxe_visual_imp.php');
 	
 	/* Configuração basica do arquivo para o módulo de segurança do Zabbix	*/
-	$page['title'] 		= _zeT('Storage Costs');
+	$page['title'] 		= _zeT('Costs');
 	$page['file'] 		= 'zbxe-sc.php';                                    
 	$page['hist_arg'] 	= array('hostid','groupid');
 
@@ -175,9 +175,9 @@ INNER JOIN hosts_groups hgr
                     $idVPS = 4; $idUBM = 5; $idtotal = 6; 
                     while($row = DBfetch($result)){
                         $report[$cont][0] = $row['host_name'];
-                        $report[$cont][1] = round(floatval($row['history_costs']),2);
+                        $report[$cont][1] = round(floatval($row['history_costs']),0);
                         $historyTotal += $report[$cont][1];
-                        $report[$cont][2] = round(floatval($row['trends_costs']),2);
+                        $report[$cont][2] = round(floatval($row['trends_costs']),0);
                         $trendTotal += $report[$cont][2];
                         $report[$cont][$idtotal] = ($report[$cont][1]*50)+($report[$cont][2]*128);
                         $storageTotal += $report[$cont][$idtotal];
@@ -206,9 +206,9 @@ INNER JOIN hosts_groups hgr
                         $report[$cont][4] = $row['history'];
                         $report[$cont][5] = $row['trends'];
                         $report[$cont][6] = ($row['status'] == 1 ? _('Not monitored') : _('Active'));
-                        $report[$cont][7] = round(floatval($row['history_costs']),2);
+                        $report[$cont][7] = round(floatval($row['history_costs']),0);
                         $historyTotal += $report[$cont][7];
-                        $report[$cont][8] = round(floatval($row['trends_costs']),2);
+                        $report[$cont][8] = round(floatval($row['trends_costs']),0);
                         $trendTotal += $report[$cont][8];                            
                         $report[$cont][$idtotal] = ($report[$cont][7]*50)+($report[$cont][8]*128);
                         $storageTotal += $report[$cont][$idtotal];
@@ -236,13 +236,13 @@ INNER JOIN hosts_groups hgr
                         // Cabeçalho do relatorio HTML
                         if ($view == "G") {
                             $table->setHeader(array(_("Host"),_zeT("History Costs"),_zeT("Trends Costs")
-                                ,_zeT("Storage Costs"),_zeT("VPS"),_zeT("BMU")
+                                ,_zeT("Costs"),_zeT("VPS"),_zeT("BMU")
                             ));	
                         } else {
                             $table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
                                 ,_("History"),_("Trends"),_("Status")
-                                ,_zeT("History Costs"),_zeT("Trends Costs")
-                                ,_zeT("Storage Costs"),_zeT("VPS"),_zeT("BMU")
+                                ,_zeT("History"),_zeT("Trends")
+                                ,_zeT("Storage"),_zeT("VPS"),_zeT("BMU")
                             ));	
                         }
                         break;			
