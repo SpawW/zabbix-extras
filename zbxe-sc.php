@@ -236,7 +236,7 @@ INNER JOIN hosts_groups hgr
                         // Cabeçalho do relatorio HTML
                         if ($view == "G") {
                             $table->setHeader(array(_("Host"),_zeT("History Costs"),_zeT("Trends Costs")
-                                ,_zeT("Costs"),_zeT("VPS"),_zeT("BMU")
+                                ,_zeT("Storage"),_zeT("VPS"),_zeT("BMU")
                             ));	
                         } else {
                             $table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
