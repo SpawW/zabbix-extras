@@ -51,6 +51,7 @@
             $fatorHost  = 0.12;
             // Transformando de bytes para GB
             $gb = round($gb/1024/1024/1000,4);
+            //var_dump(array("gb" => $gb, "vps" => $vps));
             //return ($gb/1024/1024);
             return round ((($vps*100/$refVPS)/100*$fatorVPS)+(($gb*100/$refGB)/100*$fatorGB)+$fatorHost,2);
         }
@@ -279,7 +280,7 @@ INNER JOIN hosts_groups hgr
                         $table->addRow(array('Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
                             ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps',$ubmTotal));
                     } else {
-                        var_dump($vpsTotal);
+                        //var_dump($vpsTotal);
                         $table->addRow(array($descricao,'Total',$historyTotal.$linhasDesc,$trendTotal.$linhasDesc
                             ,convert_units(array('value' => $storageTotal,'units' => 'B')),(float) $vpsTotal.' vps'),$ubmTotal);
                     }
