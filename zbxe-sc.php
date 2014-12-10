@@ -235,13 +235,13 @@ INNER JOIN hosts_groups hgr
                     case 'html';
                         // Cabeçalho do relatorio HTML
                         if ($view == "G") {
-                            $table->setHeader(array(_("Host"),_zeT("History"),_zeT("Trends")
+                            $table->setHeader(array(_("Host"),_("History"),_("Trends")
                                 ,_zeT("Storage"),_zeT("VPS"),_zeT("BMU")
                             ));	
                         } else {
                             $table->setHeader(array(_("Host"),_("Item"),_("Key"),_("Delay")
                                 ,_("History"),_("Trends"),_("Status")
-                                ,_zeT("History"),_zeT("Trends")
+                                ,_("History"),_("Trends")
                                 ,_zeT("Storage"),_zeT("VPS"),_zeT("BMU")
                             ));	
                         }
