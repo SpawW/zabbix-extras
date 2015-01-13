@@ -5,9 +5,11 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1.2";
+VERSAO_INST="2.1.3";
 UPDATEBD="S";
 BRANCH="ZE2.1";
+# Change Log
+# 2.1.3 - Adicao do suporte ao Oracle enterprise Linux
 
 registra() {
     [ -d ${TMP_DIR} ] || mkdir ${TMP_DIR}
@@ -210,7 +212,7 @@ identificaDistro() {
         fi
     fi
     case $LINUX_DISTRO in
-	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse" | "opensuse" | "amazon" )
+	"ubuntu" | "debian" | "red hat" | "red" | "centos" | "opensuse" | "opensuse" | "amazon" | "oracle" )
             CAMINHO_RCLOCAL="/etc/rc.local";
             registra "Versao do Linux - OK ($LINUX_DISTRO - $LINUX_VER)"
             ;;
