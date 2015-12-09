@@ -456,7 +456,12 @@ $csv_disabled = true;
 if (empty($firstEvent)) {
     $starttime = null;
     $events = array();
-    $paging = getPagingLine($events);
+    if (versaoZabbix() < 241) {
+        $paging = getPagingLine($events);
+    } else {
+        $paging = getPagingLine($events, "ASC");
+    }
+//to_2.4.7    $paging = getPagingLine($events);
 } else {
     $config = select_config();
     $firstEvent = reset($firstEvent);
@@ -474,7 +479,12 @@ if (empty($firstEvent)) {
         );
         $dsc_events = API::Event()->get($options);
 
-        $paging = getPagingLine($dsc_events);
+        if (versaoZabbix() < 241) {
+            $paging = getPagingLine($dsc_events);
+        } else {
+            $paging = getPagingLine($dsc_events, "ASC");
+        }
+//to_2.4.7        $paging = getPagingLine($dsc_events);
 
         $options = array(
             'source' => EVENT_SOURCE_DISCOVERY,
@@ -795,7 +805,12 @@ if (empty($firstEvent)) {
             }
             /* fim adail */
             // get pagging
-            $paging = getPagingLine($report);
+            if (versaoZabbix() < 241) {
+                $paging = getPagingLine($report);
+            } else {
+                $paging = getPagingLine($report, "ASC");
+            }
+//to_2.4.7            $paging = getPagingLine($report);
         } else {
             $table->setHeader(array(
                 _('Time'),
@@ -870,7 +885,7 @@ if (empty($firstEvent)) {
                 } else {
                     $paging = getPagingLine($events, "ASC");
                 }
-
+//to_2.4.7                    $paging = getPagingLine($events);
                 // query event with extend data
                 $options = array(
                     'nodeids' => (versaoZabbix() < 240 ? get_current_nodeid() : 0),
@@ -1016,7 +1031,12 @@ if (empty($firstEvent)) {
                 }
             } else {
                 $events = array();
-                $paging = getPagingLine($events);
+                if (versaoZabbix() < 241) {
+                    $paging = getPagingLine($events);
+                } else {
+                    $paging = getPagingLine($events, "ASC");
+                }
+//to_2.4.7                $paging = getPagingLine($events);
             }
         }
 // aqui
