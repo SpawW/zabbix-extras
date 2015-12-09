@@ -5,9 +5,9 @@
 INSTALAR="N";
 AUTOR="the.spaww@gmail.com";
 TMP_DIR="/tmp/upgZabbix";
-VERSAO_INST="2.1.3";
+VERSAO_INST="2.1.4";
 UPDATEBD="S";
-BRANCH="ZE2.1";
+BRANCH="ZE2.1.1";
 # Change Log
 # 2.1.3 - Adicao do suporte ao Oracle enterprise Linux
 
